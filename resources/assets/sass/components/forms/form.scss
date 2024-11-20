@@ -1,0 +1,15 @@
+.form-group.required .control-label:after {
+  content: "*";
+  color: red;
+  position: absolute;
+  margin-left: 5px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: normal;
+  font-size: 16px;
+}
+
+.range_sports_wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+}

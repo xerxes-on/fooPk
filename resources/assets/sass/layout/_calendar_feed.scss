@@ -1,0 +1,28 @@
+.calendar-wrapper.horizontal .calendar-item.active a {
+  background: red;
+}
+
+.calendar-item-label {
+  text-align: center;
+}
+
+.crop-text {
+  display: block;
+  overflow: hidden;
+  //white-space: nowrap;
+  //text-overflow: ellipsis;
+  //width: 100px;
+}
+
+.calendar-wrapper.horizontal {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.recipe-feed-wrapper {
+  height: 500px;
+  overflow-y: scroll;
+  margin-top: 40px;
+}

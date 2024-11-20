@@ -1,0 +1,95 @@
+///*Extra small devices (portrait phones, less than 320px)*/
+//@media (max-width: 320px) {}
+//
+///*Extra small devices (portrait phones, less than 360px)*/
+//@media (max-width: 360px) {}
+//
+///*Extra small devices (portrait phones, less than 375px)*/
+//@media (max-width: 375px) {}
+//
+///*Extra small devices (portrait phones, less than 414px)*/
+//@media (max-width: 414px) {}
+
+/*Extra small devices (portrait phones, less than 576px)*/
+@media (max-width: 575.98px) {
+  .das h1 {
+    font-size: 22px;
+    margin-bottom: 40px;
+  }
+  .header_top {
+    background-position: center;
+
+    h2 {
+      font-size: 22px;
+      margin-bottom: 15px;
+    }
+
+    p {
+      width: 100%;
+    }
+  }
+
+  .priching .p_body .media {
+    padding: 6px 20px;
+  }
+
+  .priching .p_footer a {
+    font-size: 13px;
+  }
+
+  .footer_top p {
+    font-size: 17px;
+    width: 100%;
+    margin: auto;
+  }
+}
+
+/*Small devices (landscape phones, 576px and up)*/
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .priching .priching_inner {
+    width: 75%;
+    margin: auto;
+  }
+
+  .header_bottom {
+    width: 70%;
+    margin: auto;
+  }
+
+  .das h1 {
+    font-size: 28px;
+    margin-bottom: 50px;
+  }
+}
+
+/*Medium devices (tablets, 768px and up)*/
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .header_bottom {
+    width: 60%;
+    margin: auto;
+  }
+
+  .footer_top p {
+    width: 100%;
+  }
+}
+
+/*Large devices (desktops, 992px and up)*/
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .header_bottom {
+    width: 45%;
+    margin: auto;
+  }
+}
+
+///*Extra large devices (large desktops, 1200px and up)*/
+//@media (min-width: 1200px) and (max-width: 1339.98px) {}
+//
+///*Extra large devices (large desktops, 1440px and up)*/
+//@media (min-width: 1440px) and (max-width: 1699.98px) {}
+//
+///*Extra large devices (large desktops, 1440px and up)*/
+//@media (min-width: 1700px) and (max-width: 2099.98px) {}
+//
+///*Extra large devices (large desktops, 1440px and up)*/
+//@media (min-width: 2100px) {}

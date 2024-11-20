@@ -1,0 +1,24 @@
+.table-wrapper {
+  //margin: 10px 0 0 0;
+  box-shadow: 0 5px 50px rgba(0, 0, 0, 0.2);
+  border-radius: 15px;
+  overflow: auto;
+  padding: 10px 5px 5px;
+  margin-bottom: 8px;
+}
+
+@import "default-overrides";
+@import "main";
+
+// Table ingredient
+.ingredient-amount {
+  //style="width:70px"
+  border-radius: 15px !important;
+}
+
+.empty-ingredient:not(#lorem) {
+  width: 100%;
+}
+
+@import "totals";
+@import "goals";

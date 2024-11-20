@@ -1,0 +1,8 @@
+.icons-identity {
+  display: flex;
+  align-items: center;
+
+  &-item, &-item-image {
+    margin-right: 5px;
+  }
+}

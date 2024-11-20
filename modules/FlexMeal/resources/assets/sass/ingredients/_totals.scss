@@ -1,0 +1,22 @@
+.ingredient-total:not(#lorem) {
+  td {
+    &:first-child {
+      background: $tiffany;
+    }
+
+    &:not(:first-child) {
+      border-top-color: $tiffany;
+      border-left-width: 0;
+      border-bottom-color: $tiffany;
+      border-right-width: 0;
+    }
+
+    &:nth-child(2) {
+      border-left-color: $tiffany;
+    }
+
+    &:last-child {
+      border-right-color: $tiffany;
+    }
+  }
+}

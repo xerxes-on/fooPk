@@ -1,0 +1,24 @@
+.owl-carousel .owl-item {
+  text-align: center;
+}
+
+.owl-carousel .calendar-item.rounded a,
+.calendar-wrapper.horizontal .calendar-item.rounded a {
+  font-family: Arial, Helvetica, sans-serif;
+  width: 50px;
+  height: 50px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  line-height: 50px;
+}
+
+.owl-carousel .calendar-item.disabled a,
+.calendar-wrapper.horizontal .calendar-item.disabled a {
+  background-color: #ccc;
+}

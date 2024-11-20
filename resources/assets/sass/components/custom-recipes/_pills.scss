@@ -1,0 +1,37 @@
+.own-recipe_pills {
+  display: inline-block;
+  background: $light-pink;
+  border-radius: 10px;
+
+  li {
+    display: inline-block;
+    background: $light-pink;
+    padding: 10px 15px;
+    color: $black;
+    border-radius: 10px;
+    text-transform: capitalize;
+
+    a {
+      color: $black;
+      text-decoration: none;
+    }
+
+    &.active {
+      background: $pink;
+      color: $white;
+
+      a {
+        color: $white;
+        text-decoration: none;
+      }
+
+      &:hover {
+        cursor: default;
+      }
+    }
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}

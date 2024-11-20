@@ -1,0 +1,13 @@
+// hide delete icon for root element
+li.dd-item .dd3-content .btn-delete {
+  display: none;
+}
+
+// TODO: OMG...WTF is with selector? is there another way of doing that?
+li.dd-item li.dd-item li.dd-item .dd3-content .btn-delete {
+  display: block;
+}
+
+.dd-item > button:not(#lorem) {
+  left: 0;
+}

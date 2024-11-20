@@ -1,0 +1,30 @@
+.flexmeal-name-group {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 10px;
+
+  &-label {
+    color: $white;
+    background: $pink;
+    padding: 10px 10px;
+    margin-right: 5px;
+    font-weight: bold;
+    font-size: 13px;
+    max-width: 110px;
+    min-width: 80px;
+    border-radius: 10px;
+    border: none;
+  }
+
+  &-input {
+    width: 75%;
+    font-size: 14px;
+    padding: 6px 12px;
+    margin: auto;
+    border: 2px solid $tiffany;
+    border-radius: 4px;
+    box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+  }
+}

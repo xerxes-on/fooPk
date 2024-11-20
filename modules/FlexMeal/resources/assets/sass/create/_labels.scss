@@ -1,0 +1,66 @@
+.ingestion-label {
+  display: block;
+
+  &::before {
+    content: '';
+    display: block;
+    height: 200px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: relative;
+    opacity: 0.6;
+  }
+
+  &:not(&-active):hover {
+    cursor: pointer;
+  }
+
+  &:hover, &-active {
+    &::before {
+      opacity: 0.8;
+    }
+
+    .ingestion-label-text {
+      background-color: #e6007e;
+      color: $white;
+    }
+  }
+
+  &-breakfast::before {
+    background-image: url('/images/breakfast.jpg');
+  }
+
+  &-lunch::before {
+    background-image: url('/images/lunch.jpg');
+  }
+
+  &-dinner::before {
+    background-image: url('/images/dinner.jpg');
+  }
+
+  &-breakfast-big::before {
+    background-image: url('/images/breakfast_1.jpg');
+  }
+
+  &-lunch-big::before {
+    background-image: url('/images/lunch_1.jpg');
+  }
+
+  &-dinner-big::before {
+    background-image: url('/images/dinner_1.jpg');
+  }
+
+  &-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    background-color: $light-pink;
+    font-size: 16px;
+    padding: 10px 15px;
+    text-transform: capitalize;
+    font-weight: 400;
+  }
+}

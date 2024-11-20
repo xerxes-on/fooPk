@@ -1,0 +1,33 @@
+.btn-header-group {
+  display: flex;
+  align-items: center;
+
+  @media screen and (min-width: 992px) {
+    max-height: 80px;
+
+    &::before {
+      content: '';
+      display: block;
+      min-height: 63px;
+      height: 100%;
+      width: 1.5px;
+      margin-right: 23px;
+      background-color: $black;
+    }
+  }
+  @media screen and (max-width: 991px) {
+    padding: 15px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid $theme-gray;
+    margin-bottom: 15px;
+  }
+
+  &-item {
+    @media screen and (max-width: 991px) {
+      flex-basis: calc(50% - 26px);
+      text-align: center;
+    }
+    margin-left: 9px;
+    margin-right: 9px;
+  }
+}

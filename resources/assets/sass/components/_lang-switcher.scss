@@ -1,0 +1,51 @@
+.lang {
+  background-color: $white;
+  border-radius: 30px;
+  margin: 15px 0;
+  display: inline-block;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  color: $tiffany;
+  border: 1px solid $tiffany;
+  transition: all 0.4s ease;
+
+  a {
+    color: $tiffany;
+
+    &:hover,
+    &:focus {
+      color: $tiffany;
+    }
+  }
+
+  &:hover {
+    background-color: $tiffany;
+    color: $white;
+
+    a {
+      color: $white;
+    }
+  }
+
+  .dropdown-menu {
+    background-color: $white;
+    border-radius: 30px;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    color: $tiffany;
+    border: 1px solid $tiffany;
+    transition: all 0.4s ease;
+    width: auto;
+    min-width: unset;
+
+    a {
+      color: $black;
+      padding: 4px 9px !important;
+      border-radius: 30px;
+
+      &:hover {
+        color: $tiffany;
+      }
+    }
+  }
+}

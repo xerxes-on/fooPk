@@ -1,0 +1,126 @@
+.main_goal-radio {
+
+  .main_goal-radio-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 100%;
+
+    &-item {
+      width: 33%;
+      padding: 5px 5px;
+
+      @include mobile {
+        width: 50%;
+        padding: 3px 3px;
+      }
+
+      @include tablet {
+        width: 33%;
+      }
+    }
+  }
+
+  &-input {
+    display: none;
+
+    &:checked ~ label {
+      background: #84cdd5;
+
+      &:after {
+        display: none;
+      }
+
+      &:before {
+        visibility: visible;
+      }
+    }
+  }
+
+  .main_goal-radio-label {
+    border-radius: 10px;
+    padding: 60% 15px 15px 15px;
+    box-shadow: 0 2px 52px -36px rgba(0, 0, 0, 0.75);
+    height: 100%;
+    width: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    overflow: hidden;
+    position: relative;
+    transition: all 0.4s ease;
+    cursor: pointer;
+
+    &::before {
+      content: "";
+      width: 30px;
+      height: 30px;
+      position: absolute;
+      top: 25px;
+      right: 14px;
+      color: #FFFFFF;
+      z-index: 9999;
+      background-image: url(../images/icons/checkmark.svg);
+      visibility: hidden;
+    }
+
+    &::after {
+      content: "";
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background-color: rgba(0, 0, 0, 0.3);
+    }
+
+
+    &-desc {
+      font-size: 21px;
+      line-height: 26px;
+      padding-right: 10px;
+      position: absolute;
+      bottom: 15px;
+      left: 15px;
+      z-index: 10;
+      color: #ffffff;
+      font-weight: 600;
+
+      @include mobile {
+        font-size: 16px;
+        line-height: 18px;
+      }
+
+      @include tablet {
+        line-height: 18px;
+        left: 10px;
+        font-size: 16px;
+      }
+    }
+
+  }
+
+  .lose_weight {
+    background-image: url("../images/backgrounds/girl.jpg");
+  }
+
+  .healthy_weight {
+    background-image: url("../images/backgrounds/more_defined.jpg");
+  }
+
+  .improve_fitness {
+    background-image: url("../images/backgrounds/jump.jpg");
+  }
+
+  .improve_health {
+    background-image: url("../images/backgrounds/orang.jpg");
+  }
+
+  .gain_weight {
+    background-image: url("../images/backgrounds/increase.jpg");
+  }
+
+  .build_muscle {
+    background-image: url("../images/backgrounds/muskull.jpg");
+  }
+}

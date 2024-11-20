@@ -1,0 +1,27 @@
+.btn-clear {
+  background-color: transparent;
+  border: none;
+}
+
+.btn-favorite {
+  &::after {
+    content: '';
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    background-repeat: no-repeat;
+    background-position: center center;
+  }
+}
+
+.btn-favorite-active::after {
+  background-image: url('/images/icons/ic_heart_active.svg');
+}
+
+.btn-favorite-dark::after {
+  background-image: url('/images/icons/ic_heart_black.svg');
+}
+
+.btn-favorite-light::after {
+  background-image: url('/images/icons/ic_heart.svg');
+}

@@ -1,0 +1,28 @@
+.footer_top {
+  padding: 20px 0;
+  background-color: rgb(0, 0, 0, .6);
+  color: #fff;
+
+  p {
+    margin-bottom: 0;
+    font-size: 18px;
+    width: 90%;
+    text-align: center;
+    margin: auto;
+  }
+}
+
+.footer_bottom {
+  background: rgb(255, 255, 255, .6);
+  padding: 20px 0;
+
+  a {
+    display: inline-block;
+    margin-right: 15px;
+    color: #212529;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}

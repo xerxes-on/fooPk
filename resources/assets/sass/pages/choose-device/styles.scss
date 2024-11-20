@@ -1,0 +1,250 @@
+@font-face {
+  font-family: 'Visby CF';
+  src: url('../fonts/visbyCF/VisbyCF-ExtraBold.eot');
+  src: local('Visby CF Extra Bold'), local('VisbyCF-ExtraBold'),
+  url('../fonts/visbyCF/VisbyCF-ExtraBold.eot?#iefix') format('embedded-opentype'),
+  url('../fonts/visbyCF/VisbyCF-ExtraBold.woff2') format('woff2'),
+  url('../fonts/visbyCF/VisbyCF-ExtraBold.woff') format('woff'),
+  url('../fonts/visbyCF/VisbyCF-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'TT Norms Pro';
+  src: url('../fonts/ttNormsPro/TTNormsPro-Medium.eot');
+  src: local('TT Norms Pro Medium'), local('TTNormsPro-Medium'),
+  url('../fonts/ttNormsPro/TTNormsPro-Medium.eot?#iefix') format('embedded-opentype'),
+  url('../fonts/ttNormsPro/TTNormsPro-Medium.woff2') format('woff2'),
+  url('../fonts/ttNormsPro/TTNormsPro-Medium.woff') format('woff'),
+  url('../fonts/ttNormsPro/TTNormsPro-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+body:not(#this-one) {
+  padding-top: 0;
+  background: linear-gradient(180deg, rgba(237, 246, 234, 0) 0%, rgba(255, 220, 208, 0.38) 52.08%, #FFDCD0 89.92%), #FFDCD0;
+
+  &:after {
+    content: "";
+    z-index: -1;
+    background: linear-gradient(180deg, rgba(237, 246, 234, 0) 0%, rgba(255, 220, 208, 0.38) 52.08%, #FFDCD0 89.92%), #FFDCD0;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    pointer-events: none;
+  }
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+.row {
+  position: relative;
+  overflow: hidden;
+}
+
+.page-title {
+  font-family: 'Visby CF', 'Arial', sans-serif;
+  font-weight: 800;
+  font-size: 1.3rem;
+  text-align: center;
+  padding-top: 4.4vw;
+}
+
+.stores-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.stores-links-item {
+  text-align: center;
+}
+
+.stores-links-image {
+  min-height: 46px;
+}
+
+.link-label {
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+
+.link-label::before {
+  content: url("data:image/svg+xml,%3Csvg width='36' height='18' viewBox='0 0 36 18' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M27.6094 1.5L35.0007 9L27.6094 16.5' stroke='black' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M35 9H1' stroke='black' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A");
+  padding-right: .8rem;
+}
+
+.link-label:hover {
+  text-decoration: none;
+}
+
+.link-label:hover:before {
+  animation: moove 10s linear 0s infinite normal forwards;
+}
+
+@keyframes moove {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  10%,
+  30%,
+  50%,
+  70% {
+    transform: translateX(-10px);
+  }
+
+  20%,
+  40%,
+  60% {
+    transform: translateX(10px);
+  }
+
+  80% {
+    transform: translateX(8px);
+  }
+
+  90% {
+    transform: translateX(-8px);
+  }
+}
+
+.link-label-text {
+  font-family: 'TT Norms Pro', 'Arial', sans-serif;
+  font-weight: 500;
+  line-height: 1.77;
+  letter-spacing: 0.19px;
+  text-transform: uppercase;
+  font-size: .9rem;
+  color: #D52F89;
+}
+
+.text-decor {
+  position: absolute;
+  left: -25px; /* 15 container + 10 letter spacing */
+  top: 45vh;
+  font-family: "Visby CF", 'Arial', sans-serif;
+  font-weight: 700;
+  font-size: 29vw;
+  line-height: 63px;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  opacity: 0.2;
+  z-index: -1;
+}
+
+.image-group-mobile {
+  display: none;
+}
+
+.desktop-fullscreen {
+  height: 100vh;
+}
+
+@media screen and (min-width: 768px) {
+  .page-title {
+    font-size: calc(100vw * 2 / 100);
+    /*font-size: 1.4em;*/
+    line-height: 1.618;
+    max-width: 80%;
+    margin: auto;
+    padding-bottom: 3vw;
+  }
+
+  .col-equal-height:not(#this-page) {
+    min-height: 60vh;
+    max-height: 70vh;
+  }
+
+  .stores-links-item {
+    margin-bottom: .72rem;
+  }
+
+  .image-group-main, .two-phones {
+    height: 80%;
+    //aspect-ratio: 1/1;
+    object-fit: contain;
+  }
+
+  .stores-links-image {
+    max-height: 63px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+
+  .page-title {
+    padding-bottom: 1rem;
+    padding-top: 4vh;
+    font-size: 1.45rem;
+    line-height: 1.1;
+    position: relative;
+    z-index: 9;
+  }
+
+  .mobile-stick-to-bottom:not(#lorem) {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    z-index: 3;
+  }
+
+  .stores-links {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .stores-links-item {
+    width: calc(50% - 9px);
+    /*margin-bottom: 16px;*/
+    flex-grow: 1;
+  }
+
+  .stores-links-item:first-of-type {
+    margin-right: 9px;
+  }
+
+  .link-label {
+    flex-grow: 1;
+    justify-content: center;
+    padding-top: 10px;
+    padding-bottom: 20px;
+  }
+
+  .image-group-mobile {
+    display: block;
+    height: 64px;
+    width: 64px;
+    margin: 0 auto 4vw;
+  }
+
+  .two-phones {
+    max-height: 75vh;
+  }
+
+  .image-group-main {
+    height: 60vh;
+    aspect-ratio: 1/1;
+    object-fit: contain;
+  }
+
+  .mobile-stick-right:not(#lorem) {
+    position: absolute;
+    right: -7%;
+    bottom: 0;
+  }
+
+  .link-label-text {
+    font-size: 5vw;
+  }
+}

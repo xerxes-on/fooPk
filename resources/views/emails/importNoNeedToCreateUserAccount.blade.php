@@ -1,0 +1,1 @@
+Order with ID:{{ $order['order_id'] }} made by user {{ $order['first_name'] .' '.$order['last_name']  }} no need to create user account, current plan_id = "{{$order['plan_id']}}", user email = "{{ $order['email'] }}"

@@ -1,0 +1,58 @@
+// Component is very specific. So to fortify it we use increase specify selector
+.add-ingredient:not(#lorem) {
+  border: none;
+  background: transparent;
+}
+
+.add-ingredient-column:not(#lorem) {
+  background: transparent;
+  border: none;
+  //background-color: transparent;
+}
+
+.add-ingredient-button:not(#lorem) {
+  padding: 10px;
+  font-size: 14px;
+  min-width: 80px;
+  max-width: 160px;
+  text-align: center;
+  color: #000;
+  border-style: none;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  background: $theme-gray;
+  border-radius: 15px;
+
+  &:before {
+    content: '';
+    display: block;
+    width: 25px;
+    height: 25px;
+    margin: auto;
+    background: url('/images/plus.png') no-repeat center/cover;
+  }
+}
+
+.ingredient:not(#lorem) td {
+  vertical-align: middle;
+}
+
+.ingredient-amount {
+  border-left: 1px solid $black;
+}
+
+.ingredient-amount-input {
+  border: none;
+  border-radius: 25px;
+}
+
+.btn-with-icon-trash {
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+
+  &:before {
+    content: "\f1f8";
+  }
+}

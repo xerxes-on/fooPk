@@ -1,0 +1,19 @@
+# Definition file for AWS CodeDeploy
+
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /srv/foodpunk_laravel_v2/
+permissions:
+  - object: /srv/foodpunk_laravel_v2/
+    owner: www-data
+    group: www-data
+    type:
+      - file
+      - directory
+hooks:
+  BeforeInstall:
+    - location: scripts/deployment/codedeploy-prepare.sh
+  AfterInstall:
+    - location: scripts/deployment/codedeploy-setup-app.sh

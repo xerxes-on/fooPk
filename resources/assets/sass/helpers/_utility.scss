@@ -1,0 +1,81 @@
+.d-flex {
+  display: flex;
+}
+
+.flex-grow {
+  flex-grow: 1;
+}
+
+.my-6px {
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+
+.mobile-hidden {
+  @media screen and (max-width: 767px) {
+    display: none;
+  }
+}
+
+.p-l0 {
+  padding-left: 0;
+}
+
+.p-r0 {
+  padding-right: 0;
+}
+
+.laptop-hidden {
+  @media screen and (min-width: 768px) {
+    display: none;
+  }
+}
+
+.font-07 {
+  font-size: 0.77rem !important;
+}
+
+.font-12 {
+  font-size: 1.2rem !important;
+}
+
+.border-x {
+  border-right: 1px solid #000;
+  border-left: 1px solid #000;
+}
+
+.text-white {
+  color: $white !important;
+}
+
+.borderless {
+  border: 0 !important;
+}
+
+.w-50 {
+  width: 50%;
+}
+
+.mr-0 {
+  margin-right: 0 !important;
+}
+
+.mr-5 {
+  margin-right: 5px;
+}
+.mr-10 {
+  margin-right: 10px;
+}
+
+.py-15 {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+.mb-0 {
+  margin-bottom: 0 !important;
+}
+
+.m-0 {
+  margin: 0 !important;
+}

@@ -1,0 +1,23 @@
+includes:
+    - ./vendor/nunomaduro/larastan/extension.neon
+
+parameters:
+
+    paths:
+        - app
+        - database/factories
+        - database/seeders
+        - routes
+        - tests
+        - resources/views
+
+    # The level 9 is the highest level
+    level: 9
+
+    ignoreErrors:
+        - '#PHPDoc tag @var#'
+
+    excludePaths:
+        - ./*/*/FileToBeExcluded.php
+
+    checkMissingIterableValueType: false

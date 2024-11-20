@@ -1,0 +1,29 @@
+// Variables
+@import "../../../../../resources/assets/sass/helpers/variables";
+
+// Components
+@import "../../../../../resources/assets/sass/components/buttons/btn-icon";
+@import "../../../../../resources/assets/sass/components/radio-tabs";
+
+/* Table Styles */
+.heading-text {
+  text-align: center;
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #000;
+}
+
+.flex-centered {
+  display: flex;
+  justify-content: center;
+}
+
+@import "create/name-input";
+@import "create/extra-data-input";
+@import "create/labels";
+@import "create/add-ingredients";
+@import "create/identity-items";
+
+@import "ingredients/archive-label";
+@import "ingredients/ingredients-table";

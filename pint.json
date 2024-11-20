@@ -1,0 +1,17 @@
+{
+  "preset": "psr12",
+  "rules": {
+    "declare_strict_types": true,
+    "combine_consecutive_issets": true,
+    "combine_consecutive_unsets": true,
+    "function_declaration": {
+      "closure_fn_spacing": "none"
+    },
+    "binary_operator_spaces": {
+      "operators": {
+        "=>": "align_single_space_minimal",
+        "=": "align_single_space_minimal"
+      }
+    }
+  }
+}

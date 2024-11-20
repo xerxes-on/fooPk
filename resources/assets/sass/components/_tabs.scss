@@ -1,0 +1,43 @@
+.tabs {
+  display: inline-block;
+  background-color: $light-pink;
+  border-radius: 10px;
+
+  li {
+    display: inline-block;
+
+    a {
+      display: inline-block;
+      padding: 10px 15px;
+      color: $black;
+      border-radius: 10px;
+      border: 1px solid $pink;
+      text-transform: capitalize;
+      background-color: $light-pink;
+      text-decoration: none;
+      font-weight: normal;
+      font-size: 16px;
+
+      &:hover,
+      &:focus {
+        cursor: pointer;
+        color: $black;
+        text-decoration: none;
+      }
+    }
+
+    &.active {
+      a {
+        color: $white;
+        background-color: $pink;
+
+      }
+    }
+
+    &:hover {
+      a {
+        text-decoration: none;
+      }
+    }
+  }
+}

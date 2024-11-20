@@ -1,0 +1,31 @@
+.own-recipe_name {
+  height: 240px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background-image: url("/images/kit_pic.png");
+  background-size: cover;
+  background-position: center center;
+  border-radius: 10px;
+  margin-bottom: 15px;
+
+  &_form {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    padding: 10px 15px;
+
+    input {
+      background: transparent;
+      border: 0;
+      width: 100%;
+      color: #fff;
+
+      &:focus {
+        outline: 0;
+        box-shadow: none;
+      }
+    }
+  }
+}

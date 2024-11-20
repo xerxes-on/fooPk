@@ -1,0 +1,470 @@
+@import "../components/buttons/link-icon";
+@import "../components/buttons/btn-icon";
+@import "../components/buttons/purchase";
+
+.shopping-list {
+  &_panel {
+    background: $light-pink;
+    padding: 15px 10px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    min-height: 138px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+
+    &_title {
+      font-size: 14px;
+      line-height: 1.33;
+      font-weight: bold;
+      text-align: left;
+      color: $black;
+      text-transform: uppercase;
+    }
+
+    &_content {
+      margin-top: 10px;
+      min-height: 80px;
+
+      &_half {
+        width: 50%;
+        float: left;
+        padding-right: 10px;
+
+        .input-group {
+          width: 100%;
+        }
+      }
+
+      &_label {
+        font-weight: 400;
+        color: $black;
+        text-transform: uppercase;
+        font-size: 12px;
+      }
+
+      &_input {
+        background-color: $white;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        text-indent: 1px;
+        text-overflow: '';
+        border-radius: 10px 0 0 10px;
+        height: 42px;
+        min-width: 80px;
+        padding: 10px 0 10px 10px;
+        border: 0;
+        box-shadow: none;
+        width: 100%;
+        font-size: 16px;
+        color: #777777;
+        text-transform: none;
+      }
+
+      &_calendar {
+        width: 40px;
+        border-radius: 0 10px 10px 0;
+        padding-right: 0;
+        padding-left: 0;
+        background-color: $white;
+        border: 0;
+        box-shadow: none;
+        cursor: pointer;
+      }
+    }
+  }
+
+  &_recipes {
+    &_item {
+      border-radius: 10px;
+      background-color: $light-pink;
+      display: flex;
+      flex-direction: row;
+      margin-bottom: 10px;
+      position: relative;
+
+      &_img {
+        height: 110px;
+        width: 110px;
+        display: inline-block;
+        margin-right: 15px;
+        border-radius: 10px;
+        box-shadow: 0 2px 7px 0 rgba(0, 0, 0, 0.1);
+
+        img {
+          height: 110px;
+          width: 110px;
+          object-fit: cover;
+          border-radius: 10px;
+          overflow: hidden;
+        }
+      }
+
+      &_info {
+        overflow: hidden;
+        width: 100%;
+
+        &_title {
+          margin-top: 15px;
+          display: block;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          width: 90%;
+          font-size: 21px;
+          font-weight: bold;
+          line-height: 1.33;
+          text-align: left;
+          color: $black;
+          margin-bottom: 5px;
+
+          &:hover {
+            color: $black;
+          }
+        }
+
+        &_type {
+          font-size: 12px;
+          line-height: 1.33;
+          text-align: left;
+          color: $black;
+          text-transform: uppercase;
+        }
+      }
+
+      &_right {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        display: flex;
+        align-items: center;
+
+        &_label {
+          background-color: $white;
+          padding: 5px 8px;
+          border-radius: 6px;
+          display: inline-block;
+          font-size: 15px;
+          text-align: left;
+          color: $black;
+          font-weight: 400;
+          margin: 3px;
+          line-height: 24px;
+          height: 34px;
+          white-space: nowrap;
+          float: right;
+
+          &_rounded {
+            margin-left: 10px;
+            height: 40px;
+            width: 40px;
+            border-radius: 100%;
+            line-height: 38px;
+            text-align: center;
+            padding: 0;
+            cursor: pointer;
+            background-color: $white;
+            transition: all 0.4s ease;
+
+            &:hover {
+              cursor: pointer;
+              box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+            }
+
+            &.ingredient-delete-anchor {
+              background-color: transparent;
+
+              &:before {
+                content: '';
+                display: block;
+              }
+            }
+          }
+        }
+
+        &_select {
+          background-color: $white;
+          -webkit-appearance: none;
+          -moz-appearance: none;
+          text-indent: 1px;
+          text-overflow: '';
+          border-radius: 10px;
+          height: 42px;
+          min-width: 80px;
+          padding: 10px;
+          border: 0;
+          line-height: 24px;
+          box-shadow: none;
+          background-image: url("/images/icons/ic_expand.svg");
+          background-repeat: no-repeat;
+          background-position: center right 10px;
+
+          &::-ms-expand {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+
+  &_recipes-group {
+    margin-bottom: 10px;
+    padding-top: 10px;
+
+    &-title {
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+  }
+
+  &_ingredients {
+    &_list {
+      margin: 0 0 20px;
+      padding: 0;
+      list-style-type: none;
+
+      &_item {
+        background-color: $light-pink;
+        padding: 8px;
+        border-radius: 6px;
+        font-size: 15px;
+        line-height: 1.33;
+        text-align: left;
+        color: $black;
+        text-transform: none;
+        margin-bottom: 10px;
+        position: relative;
+        display: flex;
+        align-items: center;
+
+        &_amount {
+          display: inline-block;
+          margin: 0 5px;
+          width: 70px;
+          font-weight: bold;
+        }
+
+        &_label {
+          margin-bottom: 0;
+          font-weight: normal;
+          flex-grow: 1;
+
+          .cross-line {
+            display: none;
+            height: 1px;
+            background-color: $black;
+            width: calc(100% - 25px);
+            position: absolute;
+            top: 50%;
+            right: -5px;
+          }
+        }
+
+        &_check {
+          &:checked,
+          &:not(:checked) {
+            position: absolute;
+            left: -9999px;
+
+            + .shopping-list_ingredients_list_item_label {
+              position: relative;
+              padding-left: 28px;
+              cursor: pointer;
+              line-height: 20px;
+              display: inline-block;
+              color: #666;
+
+              &:before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 18px;
+                height: 18px;
+                border: 2px solid $black;
+                border-radius: 100%;
+                background: $white;
+              }
+
+              &:after {
+                content: '';
+                width: 10px;
+                height: 10px;
+                background: $pink;
+                position: absolute;
+                top: 4px;
+                left: 4px;
+                border-radius: 100%;
+                -webkit-transition: all 0.2s ease;
+                transition: all 0.2s ease;
+              }
+            }
+          }
+
+          &:not(:checked) {
+            + .shopping-list_ingredients_list_item_label {
+              &:after {
+                opacity: 0;
+                -webkit-transform: scale(0);
+                transform: scale(0);
+              }
+            }
+          }
+
+          &:checked {
+            + .shopping-list_ingredients_list_item_label {
+              .cross-line {
+                display: block;
+              }
+
+              &:after {
+                opacity: 1;
+                -webkit-transform: scale(1);
+                transform: scale(1);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  &_archive {
+    &_item {
+      background-color: $light-pink;
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 15px;
+      line-height: 1.33;
+      text-align: left;
+      color: $black;
+      text-transform: none;
+      margin-bottom: 10px;
+      position: relative;
+
+      &_rename-wrapper {
+        width: 90%;
+
+        .control-block {
+          position: absolute;
+          right: 10px;
+          top: 10px;
+          opacity: 0.6;
+          transition: all 0.3s ease;
+
+          &:hover {
+            opacity: 1;
+            cursor: pointer;
+          }
+        }
+
+        input {
+          font-size: 24px;
+          font-weight: bold;
+        }
+      }
+
+      &_date {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 5px;
+        display: block;
+        color: $black;
+
+        &:hover {
+          color: $black;
+        }
+      }
+
+      &_contains {
+        width: 90%;
+        font-size: 17px;
+        display: block;
+        color: $black;
+
+        &:hover {
+          color: $black;
+        }
+      }
+
+      &_remove {
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
+        opacity: 0.6;
+        transition: all 0.3s ease;
+
+        &:hover {
+          opacity: 1;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+}
+
+.shopping-list_panel_buttons {
+  .shopping-list_panel_content {
+    display: flex;
+    align-items: flex-end;
+
+    .btn {
+      margin-bottom: 8px;
+    }
+  }
+}
+
+.btn-with-icon-delete:before {
+  background-image: url('/images/icons/ic_delete.svg');
+  margin: auto;
+}
+
+.btn-with-icon-rename:before {
+  background-image: url('/images/icons/ic_edit_black.svg');
+}
+
+.btn-with-icon-cancel:before {
+  background-image: url('/images/icons/ic_close.svg');
+}
+
+.btn-with-icon-confirm:before {
+  background-image: url('/images/icons/ic_check.svg');
+}
+
+.link-with-icon-printer:before {
+  background-image: url('/images/icons/ic_printer_white.svg');
+}
+
+.link-with-icon-clear:before {
+  background-image: url('/images/icons/ic_clear.svg');
+}
+
+.link-with-icon-save:before {
+  background-image: url('/images/icons/ic_save.svg');
+}
+
+@media screen and (max-width: 991px) {
+  .shopping-list_panel_buttons {
+    min-height: auto;
+
+    .shopping-list {
+      &_panel {
+        &_content {
+          min-height: auto;
+          margin: 0;
+          padding: 5px 0;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .shopping-list_panel_buttons {
+    .shopping-list_panel_content {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+}

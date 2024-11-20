@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg" height="24" width="24">
+    <defs>
+        <path id="path-0" opacity="1" d="M0,0 L24,0 L24,24 L0,24 L0,0Z"/>
+        <path id="path-1" opacity="1"
+              d="M9,15 L9,17 L15,17 L15,15 L9,15ZM12,4 C16.42,4 20,7.58 20,12 C20,16.42 16.42,20 12,20 C7.58,20 4,16.42 4,12 C4,7.579999999999998 7.58,4 12,4 L12,4ZM11.99,2 C6.47,2 2,6.48 2,12 C2,17.52 6.47,22 11.99,22 C17.52,22 22,17.52 22,12 C22,6.4799999999999995 17.52,2 11.99,2 L11.99,2Z"/>
+        <ellipse id="ellipse-2" opacity="1" rx="1.5" ry="1.5" cx="15.5" cy="9.5"/>
+        <ellipse id="ellipse-3" opacity="1" rx="1.5" ry="1.5" cx="8.5" cy="9.5"/>
+    </defs>
+    <g opacity="1">
+        <g opacity="1">
+            <g/>
+            <g>
+                <use xlink:href="#path-1" fill="rgb(0,0,0)" fill-opacity="1"/>
+            </g>
+            <g>
+                <use xlink:href="#ellipse-2" fill="rgb(0,0,0)" fill-opacity="1"/>
+            </g>
+            <g>
+                <use xlink:href="#ellipse-3" fill="rgb(0,0,0)" fill-opacity="1"/>
+            </g>
+        </g>
+    </g>
+</svg>

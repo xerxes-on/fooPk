@@ -1,0 +1,22 @@
+@charset "UTF-8";
+
+body {
+  font-family: 'Lato', sans-serif;
+  font-weight: 400;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+}
+
+//.wrapper {
+//  background-image: url(../img/whitestraw.jpg);
+//  background-size: cover;
+//  background-repeat: no-repeat;
+//  background-position: center;
+//}
+
+@import "sections/header";
+@import "sections/main";
+@import "sections/footer";
+@import "media";

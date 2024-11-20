@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <defs>
+        <style>
+            .cls-1{fill:none}
+        </style>
+    </defs>
+    <g id="ic_blk_Shopping_Carg" data-name="ic / blk / Shopping Carg" transform="translate(-888 -27)">
+        <path id="Shape"
+              d="M12 4.6L15 9H9l3-4.4zm0 8.4a2 2 0 1 1-2 2 2.006 2.006 0 0 1 2-2zm0-10.98a.977.977 0 0 0-.83.43L6.79 9H2a1 1 0 0 0-1 1 .842.842 0 0 0 .04.27l2.54 9.27A1.989 1.989 0 0 0 5.5 21h13a2.01 2.01 0 0 0 1.93-1.46l2.54-9.27L23 10a1 1 0 0 0-1-1h-4.79l-4.38-6.56a.993.993 0 0 0-.83-.42z"
+              transform="translate(888.125 27)"/>
+        <path id="Bounds" d="M0 0h24v24H0z" class="cls-1" transform="translate(888 27)"/>
+    </g>
+</svg>

@@ -1,0 +1,6 @@
+@include('admin::recipe.rangesBlock')
+@include('admin::recipe.dietsBlock')
+@include('admin::recipe.ingredients')
+@include('admin::recipe.variableIngredients')
+@include('admin::recipe.calculatedVariableIngredients')
+@include('admin::recipe.steps')

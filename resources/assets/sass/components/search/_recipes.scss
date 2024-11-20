@@ -1,0 +1,370 @@
+// Recipes to search (all, buy)
+.search-recipes {
+  &_form {
+    margin: 15px 0 0;
+    width: 100%;
+    background: $light-pink;
+    border-radius: 10px;
+    padding: 1px 10px;
+
+    input {
+      background: transparent;
+      border: 0;
+      width: 100%;
+      color: $black;
+      box-shadow: none;
+      font-size: 16px;
+      font-weight: 300;
+      padding-left: 6px;
+      padding-right: 6px;
+
+      &:focus {
+        outline: 0;
+        box-shadow: none;
+      }
+    }
+
+    &_close_link {
+      display: inline-block;
+
+      &::before {
+        content: '';
+        display: block;
+        width: 30px;
+        height: 30px;
+        background: url('/images/icons/ic_close.svg') no-repeat center;
+      }
+    }
+
+    &_btn {
+      background-color: transparent;
+      border: 0;
+      outline: 0;
+
+      &::before {
+        content: '';
+        display: block;
+        width: 30px;
+        height: 30px;
+        background: url('/images/icons/ic_search.svg') no-repeat center;
+      }
+    }
+  }
+
+  &_label {
+    font-weight: 400;
+    color: $black;
+    text-transform: uppercase;
+    font-size: 10px;
+    margin-bottom: 0;
+    position: relative;
+    bottom: -3px;
+  }
+
+  &_select {
+    background-color: $light-pink;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-indent: 1px;
+    text-overflow: '';
+    border-radius: 10px;
+    height: 38px;
+    min-width: 80px;
+    padding: 6px 10px;
+    border: 0;
+    box-shadow: none;
+    background-image: url("/images/icons/ic_expand.svg");
+    background-repeat: no-repeat;
+    background-position: center right 5px;
+
+    &::-ms-expand {
+      display: none;
+    }
+  }
+
+  &_list {
+    margin: 30px 0;
+
+    &_item {
+      border-radius: 10px;
+      background-color: $light-pink;
+      display: flex;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+      position: relative;
+
+      &.invalid_recipe {
+        background-color: #f2dede;
+      }
+
+      &_img {
+        position: relative;
+        height: 150px;
+        //width: 110px;
+        //display: inline-block;
+        //margin-right: 15px;
+        box-shadow: 0 2px 7px 0 rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        z-index: 10;
+        flex: 0 0 150px;
+
+        img {
+          object-fit: cover;
+          max-width: 100%;
+          border-radius: 10px;
+        }
+
+        .recipe-locked {
+          //TODO: check it
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          border-radius: 10px;
+          background-color: rgba(10, 183, 181, 0.3);
+
+          &:not(.unlockable) {
+            cursor: pointer;
+            // unlockable lock
+          }
+
+          &::before {
+            content: '';
+            background: url('/images/icons/recipe-locked.svg') no-repeat center /cover;
+            height: 24px;
+            width: 24px;
+            margin: 5px 0;
+            opacity: .5;
+          }
+
+          .recipe-unlocked {
+            background: $pink;
+            color: white;
+            font-size: 14px;
+            line-height: 1.8em;
+            border-radius: 0 0 10px 10px;
+            padding: 0 5px;
+            text-align: center;
+          }
+        }
+      }
+
+      &_info {
+        overflow: hidden;
+        padding: 10px 15px;
+        flex-grow: 1;
+        flex-basis: calc(100% - 180px);
+        //width: 100%; //calc(100% - 340px);
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+
+        &_title {
+          //margin-top: 15px;
+          //display: block;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          font-size: 21px;
+          font-weight: bold;
+          line-height: 1.33;
+          color: $black;
+          margin-bottom: 5px;
+          @media (min-width: 768px) {
+            min-width: 350px;
+            flex: 0 1 calc(90% - 88px * 2); // 88 is a width of one vju star component
+          }
+          @media (max-width: 768px) {
+            min-width: 150px;
+            flex: 1 0 90%; // 88 is a width of one vju star component
+          }
+
+          &:hover {
+            color: $black;
+          }
+        }
+
+        &_wrap {
+          overflow: hidden;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex: 1 0 100%;
+          @media screen and (max-width: 768px) {
+            flex-wrap: wrap;
+          }
+          //flex: 1 0 calc(88px * 2);
+        }
+
+        &_cooking-time {
+          display: flex;
+          align-items: center;
+          //padding-top: 10px;
+          //flex: 1 0 100%;
+          white-space: nowrap;
+
+          &::before {
+            content: '';
+            background: url("/images/icons/ic_timer.svg") no-repeat center center /cover;
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+          }
+
+          &-invalid::before {
+            content: '';
+            background: url("/images/icons/ic_subtract.svg") no-repeat center center /cover;
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+          }
+
+          //&_time {
+          //  text-transform: uppercase;
+          //  font-size: 16px;
+          //  letter-spacing: normal;
+          //  text-align: left;
+          //  line-height: 24px;
+          //  color: rgba(0, 0, 0, 0.7);
+          //}
+
+          //&_favourites {
+          //  //float: right;
+          //  width: 24px !important;
+          //  height: 24px;
+          //}
+        }
+
+        &_type {
+          font-size: 12px;
+          line-height: 1.33;
+          //flex: 1 0 100%;
+          color: $black;
+          //padding-top: 10px;
+          //padding-bottom: 10px;
+          text-transform: uppercase;
+        }
+      }
+
+      &_right {
+        //position: absolute;
+        //top: 15px;
+        //right: 10px;
+        //width: 230px;
+
+        &_label {
+          background-color: $white;
+          padding: 5px;
+          border-radius: 6px;
+          color: $black;
+          text-transform: uppercase;
+          margin: 3px;
+          line-height: 24px;
+          white-space: nowrap;
+          //height: 34px;
+          //float: right;
+          //display: inline-block;
+          //font-size: 15px;
+          //text-align: left;
+          &_mobile {
+            padding: 5px 8px;
+            margin: 10px 15px;
+            //width: 100%;
+          }
+        }
+      }
+
+      &_footer {
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      &_ingredients {
+        margin: 10px;
+        font-size: 12px;
+        //width: 100%;
+      }
+    }
+  }
+}
+
+
+.recipe-diets {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.recipe-diets-item:not(:last-child)::after {
+  content: ',';
+  margin-right: 5px;
+}
+
+.recipe-diets-item:not(:last-child) {
+  margin-right: 5px;
+}
+
+@media screen and (max-width: 768px) {
+  .search-recipes {
+    &_list {
+      &_item {
+        //overflow: auto;
+        //display: block;
+        //padding-right: 10px;
+        /*padding-bottom: 65px;*/
+        //&_img {
+        //  float: left;
+        //  margin-right: 5px;
+        //  margin-left: 10px;
+        //  margin-top: 10px;
+        //}
+        //
+        &_info {
+          //width: calc(100% - 130px);
+
+          &_title {
+            //width: 100%;
+            font-size: 18px;
+          }
+        }
+
+        &_right {
+          //display: none;
+          //width: 96%;
+          //right: unset;
+          //left: 10px;
+          //bottom: 3px;
+
+          &_label {
+            //float: left;
+            //padding: 3px 6px;
+            font-size: 13px;
+            line-height: 24px;
+            //height: 30px;
+            //max-width: 100%;
+            //overflow: auto;
+
+            //&:nth-child(1) {
+            //  float: right;
+            //}
+            //
+            //&:nth-child(2) {
+            //  float: right;
+            //  clear: right;
+            //}
+          }
+        }
+
+        //&_ingredients {
+        //  float: left;
+        //}
+      }
+    }
+  }
+}

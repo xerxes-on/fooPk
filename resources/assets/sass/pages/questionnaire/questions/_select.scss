@@ -1,0 +1,56 @@
+.exclude_ingredients {
+
+  .exclude_ingredients-select {
+    @include mobile {
+      margin-top: 25px;
+    }
+
+    .dropdown-toggle {
+      background: #EFEFEF;
+      padding: 15px 15px 15px 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 52px -36px rgba(0, 0, 0, 0.75);
+      font-size: 14px;
+      border: none;
+
+      .selected-tag {
+        padding: 6px 10px;
+        border-radius: 8px;
+
+        .close {
+          margin-left: 6px;
+          font-size: 25px;
+          color: #262626;
+          opacity: 1;
+
+          &:hover {
+            opacity: .2;
+          }
+        }
+      }
+    }
+
+    .dropdown-menu {
+      display: block;
+      background: #EFEFEF;
+      border-radius: 0 0 10px 10px;
+      box-shadow: 0 2px 52px -36px rgba(0, 0, 0, 0.75);
+      font-size: 14px;
+      border: none;
+
+      .active {
+        color: #FFFFFF;
+        background: #6CC4CD;
+      }
+
+      li a {
+        padding: 15px 15px 15px 15px;
+      }
+
+      .highlight a {
+        background: #6CC4CD;
+        color: #FFFFFF;
+      }
+    }
+  }
+}

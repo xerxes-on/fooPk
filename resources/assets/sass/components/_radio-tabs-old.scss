@@ -1,0 +1,46 @@
+// TODO: remove and rewrite
+.radio-tabs {
+  display: inline-block;
+  background-color: $light-pink;
+  border-radius: 10px;
+
+  label {
+    float: left;
+    margin-bottom: 0;
+  }
+
+  input[type=radio] {
+    display: none;
+  }
+
+  input[type=radio] + label {
+    display: inline-block;
+    padding: 10px 15px;
+    color: #000;
+    border-radius: 0;
+    text-transform: capitalize;
+    background-color: $light-pink;
+    font-weight: normal;
+    font-size: 16px;
+
+    &:first-of-type {
+      border-radius: 10px 0 0 10px;
+    }
+
+    &:last-of-type {
+      border-radius: 0 10px 10px 0;
+    }
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  input[type=radio]:checked + label {
+    outline: 0;
+    color: $white;
+    background-color: $pink;
+    border-radius: 10px;
+  }
+}
+

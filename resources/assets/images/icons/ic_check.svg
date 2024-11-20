@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg" height="24" width="24">
+    <defs>
+        <path id="path-0" opacity="1" d="M0,0 L24,0 L24,24 L0,24 L0,0Z"/>
+        <path id="path-1" opacity="1"
+              d="M8.999999999999929,16.170000000000073 L4.829999999999929,12.000000000000071 L3.409999999999929,13.410000000000071 L8.999999999999929,19.00000000000007 L20.99999999999993,7.000000000000072 L19.58999999999993,5.590000000000072 L8.999999999999929,16.170000000000073Z"/>
+    </defs>
+    <g opacity="1">
+        <g opacity="1">
+            <g opacity="1"/>
+            <g opacity="1">
+                <use xlink:href="#path-1" fill="rgb(0,0,0)" fill-opacity="1"/>
+            </g>
+        </g>
+    </g>
+</svg>

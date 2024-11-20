@@ -1,0 +1,103 @@
+@import 'clear';
+@import 'favorite';
+
+// TODO: lots of props duplicated
+// TODO: spread everything across different files or compact somehow
+@import "btn-close";
+
+.btn-base {
+  border-radius: 30px;
+  margin: 15px 0;
+  padding: 8px 30px;
+  transition: background-color 0.4s ease-in-out, color 0.4s ease-in-out;
+  border-color: transparent;
+  min-width: 140px;
+}
+
+.btn-pink {
+  background-color: #e3e3e3;
+  color: #222;
+
+  &:hover, &:focus {
+    background-color: $pink;
+    color: $white;
+  }
+}
+
+.btn-pink-light {
+  background-color: $light-pink;
+  color: #222;
+  font-weight: 600;
+  min-width: 140px;
+  cursor: pointer;
+
+  &:hover, &:focus {
+    background-color: $pink;
+    color: $white;
+  }
+}
+
+.btn-pink-full {
+  background-color: $pink;
+  border-radius: 30px;
+  margin: 15px 0;
+  display: inline-block;
+  padding: 8px 30px;
+  color: $white;
+  transition: all 0.4s ease;
+  min-width: 140px;
+
+  &:disabled, &:hover, &:focus {
+    background-color: #d3d3d3;
+    color: #222;
+  }
+}
+
+.btn-gray {
+  background-color: #e3e3e3;
+  border-radius: 30px;
+  margin: 15px 0;
+  display: inline-block;
+  padding: 8px 30px;
+  color: #222;
+  transition: all 0.4s ease;
+  min-width: 140px;
+
+  &:hover, &:focus {
+    background-color: #d3d3d3;
+    color: #222;
+  }
+}
+
+.btn-white {
+  background-color: $white;
+  border-radius: 30px;
+  margin: 15px 0;
+  display: inline-block;
+  padding: 8px 30px;
+  color: $tiffany;
+  border: 1px solid $tiffany;
+  transition: all 0.4s ease;
+  min-width: 140px;
+
+  &:hover, &:focus {
+    background-color: $tiffany;
+    color: $white;
+  }
+}
+
+.btn-tiffany {
+  background-color: $tiffany;
+  border-radius: 30px;
+  margin: 15px 0;
+  display: inline-block;
+  padding: 8px 30px;
+  color: $white;
+  transition: all 0.4s ease;
+  min-width: 140px;
+
+  &:hover, &:focus {
+    background-color: $pink;
+    color: $white;
+  }
+}

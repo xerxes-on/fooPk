@@ -1,0 +1,309 @@
+// Recipe select item
+.select-recipe-list {
+  &_item {
+    border-radius: 10px;
+    background-color: $light-pink;
+    position: relative;
+    display: flex;
+    @media screen and (max-width: 768px) {
+      flex-wrap: wrap;
+    }
+    margin-bottom: 10px;
+
+    &_label {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+
+    //&_radio {
+    //  display: none;
+    //}
+
+    &_img {
+      height: 150px;
+      width: 110px;
+      display: inline-block;
+      margin-right: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 7px 0 rgba(0, 0, 0, 0.1);
+      //margin-right: 15px;
+      flex: 0 0 150px;
+
+      img {
+        max-width: 100%;
+        object-fit: cover;
+        border-radius: 10px;
+        overflow: hidden;
+      }
+    }
+
+    &_info {
+      overflow: hidden;
+      display: flex;
+      flex-grow: 1;
+      flex-wrap: wrap;
+      //flex-direction: column;
+      padding: 10px 15px;
+      flex-basis: calc(100% - 170px);
+      justify-content: space-between;
+      //width: 100%; //calc(100% - 340px);
+
+      &_title {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        font-size: 21px;
+        font-weight: bold;
+        line-height: 1.33;
+        color: $black;
+        margin-bottom: 5px;
+        @media (min-width: 768px) {
+          min-width: 350px;
+          flex: 0 1 calc(90% - 88px * 2); // 88 is a width of one vju star component
+        }
+        @media (max-width: 768px) {
+          min-width: 150px;
+          flex: 1 0 90%; // 88 is a width of one vju star component
+        }
+        //&:hover {
+        //  color: $black;
+        //}`
+      }
+
+      &_cooking-time {
+        display: flex;
+        align-items: center;
+        //padding-top: 10px;
+        //flex: 1 0 100%;
+        white-space: nowrap;
+
+        &::before {
+          content: '';
+          background: url("/images/icons/ic_timer.svg") no-repeat center center /cover;
+          display: inline-block;
+          width: 24px;
+          height: 24px;
+          margin-right: 10px;
+        }
+
+        &-invalid::before {
+          content: '';
+          background: url("/images/icons/ic_subtract.svg") no-repeat center center /cover;
+          display: inline-block;
+          width: 24px;
+          height: 24px;
+        }
+
+        //&_time {
+        //  text-transform: uppercase;
+        //  font-size: 16px;
+        //  letter-spacing: normal;
+        //  text-align: left;
+        //  line-height: 24px;
+        //  color: rgba(0, 0, 0, 0.7);
+        //}
+        //
+        //&_favourites {
+        //  //float: right;
+        //  width: 24px !important;
+        //  height: 24px;
+        //}
+      }
+
+      &_type {
+        font-size: 12px;
+        line-height: 1.33;
+        color: #000;
+        text-transform: uppercase;
+
+        &_item:not(:last-child)::after {
+          content: '/';
+          margin-right: 5px;
+          margin-left: 5px;
+        }
+      }
+    }
+
+    &_right {
+      //position: absolute;
+      //bottom: 10px;
+      //right: 10px;
+      //display: flex;
+      //justify-content: space-between;
+
+      &_label {
+        background-color: $white;
+        padding: 5px;
+        border-radius: 6px;
+        color: $black;
+        text-transform: uppercase;
+        margin: 3px;
+        line-height: 24px;
+        white-space: nowrap;
+
+        &_mobile {
+          padding: 5px 8px;
+          margin: 10px 15px;
+          width: 100%;
+        }
+
+        //min-height: 34px;
+        //white-space: nowrap;
+        //float: right;
+      }
+    }
+
+    &.active {
+      background-color: $pink;
+
+      &:after {
+        content: '';
+        display: block;
+        background-image: url("/images/icons/ic_check.svg");
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: 60%;
+        width: 35px;
+        height: 35px;
+        position: absolute;
+        top: 4px;
+        right: 10px;
+        background-color: $white;
+        border-radius: 100%;
+        text-align: center;
+        line-height: 35px;
+      }
+
+      .select-recipe-list_item_info_title,
+      .select-recipe-list_item_info_type,
+      .select-recipe-list_item_info_cooking-time,
+      .inline-nutrients-item {
+        color: $white;
+      }
+
+      .select-recipe-list_item_info_cooking-time_time_img::before {
+        background-image: url("/images/icons/ic_timer_white.svg");
+      }
+
+      .select-recipe-list_item_info_cooking-time_time_sub::before {
+        background-image: url("/images/icons/ic_subtract_white.svg");
+      }
+
+    }
+
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .select-recipe-list {
+    &_item {
+      padding-top: 10px;
+
+      &_img {
+        width: 90px;
+        height: 90px;
+        margin-right: 5px;
+        margin-left: 10px;
+      }
+
+      &_info {
+        //width: calc(100% - 105px);
+        //height: 100px;
+
+        &_title {
+          width: 83%;
+          margin-top: 0;
+          font-size: 16px;
+          //margin-bottom: 0;
+        }
+
+        &_type {
+          font-size: 10px;
+        }
+
+        &_cooking-time {
+          //clear: both;
+          padding-top: 3px;
+          font-size: 12px;
+          line-height: 25px;
+        }
+      }
+
+      &_right {
+        width: calc(100% - 15px);
+
+        &_label {
+          padding: 3px 5px;
+          font-size: 12px;
+          line-height: 20px;
+          //height: 26px;
+          //float: right;
+          //max-width: 120px;
+          //text-overflow: ellipsis;
+          //white-space: nowrap;
+          //overflow: hidden;
+        }
+      }
+
+      &_checked {
+        width: 30px;
+        height: 30px;
+      }
+    }
+  }
+}
+
+@media (max-width: 420px) {
+  .select-recipe-list {
+    &_item {
+      overflow: hidden;
+
+      &_img {
+        display: none;
+      }
+
+      &_info {
+        width: calc(100% - 50px);
+        padding: 0 10px;
+
+        &_title {
+          width: 83%;
+          margin-top: 0;
+          font-size: 16px;
+          margin-bottom: 0;
+          white-space: unset;
+        }
+
+        &_type {
+          font-size: 10px;
+        }
+
+        &_cooking-time {
+          padding-top: 3px;
+          font-size: 12px;
+          line-height: 25px;
+        }
+      }
+
+      &_right {
+        width: 100%;
+        flex-wrap: wrap;
+        justify-content: space-evenly;
+
+        &_label {
+          padding: 3px 5px;
+          font-size: 12px;
+          line-height: 20px;
+        }
+      }
+
+      &_checked {
+        width: 30px;
+        height: 30px;
+      }
+    }
+  }
+}

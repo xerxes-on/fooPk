@@ -1,0 +1,38 @@
+.article-image-link {
+  color: transparent;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.article-info {
+  overflow: hidden;
+  padding: 10px 15px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  flex-direction: column;
+  flex: 1 1 calc(100% - 150px); // 150 is the width of the image
+}
+
+.article-link {
+  color: #000;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.33;
+  margin-bottom: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.article-description {
+  font-size: 14px;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.nav.nav-pills.nav-stacked .active a  {
+  background-color: #e6007e;
+}

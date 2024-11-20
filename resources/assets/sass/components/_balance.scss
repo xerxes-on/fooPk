@@ -1,0 +1,56 @@
+.balance-info {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  margin-right: 25px;
+  justify-content: center;
+
+  &-link {
+    position: relative;
+
+    &::after {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 40px;
+      background: url('/images/icons/money.svg') no-repeat center/cover;
+    }
+  }
+
+  &-currency {
+    position: absolute;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 16px;
+    color: #fff;
+    background-color: $pink;
+    border-radius: 30px;
+    padding: 6px 7px;
+    bottom: -10px;
+    right: -20px;
+  }
+}
+
+.balance-info-list {
+  &-link {
+    display: flex;
+    align-items: center;
+
+    &::before {
+      content: '';
+      display: block;
+      width: 50px;
+      height: 28px;
+      background: url('/images/icons/money_white.svg') no-repeat center/cover;
+    }
+  }
+
+  &-currency {
+    padding-left: 3px;
+    padding-right: 3px;
+    font-weight: bold;
+    line-height: 16px;
+    color: $white;
+  }
+}

@@ -1,0 +1,66 @@
+//@import url(https://fonts.googleapis.com/css?family=Oswald:400|Raleway:400,700,400italic,700italic);
+
+// RADIAL PROGRESS
+// Circumference = 2πr
+// π = 3.1415926535898
+// r = 35
+svg.radial-progress {
+  height: auto;
+  max-width: 100px;
+  //padding: 1em;
+  transform: rotate(-90deg);
+  width: 100%;
+
+  circle {
+    fill: rgba(0, 0, 0, 0);
+    stroke: #fff;
+    stroke-dashoffset: 219.91148575129; // Circumference
+    stroke-width: 10;
+
+    &.incomplete {
+      opacity: 0.25;
+    }
+
+    &.complete {
+      stroke-dasharray: 219.91148575129; //Circumference
+    }
+  }
+
+  text {
+    fill: #000;
+    font: 400 1em/1 'Oswald', sans-serif;
+    text-anchor: middle;
+  }
+
+  //COLORS
+
+  //Primary
+  &:nth-of-type(6n+1) circle {
+    //stroke: #a2ed56;
+    stroke: #fca858;
+  }
+
+  //Secondary
+  &:nth-of-type(6n+2) circle {
+    stroke: #83e4e2;
+  }
+
+  //Tertiary
+  &:nth-of-type(6n+3) circle {
+    stroke: #fd6470;
+  }
+
+  //Quaternary
+  &:nth-of-type(6n+4) circle {
+    stroke: #fca858;
+  }
+
+  //Quinary
+  &:nth-of-type(6n+5) circle {
+    stroke: #fddc32;
+  }
+}
+
+.swal2-toast.calc-progress-bar .swal2-header {
+  display: none;
+}

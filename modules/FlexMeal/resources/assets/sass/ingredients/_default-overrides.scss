@@ -1,0 +1,20 @@
+//Boostrap override
+.fl-table > thead > tr > th,
+.fl-table > thead > tr > td,
+.fl-table > tbody > tr > th,
+.fl-table > tbody > tr > td,
+.fl-table > tfoot > tr > th,
+  /*.fl-table > tfoot > tr > td*/
+{
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+}
+
+.fl-table > caption + thead > tr:first-child > th,
+.fl-table > caption + thead > tr:first-child > td,
+.fl-table > colgroup + thead > tr:first-child > th,
+.fl-table > colgroup + thead > tr:first-child > td,
+.fl-table > thead:first-child > tr:first-child > th,
+.fl-table > thead:first-child > tr:first-child > td {
+  border-bottom: 0;
+}

@@ -1,0 +1,20 @@
+.challenge-day-info {
+  font-size: 14px;
+  font-weight: 700;
+  color: $pink;
+
+  &-title {
+    display: block;
+    white-space: nowrap;
+  }
+}
+
+@media screen and (max-width: 991px) {
+  .challenge-day-info-desktop {
+    display: none;
+  }
+  .challenge-day-info {
+    text-align: center;
+    background-color: $light-pink;
+  }
+}

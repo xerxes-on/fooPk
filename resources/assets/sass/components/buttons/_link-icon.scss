@@ -1,0 +1,18 @@
+.link-with-icon {
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &::before {
+    content: '';
+    display: block;
+    margin-right: 5px;
+    width: 24px;
+    height: 24px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    flex-shrink: 0;
+  }
+}

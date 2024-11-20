@@ -1,0 +1,48 @@
+.header-submenu {
+  background: $light-pink;
+  border: none;
+  padding: 0;
+  top: 120%;
+  box-shadow: none;
+
+  &-wrap {
+    display: flex;
+    list-style-type: none;
+    flex-wrap: wrap;
+
+    @media screen and (max-width: 991px) {
+      flex-direction: column;
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+  }
+
+  &-item {
+    margin-bottom: 9px;
+    @media screen and (min-width: 992px) {
+      &:not(:last-child) {
+        margin-right: 8px;
+      }
+    }
+  }
+
+  &-link {
+    color: $black;
+    padding: 3px 8px;
+    border: 1px solid $pink;
+    border-radius: 6px;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out;
+    font-size: 16px;
+    white-space: nowrap;
+    @media screen and (max-width: 991px) {
+      display: block;
+      text-align: center;
+    }
+
+    &.active, &:hover, &:focus {
+      text-decoration: none;
+      color: $white;
+      background-color: $pink;
+    }
+  }
+}

@@ -1,0 +1,38 @@
+/*
+====================================================
+
+	TOC:
+	
+	1. PRIMARY STYLES
+	2. COMMONS FOR PAGE DESIGN
+		JQUERY LIGHT BOX
+	3. MAIN SECTION
+		TIME COUNTDOWN
+		SOCIAL BTN
+	4. SOCIAL BTN
+
+====================================================
+
+/* ---------------------------------
+1. PRIMARY STYLES
+--------------------------------- */
+@import "primary";
+
+/* ---------------------------------
+2. COMMONS FOR PAGE DESIGN
+--------------------------------- */
+
+@import "commonPage";
+
+/* ---------------------------------
+3. MAIN SECTION
+--------------------------------- */
+@import "section";
+
+/* TIME COUNTDOWN */
+@import "countdown";
+
+/* ---------------------------------
+4. RESPONSIVE
+--------------------------------- */
+@import "responsive";

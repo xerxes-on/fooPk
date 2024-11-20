@@ -1,0 +1,110 @@
+.tags-look .tagify__dropdown__item {
+  display: inline-block;
+  border-radius: 3px;
+  padding: 0.3em 0.5em;
+  border: 1px solid #CCC;
+  background: #F3F3F3;
+  margin: 0.2em;
+  font-size: 0.85em;
+  color: black;
+  transition: 0s;
+
+  &:hover {
+    background: lightyellow;
+    border-color: gold;
+  }
+}
+
+.tags-look .tagify__dropdown__item--active {
+  color: black;
+}
+
+.tags.tagify {
+  height: auto;
+}
+
+.tags-look .tagify__dropdown__item {
+  display: inline-block;
+  border-radius: 3px;
+  padding: .3em .5em;
+  border: 1px solid #CCC;
+  background: #F3F3F3;
+  margin: .2em;
+  font-size: .85em;
+  color: black;
+  transition: 0s;
+}
+
+.tags-look .tagify__dropdown__item--active {
+  color: black;
+}
+
+.tags-look .tagify__dropdown__item:hover {
+  background: lightyellow;
+  border-color: gold;
+}
+
+.tags.tagify {
+  height: auto;
+}
+
+.client-notes {
+  [data-client-notes-new-form-wrapper] {
+    .btn-group {
+      margin-top: 10px;
+
+      button {
+        margin-right: 5px;
+      }
+    }
+  }
+
+  [data-client-notes-list] {
+    max-height: 500px;
+    min-height: 250px;
+    overflow: auto;
+
+    .client-note-list-item {
+
+      p {
+        white-space: pre-line;
+      }
+
+      .note-edite-textarea {
+        width: 100%;
+        border: 1px solid grey;
+        border-radius: 2px;
+
+        &:focus-visible {
+          outline: 0 transparent;
+        }
+      }
+
+      &.list-group-item {
+        padding-bottom: 0;
+      }
+
+      [data-client-notes-list-item-edit] {
+        float: right;
+        cursor: pointer;
+      }
+
+      [data-client-notes-list-item-edit-btns] {
+        margin-bottom: 10px;
+      }
+
+      .client-note-meta {
+        text-align: right;
+      }
+
+    }
+  }
+}
+
+.table-primary .table-badge {
+  white-space: nowrap;
+}
+
+.links-row {
+  padding: 0 15px 1rem;
+}

@@ -1,0 +1,51 @@
+.week-range {
+  font-size: 21px;
+  color: $black;
+  line-height: 35px;
+  white-space: nowrap;
+}
+
+.week-carousel-nav {
+  display: flex;
+  align-items: center;
+
+  &_prev,
+  &_next {
+    &::before {
+      content: '';
+      display: block;
+      height: 24px;
+      width: 24px;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    background-color: $light-pink;
+    width: 35px;
+    height: 35px;
+    text-align: center;
+    border-radius: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 5px;
+    transition: background-color 0.4s ease;
+
+    &:hover {
+      cursor: pointer;
+      background-color: $medium-pink;
+    }
+
+    &:focus {
+      background-color: $pink;
+    }
+  }
+
+  &_prev::before {
+    background-image: url('/images/icons/ic_back.png');
+  }
+
+  &_next::before {
+    background-image: url('/images/icons/ic_next.png');
+  }
+}

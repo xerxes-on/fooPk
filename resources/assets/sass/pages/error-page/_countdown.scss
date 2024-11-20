@@ -1,0 +1,31 @@
+#normal-countdown {
+  text-align: center;
+}
+
+#normal-countdown .time-sec {
+  position: relative;
+  display: inline-block;
+  margin: 12px;
+  height: 90px;
+  width: 90px;
+  border-radius: 100px;
+  box-shadow: 0px 0px 0px 5px rgba(255, 255, 255, .5);
+  background: #fff;
+  color: #333;
+}
+
+#normal-countdown .time-sec .main-time {
+  font-weight: 500;
+  line-height: 70px;
+  font-size: 2em;
+  color: #F84982;
+}
+
+#normal-countdown .time-sec span {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: .9em;
+  font-weight: 600;
+}

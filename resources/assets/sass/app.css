@@ -1,0 +1,64 @@
+/*
+Error: File to import not found or unreadable: ~bootstrap-sass/assets/stylesheets/bootstrap.
+        on line 9 of app.scss
+
+4: 
+5: // Variables
+6: @import "variables";
+7: 
+8: // Bootstrap
+9: @import "~bootstrap-sass/assets/stylesheets/bootstrap";
+10: 
+11: // FontAwesome
+12: @import "~font-awesome/scss/font-awesome";
+13: 
+14: // ion.rangeSlider
+
+Backtrace:
+app.scss:9
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/tree/import_node.rb:67:in `rescue in import'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/tree/import_node.rb:45:in `import'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/tree/import_node.rb:28:in `imported_file'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/tree/import_node.rb:37:in `css_import?'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/tree/visitors/perform.rb:314:in `visit_import'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/tree/visitors/base.rb:36:in `visit'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/tree/visitors/perform.rb:162:in `block in visit'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/stack.rb:79:in `block in with_base'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/stack.rb:135:in `with_frame'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/stack.rb:79:in `with_base'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/tree/visitors/perform.rb:162:in `visit'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/tree/visitors/base.rb:52:in `block in visit_children'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/tree/visitors/base.rb:52:in `map'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/tree/visitors/base.rb:52:in `visit_children'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/tree/visitors/perform.rb:171:in `block in visit_children'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/tree/visitors/perform.rb:183:in `with_environment'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/tree/visitors/perform.rb:170:in `visit_children'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/tree/visitors/base.rb:36:in `block in visit'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/tree/visitors/perform.rb:190:in `visit_root'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/tree/visitors/base.rb:36:in `visit'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/tree/visitors/perform.rb:161:in `visit'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/tree/visitors/perform.rb:10:in `visit'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/tree/root_node.rb:36:in `css_tree'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/tree/root_node.rb:29:in `render_with_sourcemap'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/engine.rb:389:in `_render_with_sourcemap'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/engine.rb:307:in `render_with_sourcemap'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/plugin/compiler.rb:462:in `update_stylesheet'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/plugin/compiler.rb:215:in `block in update_stylesheets'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/plugin/compiler.rb:209:in `each'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/plugin/compiler.rb:209:in `update_stylesheets'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/plugin.rb:82:in `update_stylesheets'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/exec/sass_scss.rb:340:in `watch_or_update'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/exec/sass_scss.rb:51:in `process_result'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/exec/base.rb:52:in `parse'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/lib/sass/exec/base.rb:19:in `parse!'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/gems/sass-3.5.3/bin/scss:13:in `<top (required)>'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/bin/scss:22:in `load'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/bin/scss:22:in `<main>'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/bin/ruby_executable_hooks:15:in `eval'
+/Users/tatianakushnir/.rvm/gems/ruby-2.1.10/bin/ruby_executable_hooks:15:in `<main>'
+*/
+body:before {
+    white-space: pre;
+    font-family: monospace;
+    content: "Error: File to import not found or unreadable: ~bootstrap-sass/assets/stylesheets/bootstrap.\A         on line 9 of app.scss\A \A 4: \A 5: // Variables\A 6: @import \"variables\";\A 7: \A 8: // Bootstrap\A 9: @import \"~bootstrap-sass/assets/stylesheets/bootstrap\";\A 10: \A 11: // FontAwesome\A 12: @import \"~font-awesome/scss/font-awesome\";\A 13: \A 14: // ion.rangeSlider";
+}

@@ -1,0 +1,60 @@
+.btn-with-icon {
+  background: none;
+  border-color: transparent;
+  margin-right: 8px;
+
+  &::before {
+    content: '';
+    display: block;
+    width: 25px;
+    height: 25px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+  }
+}
+
+.btn-with-icon-edit::before {
+  background-image: url('/images/icons/ic_edit_black.svg');
+}
+
+.btn-with-icon-delete:before {
+  background-image: url('/images/icons/ic_delete.svg');
+}
+
+.btn-with-icon-close:before {
+  background-image: url('/images/icons/ic_close.svg');
+}
+
+.btn-with-icon-check:before {
+  background-image: url('/images/icons/ic_check.svg');
+}
+
+.btn-with-icon-cart::before {
+  background-image: url('/images/icons/ic_cart_add.svg');
+}
+
+.btn-with-icon-loading::before {
+  background-image: url('/images/icons/loading.svg');
+}
+
+.btn-with-icon-question-o {
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  text-align: center;
+  display: inline-block;
+  color: rgba(128, 128, 128, 0.8);
+  line-height: 25px;
+  transition: color 0.16s ease-in-out;
+
+  &:hover, &:focus {
+    text-decoration: none;
+    color: grey;
+  }
+
+  &:before {
+    content: "\f29c";
+  }
+}

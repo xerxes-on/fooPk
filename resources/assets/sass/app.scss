@@ -1,0 +1,51 @@
+// Variables
+@import "helpers/variables";
+
+// Fonts
+// Fonts are loaded via Google Fonts
+//@import "base/fonts";
+
+/**
+Vendors
+  1.Bootstrap
+  2.FontAwesome
+
+Warnings:
+Update required:
+1.font-awesome
+  font-awesome/scss/_list.scss 14:9 Recommendation: math.div(2em, 14) or calc(2em / 14)
+  node_modules/font-awesome/scss/_larger.scss 7:17 Recommendation: math.div(3em, 4) or calc(3em / 4)
+  node_modules/font-awesome/scss/_larger.scss 6:15 Recommendation: math.div(4em, 3) or calc(4em / 3)
+  node_modules/font-awesome/scss/_fixed-width.scss 4:11 Recommendation: math.div(18em, 14) or calc(18em / 14)
+node_modules/font-awesome/scss/_variables.scss 12:24  Recommendation: math.div(30em, 14) or calc(30em / 14)
+*/
+@import "~bootstrap-sass/assets/stylesheets/bootstrap";
+@import "~font-awesome/scss/font-awesome";
+
+// site styles
+@import "base/scaffold";
+@import "style";
+// TODO: style file should be split....one pile of mess
+@import 'layout/dashboard';
+
+// Layouts
+@import "layout/site-navigation";
+@import "layout/sidebar";
+@import "layout/main";
+@import "layout/carousel";
+@import "layout/calendar_feed";
+@import "layout/footer";
+
+@import "modal.scss";
+
+// Components
+@import "components/r_table";
+@import "components/placeholders";
+@import "components/forms/form";
+@import "components/cards/articles";
+
+// Utility
+@import "helpers/utility";
+
+// Validation
+@import "components/forms/validation";

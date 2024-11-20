@@ -1,0 +1,208 @@
+.header {
+  padding-top: 15px;
+  padding-bottom: var(--header-offset-top, 15px);
+  min-height: 80px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  background-color: $light-pink;
+
+  &-wrap {
+    width: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  .navbar-brand {
+    height: auto;
+
+    img {
+      object-fit: cover;
+    }
+  }
+
+  &-navbar-toggle {
+    &:not(.collapsed) {
+      transform: translateX(270px);
+
+      span {
+        background-color: $black;
+        margin: 0;
+
+        &:nth-child(1) {
+          transform: rotate(405deg);
+        }
+
+        &:nth-child(2) {
+          transform: translate(-1px, -5px) rotate(-405deg);
+        }
+
+        &:nth-child(3) {
+          display: none;
+        }
+      }
+    }
+
+    span {
+      background-color: $pink;
+    }
+  }
+}
+
+.navbar {
+  margin-bottom: 0;
+
+  &-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.main-menu {
+  list-style: none;
+  display: flex;
+  position: relative;
+  width: 100%;
+
+  &-item {
+    margin-left: 5px;
+    margin-right: 15px;
+    transition: all 0.4ms ease;
+    @media screen and (min-width: 992px) {
+      &-mobile {
+        display: none;
+      }
+    }
+
+    &-link {
+      color: $black;
+      font-size: 16px;
+      line-height: 1.57;
+      font-weight: bold;
+      background-color: transparent;
+      border: none;
+      transition: color 0.4s ease;
+
+      &.active,
+      &:hover,
+      &:focus {
+        color: $pink;
+        text-decoration: none;
+      }
+
+      &:last-of-type {
+        margin-right: 0;
+      }
+    }
+  }
+}
+
+.navbar-left, .navbar-right {
+  float: none !important;
+}
+
+// Responsive
+@media screen and (max-width: 1000px) {
+  .header-container {
+    width: 100%;
+  }
+}
+
+@media only screen and (max-width: 991px) {
+  .navbar-collapse {
+    box-shadow: 2px 0 3px rgba(0, 0, 0, 0.06);
+    max-width: 280px;
+    transition: all .01s ease-in-out; // make it appear faster
+  }
+}
+
+@media only screen and (min-width: 992px) {
+  .navbar-collapse {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 991px) {
+  .header-guest {
+    .navbar-brand {
+      padding: 0;
+      order: 0;
+      margin: 0 auto 0 0;
+    }
+  }
+  .navbar-brand {
+    padding: 0;
+    order: 1;
+    margin: auto;
+  }
+  .navbar-collapse {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: $white;
+    max-height: 100% !important; // Due to bootstrap specific selector
+    height: 100vh;
+  }
+  .navbar-wrap {
+    flex-direction: column;
+  }
+
+  .main-menu {
+    flex-direction: column;
+    order: 1;
+    width: 100%;
+
+    &-item {
+
+      margin-bottom: 10px;
+
+      &-link {
+        border-radius: 9px;
+        padding: 10px;
+        display: block;
+        width: 100%;
+        text-align: center;
+
+        &.active,
+        &:hover,
+        &:focus {
+          color: $white;
+          background: $pink;
+        }
+
+        &:last-of-type {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}
+
+@media(max-width: 768px) {
+  .header {
+    .navbar-brand {
+      //height: auto;
+
+      img {
+        width: 76px;
+        height: 36px;
+        object-fit: cover;
+      }
+    }
+  }
+}
+
+@media (max-width: 420px) {
+  .header {
+    .navbar-brand {
+      padding: 8px 0 0 5px;
+    }
+  }
+}
+
+@import "../components/dropdown-menu-items";
+@import "../components/lang-switcher";
+@import "../components/button-group";
+@import "../components/balance";
+@import "../components/challenge-day";
+@import "../components/user-dropdown";
+@import "../components/content-links";

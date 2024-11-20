@@ -1,0 +1,53 @@
+.personal-goals:not(#lorem) {
+
+  .personal-goals-icon {
+    &::before {
+
+      content: '';
+      display: block;
+      width: 25px;
+      height: 25px;
+      margin: 5px auto;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    &-protein::before {
+      background-image: url('/images/protein.png');
+    }
+
+    &-fat::before {
+      background-image: url('/images/fett.png');
+    }
+
+    &-carbs::before {
+      background-image: url('/images/kohlenhydrate.png');
+    }
+
+    &-calories::before {
+      background-image: url('/images/kalorien.png');
+    }
+  }
+
+  td {
+    &:first-child {
+      background: $pink;
+    }
+
+    &:not(:first-child) {
+      border-top-color: $pink;
+      border-bottom-color: $pink;
+      border-left-width: 0;
+      border-right-width: 0;
+    }
+
+    &:nth-child(2) {
+      border-left-color: $pink;
+    }
+
+    &:last-child {
+      border-right-color: $pink;
+    }
+  }
+}

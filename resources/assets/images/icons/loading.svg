@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" fill="transparent" aria-hidden="true" viewBox="0 0 38 38">
+    <g fill-rule="evenodd" stroke="currentColor" stroke-width="4" transform="translate(2 2)">
+        <circle cx="17" cy="17" r="16.5" stroke-opacity=".5" class="st0"/>
+        <path d="M11.294 1.518C2.755 4.665-1.63 14.168 1.518 22.706" class="st1">
+            <animateTransform accumulate="none" additive="replace" attributeName="transform" calcMode="linear" dur="1s"
+                              from="0 17 17" repeatCount="indefinite" restart="always" to="360 17 17" type="rotate"/>
+        </path>
+    </g>
+</svg>
