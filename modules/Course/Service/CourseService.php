@@ -54,17 +54,17 @@ final class CourseService
      */
     public function all(?User $user = null): EloquentCollection
     {
-        $challenges = Course::active()->get();
+        $courses = Course::active()->get();
 
         if ($user === null) {
             $user = \Auth::user();
         }
         if ($user !== null) {
             //added filter TBR2023
-            $challenges = $user->_prepareCoursesForUser($challenges);
+            $courses = $user->_prepareCoursesForUser($courses);
         }
 
-        return $challenges;
+        return $courses;
     }
 
     /**
@@ -73,8 +73,8 @@ final class CourseService
      */
     public function purchasable(User $user): EloquentCollection
     {
-        $aboChallengesUser = $user->courses()->pluck('course_id')->toArray();
-        return $this->all($user)->filter(static fn($challenge) => !in_array($challenge->id, $aboChallengesUser));
+        $userCourses = $user->getParticipatedCourseIds()->toArray();
+        return $this->all($user)->filter(static fn(Course $course) => !in_array($course->id, $userCourses));
     }
 
     /**
@@ -90,6 +90,9 @@ final class CourseService
     {
         $foodpoints = (int)$model->foodpoints;
         if ($foodpoints === 0) {
+            return 0;
+        }
+        if ($model->id === CourseId::TBR2024_DE->value && $userCourses->intersect(CourseId::getTBRDiscountRange())->isNotEmpty()) {
             return 0;
         }
 

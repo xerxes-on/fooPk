@@ -10,8 +10,11 @@ enum CourseId: int
 {
     use EnumToArray;
 
+    case TBR              = 1;
     case TBF              = 6;
     case QUICK_GUIDE_DE   = 9;
+    case TBR2             = 15;
+    case TBR2022          = 19;
     case QUICK_GUIDE_EN   = 30;
     case TBR2023          = 24;
     case BOOTCAMP         = 17;
@@ -29,11 +32,16 @@ enum CourseId: int
         return $lang === 'en' ? self::QUICK_GUIDE_EN->value : self::QUICK_GUIDE_DE->value;
     }
 
-    public static function isGuide(int $id): bool
+    public static function isGuide(int $courseId): bool
     {
-        return match ($id) {
+        return match ($courseId) {
             self::QUICK_GUIDE_DE->value, self::QUICK_GUIDE_EN->value => true,
             default => false,
         };
+    }
+
+    public static function getTBRDiscountRange(): array
+    {
+        return [self::TBR->value, self::TBR2->value, self::TBR2022->value, self::TBR2023->value, self::TBR2024_EN->value];
     }
 }

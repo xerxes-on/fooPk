@@ -52,6 +52,8 @@ final class IngredientUnitAdminSection extends Section implements Initializable
                     AdminColumn::text('id', '#')->setWidth(30),
                     AdminColumn::custom(trans('ingredient::admin.type.title'), static fn(IngredientUnitModel $model) => IngredientUnitType::getNameFor($model->type))
                         ->setWidth(30),
+                    AdminColumn::custom(trans('ingredient::admin.unit_visibility'), static fn(IngredientUnitModel $model) => $model->visibility ? trans('common.yes') : trans('common.no'))
+                        ->setWidth(10),
                     AdminColumn::text('full_name', trans('common.full_name'))->setWidth(10),
                     AdminColumn::text('short_name', trans('common.short_name'))->setWidth(30),
                     AdminColumn::text('default_amount', trans('common.default_amount'))->setWidth(30)
@@ -70,6 +72,7 @@ final class IngredientUnitAdminSection extends Section implements Initializable
         return AdminForm::panel()
             ->addBody(
                 [
+                    AdminFormElement::checkbox('visibility', trans('ingredient::admin.unit_visibility'))->setDefaultValue(1),
                     AdminFormElement::text('full_name', trans('common.full_name'))->required(),
                     AdminFormElement::text('short_name', trans('common.short_name'))->required(),
                     AdminFormElement::select('type', trans('ingredient::admin.type.title'), IngredientUnitType::forSelect())

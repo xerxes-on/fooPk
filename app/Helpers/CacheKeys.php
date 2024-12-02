@@ -160,4 +160,10 @@ final class CacheKeys
     {
         return "recipes-by-ingredients";
     }
+
+    /*-----------------------COURSES------------------------------*/
+    public static function userParticipatedCourses(int $userId): string
+    {
+        return "user_{$userId}_participated_courses";
+    }
 }

@@ -16,6 +16,7 @@ use Modules\Ingredient\Enums\IngredientUnitType;
  *
  * @property int $id
  * @property int $type
+ * @property int $visibility Describes if the unit is visible on frontend
  * @property int|null $next_unit_id
  * @property float|null $max_value
  * @property float $default_amount
@@ -45,6 +46,7 @@ use Modules\Ingredient\Enums\IngredientUnitType;
  * @method static Builder|IngredientUnit whereTranslationLike(string $translationField, $value, ?string $locale = null)
  * @method static Builder|IngredientUnit whereType($value)
  * @method static Builder|IngredientUnit whereUpdatedAt($value)
+ * @method static Builder|IngredientUnit whereVisibility($value)
  * @method static Builder|IngredientUnit withTranslation()
  * @mixin \Eloquent
  */
@@ -74,6 +76,7 @@ final class IngredientUnit extends Model implements TranslatableContract
      */
     protected $fillable = [
         'type',
+        'unit',
         'next_unit_id',
         'max_value',
         'default_amount'

@@ -6,6 +6,7 @@ namespace Modules\Ingredient\Http\Requests\Admin;
 
 use App\Enums\Admin\Permission\PermissionEnum;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
 
 /**
  * Ingredient Form Request
@@ -64,6 +65,45 @@ final class IngredientFormRequest extends FormRequest
             'hint.link_url'       => ['url:https', 'nullable', 'required_with:hint.link_text', 'max:191'],
             'vitamins'            => ['array'],
             'vitamins.*'          => ['integer'],
+        ];
+    }
+
+    /**
+     * Add an after validation callback.
+     */
+    public function after(): array
+    {
+        return [
+            function (Validator $validator) {
+                // missing alternative unit
+                if ((int)$this->unit_amount > 0 && is_null($this->alternative_unit_id)) {
+                    $validator->errors()->add(
+                        'alternative_unit_id',
+                        trans(
+                            'validation.required_with',
+                            [
+                                'attribute' => trans('ingredient::admin.secondary_unit_title'),
+                                'values'    => trans('ingredient::common.unit_amount')
+                            ]
+                        )
+                    );
+                    return;
+                }
+
+                // missing unit amount
+                if ((int)$this->unit_amount === 0 && (int)$this->alternative_unit_id > 0) {
+                    $validator->errors()->add(
+                        'unit_amount',
+                        trans(
+                            'validation.required_with',
+                            [
+                                'attribute' => trans('ingredient::common.unit_amount'),
+                                'values'    => trans('ingredient::admin.secondary_unit_title')
+                            ]
+                        )
+                    );
+                }
+            }
         ];
     }
 

@@ -13,6 +13,7 @@ use App\Services\AdminStorage;
 use App\Models\CustomRecipe;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Modules\Course\Jobs\NotifyAdminsOnRestartedCoursesJob;
 use Modules\PushNotification\Models\UserDevice;
 
 class Kernel extends ConsoleKernel
@@ -51,7 +52,8 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('user_deactivation_check')->dailyAt('02:30')->withoutOverlapping();
 
-        $schedule->job(new CheckAmountOfUserRecipes())->dailyAt('05:00');
+        $schedule->job(CheckAmountOfUserRecipes::class)->dailyAt('05:00');
+        $schedule->job(NotifyAdminsOnRestartedCoursesJob::class)->dailyAt('07:00');
 
         // Specific environment commands.
 
@@ -61,7 +63,7 @@ class Kernel extends ConsoleKernel
             $schedule->command('recipe:distribution')->monthlyOn(1, '01:00')->withoutOverlapping();
             // sport challenge checker
             // deprecated, TBR2024
-//            $schedule->command('checker:challenges-sport')->everyThreeHours()->withoutOverlapping();
+            // $schedule->command('checker:challenges-sport')->everyThreeHours()->withoutOverlapping();
 
             // weekly foodpoints distribution, runs every day and distribute to allowed users
             $schedule->command('foodpoints:monthly-distribution')->dailyAt('10:30')->withoutOverlapping();

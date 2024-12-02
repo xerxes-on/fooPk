@@ -10,6 +10,7 @@ use Bavix\Wallet\Internal\Exceptions\ExceptionInterface;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Modules\Course\Events\UserObtainedCourseEvent;
 use Modules\Course\Http\Requests\BuyCourseRequest;
 use Modules\Course\Models\Course;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
@@ -19,11 +20,11 @@ use Symfony\Component\HttpFoundation\Response as ResponseAlias;
  *
  * @package Modules\Course\Actions
  */
-class BuyCourseAction
+final class BuyCourseAction
 {
     use CanSendJsonResponse;
 
-    private ?Course $course;
+    private ?Course $course = null;
     private Carbon $startAt;
     private Carbon $endsAt;
 
@@ -38,11 +39,11 @@ class BuyCourseAction
 
         try {
             $this->getCourse((int)$request->challengeId, $user);
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
             return $this->sendError('', trans('course::common.not_found'));
         }
 
-        $foodpoint = $this->course->getActualPrice($user->courses()->pluck('course_id'));
+        $foodpoint = $this->course->getActualPrice($user->getParticipatedCourseIds());
         if ($foodpoint > 0 && !$user->canWithdraw($foodpoint)) {
             return $this->sendError(['link' => ['url' => $link, 'text' => 'Shop']], trans('course::common.insufficient_funds'), ResponseAlias::HTTP_PAYMENT_REQUIRED);
         }
@@ -55,6 +56,7 @@ class BuyCourseAction
         }
 
         try {
+            $this->maybeWithdrawFromUser($user, $foodpoint, $this->course->id);
             $user->courses()
                 ->attach(
                     $this->course,
@@ -63,21 +65,14 @@ class BuyCourseAction
                         'ends_at'  => $this->endsAt
                     ]
                 );
-        } catch (\Throwable $e) {
-            logError($e); //TODO: investigate
-        }
-
-        // TODO: maybe here should be a correct condition to use this
-        $message = trans('common.success');
-        try {
-            $this->maybeWithdrawFromUser($user, $foodpoint, $this->course->id);
+            UserObtainedCourseEvent::dispatch($user);
             $this->notifyAdmin($user, $this->course->title, $foodpoint);
-        } catch (ExceptionInterface $e) {
+        } catch (\Throwable $e) {
             logError($e);
-            $message = $e->getMessage();
+            return $this->sendError('', $e->getMessage());
         }
 
-        return $this->sendResponse(null, $message);
+        return $this->sendResponse(null, trans('common.success'));
     }
 
     private function getCourse(int $challengeId, User $user): void
@@ -91,20 +86,21 @@ class BuyCourseAction
     private function setupDurationDates(string $startDate): void
     {
         $startAt = Carbon::parse($startDate);
-        if (!empty($this->course->minimum_start_at) && $startAt->lt($this->course->minimum_start_at)) {
+        $today   = Carbon::now()->startOfDay();
+        if ($this->course->minimum_start_at instanceof Carbon && $startAt->lt($this->course->minimum_start_at)) {
             $startAt = $this->course->minimum_start_at;
         }
         $this->startAt = $startAt instanceof Carbon ? $startAt->startOfDay() : Carbon::parse($startAt)->startOfDay();
+        $this->startAt = $this->startAt->lt($today) ? $today : $this->startAt;
         $this->endsAt  = $this->startAt->copy()->addDays($this->course->duration)->startOfDay();
     }
 
     private function notifyAdmin(User $user, string $courseTitle, int $foodpoint): void
     {
-        $startAtDateForNotification = $this->startAt->copy()->format('d.m.Y');
-
+        $startAtDate = $this->startAt->copy()->format('d.m.Y');
         send_raw_admin_email(
-            "User $user->email (#$user->id) has Added the $courseTitle Challenge.\nStart date: $startAtDateForNotification \nFoodpoints: $foodpoint",
-            'Challenge has been Added!'
+            "User $user->email (#$user->id) has Added the $courseTitle Course.\nStart date: $startAtDate \nFoodpoints: $foodpoint",
+            'Course has been Added!'
         );
     }
 
@@ -114,7 +110,7 @@ class BuyCourseAction
     private function maybeWithdrawFromUser(User $user, int $foodpoint, int $courseId): void
     {
         if ($foodpoint > 0) {
-            $user->withdraw($foodpoint, ['description' => "Purchase of Challenge #$courseId"]);
+            $user->withdraw($foodpoint, ['description' => "Purchase of Course #$courseId"]);
         }
     }
 }

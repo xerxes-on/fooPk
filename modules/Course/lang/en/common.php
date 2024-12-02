@@ -38,9 +38,9 @@ return [
         'approve' => 'Change start date',
     ],
     'status' => [
-        'finished'    => 'Closed',
-        'in_progress' => 'In progress',
-        'not_started' => 'Start soon',
+        'finished'      => 'Closed',
+        'in_progress'   => 'In progress',
+        'not_started'   => 'Start soon',
         'not_purchased' => 'Not purchased'
     ],
     'day'              => 'Day',
@@ -50,5 +50,5 @@ return [
     'not_found'        => 'Course not found',
     'confirm_purchase' => 'Are you sure, you want to unlock this course?',
     'schedule_in_past' => 'Date cannot be earlier than :date',
-    'scheduled'        => 'Start date changed successfully',
+    'scheduled'        => 'Start date changed to :date',
 ];

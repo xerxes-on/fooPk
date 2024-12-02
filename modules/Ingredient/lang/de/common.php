@@ -3,5 +3,5 @@
 declare(strict_types=1);
 
 return [
-    'unit_amount' => 'Unit amount equivalent',
+    'unit_amount' => 'Menge pro alternativer Einheit',
 ];

@@ -27,26 +27,26 @@ final class CourseController extends Controller
     {
         return view('course::index', [
             'courses'       => Course::getUserCourses($request->user()),
-            'userCoursesId' => $request->user()->courses()->pluck('course_id'),
+            'userCoursesId' => $request->user()->getParticipatedCourseIds(),
         ]);
     }
 
     public function shop(Request $request): View|Factory
     {
         $user = $request->user();
-        $now  = Carbon::now()->format('d.m.Y');
+        $now  = Carbon::now();
         return view('course::shop', [
             'courses' => Course::getPurchasable($user)
                 ->map(
                     // need to filter data for correct display in date picker, 0d or date in format d.m.Y
                     function (Course $challenge) use ($now) {
-                        $challenge->minimum_start_at_for_js = empty($challenge->minimum_start_at) ?
-                            $now :
-                            $challenge->minimum_start_at->startOfDay()->format('d.m.Y');
+                        $startAt                            = empty($challenge->minimum_start_at) ? $now : $challenge->minimum_start_at;
+                        $startAt                            = $startAt->lt($now) ? $now : $startAt;
+                        $challenge->minimum_start_at_for_js = $startAt->format('d.m.Y');
                         return $challenge;
                     }
                 ),
-            'userCoursesId' => $user->courses()->pluck('course_id'),
+            'userCoursesId' => $user->getParticipatedCourseIds(),
         ]);
     }
 

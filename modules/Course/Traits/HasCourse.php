@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Modules\Course\Traits;
 
+use App\Helpers\CacheKeys;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Modules\Course\Enums\CourseId;
 use Modules\Course\Models\Course;
 
@@ -15,12 +18,26 @@ trait HasCourse
     {
         return $this
             ->belongsToMany(Course::class, 'course_users', 'user_id', 'course_id')
-            ->withPivot('id', 'start_at', 'ends_at');
+            ->withPivot('id', 'start_at', 'counter', 'ends_at');
     }
 
     public function getCourseAttribute(): ?Course
     {
         return $this->courses()->orderBy('pivot_ends_at', 'desc')->first();
+    }
+
+    public function getParticipatedCourseIds(): Collection
+    {
+        $courses = Cache::get(CacheKeys::userParticipatedCourses($this->getKey()));
+
+        if (!empty($courses)) {
+            return $courses;
+        }
+
+        $courses = $this->courses()->pluck('course_id');
+        Cache::put(CacheKeys::userParticipatedCourses($this->getKey()), $courses, config('cache.lifetime_short'));
+
+        return $courses;
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Course\Http\View\Components;
 
+use Carbon\Carbon;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
@@ -19,6 +20,7 @@ final class CourseComponent extends Component
     public bool $isForPurchase    = false;
     public UserCourseStatus $courseStatus;
     public bool $isGuide;
+    public string $restartDate;
 
     /**
      * Create a new component instance.
@@ -32,6 +34,10 @@ final class CourseComponent extends Component
             $this->courseStatus     = $course->getStatus();
             $this->courseIsFinished = $this->courseStatus === UserCourseStatus::FINISHED;
         }
+        $now                    = Carbon::now();
+        $restartDate            = empty($course->minimum_start_at) ? $now : $course->minimum_start_at;
+        $restartDate            = $restartDate->lt($now) ? $now : $restartDate;
+        $this->restartDate      = $restartDate->format('Y-m-d');
     }
 
     /**

@@ -41,7 +41,7 @@
                                 <li>@if($isNotSpice)
                                         <span>{{ $ingredient['ingredient_amount'] }}</span>
                                     @endif
-                                    {{ $ingredient['ingredient_text'] }} ({{$ingredient['ingredient_type']}})
+                                    {{ $ingredient['ingredient_text'] }}
                                 </li>
                             @empty
                                 <li>@lang('common.no_ingredients')</li>

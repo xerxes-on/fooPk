@@ -20,7 +20,9 @@ final class CourseServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
         $this->loadTranslationsFrom(__DIR__ . '/../lang', 'course');
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'course');
         $this->mergeConfigFrom(__DIR__ . '/../config/main.php', 'course');

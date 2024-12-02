@@ -14,4 +14,5 @@ return [
     ],
     'primary_unit_title' => 'Primary unit',
     'secondary_unit_title' => 'Alternative unit',
+    'unit_visibility' => 'Unit displayed in frontend',
 ];

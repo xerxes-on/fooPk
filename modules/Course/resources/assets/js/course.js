@@ -32,7 +32,6 @@ $(document).ready(function () {
                     return;
                 }
 
-                // /user/challenge/buying
                 $.ajax({
                     type: 'POST',
                     url: window.foodPunk.course.routes.buy,
@@ -93,11 +92,10 @@ $(document).ready(function () {
             confirmButtonText: window.foodPunk.course.i18n[$context].approve,
             cancelButtonText: window.foodPunk.course.i18n.cancel,
             didOpen: () => {
-                const today = (new Date()).toISOString().split("T")[0];
                 const input = Swal.getInput();
-                input.min = today;
+                input.min = $elem.attr('data-start-at');
                 input.required = 'required';
-                input.value = today;
+                input.value = $elem.attr('data-start-at');
             },
             inputValidator: (value) => {
                 let initialValue = new Date(Swal.getInput().min);

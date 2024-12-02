@@ -229,6 +229,7 @@ final class IngredientsAdminSection extends SectionWithImage implements Initiali
                     ->setLoadOptionsQueryPreparer(function (Select $element, Builder $query) {
                         return $query->IsSecondary();
                     })
+                    ->setDisplay('full_name')
                     ->setHtmlAttribute('required', 'required')]),
             AdminFormElement::number('unit_amount', trans('ingredient::common.unit_amount'))
                 ->setHelpText(trans('ingredient::admin.help.unit_amount'))

@@ -17,11 +17,11 @@ use Modules\Course\Models\Course;
  *
  * @package Modules\Course\Actions
  */
-class RescheduleCourseAction
+final class RescheduleCourseAction
 {
     use CanSendJsonResponse;
 
-    private ?Course $course;
+    private ?Course $course = null;
     private Carbon $startAt;
     private Carbon $endsAt;
 
@@ -44,19 +44,25 @@ class RescheduleCourseAction
         }
 
         try {
-            $user->courses()
-                ->updateExistingPivot(
-                    $this->course->id,
+            \DB::table('course_users')
+                ->where([
+                    ['user_id', $user->id],
+                    ['course_id', $this->course->id]
+                ])
+                ->increment(
+                    'counter',
+                    1,
                     [
                         'start_at' => $this->startAt,
                         'ends_at'  => $this->endsAt
                     ]
                 );
         } catch (\Throwable $e) {
-            logError($e); //TODO: investigate
+            logError($e);
+            return $this->sendError('unexpected', trans('common.unexpected_error'));
         }
 
-        return $this->sendResponse(null, trans('course::common.scheduled'));
+        return $this->sendResponse(null, trans('course::common.scheduled', ['date' => $this->startAt->format('d.m.Y')]));
     }
 
     private function getCourse(int $courseId, User $user): void
@@ -64,16 +70,18 @@ class RescheduleCourseAction
         $this->course = $user->_prepareCoursesForUser(collect([Course::findOrFail($courseId)]))->first();
 
         if (is_null($this->course)) {
-            throw new ModelNotFoundException('');
+            throw new ModelNotFoundException();
         }
     }
 
     private function setupDurationDates(): void
     {
-        if (!empty($this->course->minimum_start_at) && $this->startAt->lt($this->course->minimum_start_at)) {
-            $this->startAt = Carbon::parse($this->course->minimum_start_at);
+        $today = Carbon::now()->startOfDay();
+        if ($this->course->minimum_start_at instanceof Carbon && $this->startAt->lt($this->course->minimum_start_at)) {
+            $this->startAt = $this->course->minimum_start_at;
         }
         $this->startAt = $this->startAt->startOfDay();
+        $this->startAt = $this->startAt->lt($today) ? $today : $this->startAt;
         $this->endsAt  = $this->startAt->copy()->addDays($this->course->duration)->startOfDay();
     }
 }

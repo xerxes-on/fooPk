@@ -56,11 +56,15 @@
                                 <br>{{parseDateString($course->pivot->start_at,'d.m.Y')}}
                             </p>
                             @if($courseIsFinished)
-                                <button class="btn btn-orange js-restart-course" data-id="{{ $course->id }}"
-                                        type="button">@lang('course::common.restart.button')</button>
+                                <button class="btn btn-orange js-restart-course"
+                                        data-id="{{ $course->id }}"
+                                        type="button"
+                                        data-start-at="{{ $restartDate }}">@lang('course::common.restart.button')</button>
                             @else
-                                <button class="btn btn-orange js-change-course-date" data-id="{{ $course->id }}"
-                                        type="button">@lang('course::common.change_date.button')</button>
+                                <button class="btn btn-orange js-change-course-date"
+                                        data-id="{{ $course->id }}"
+                                        type="button"
+                                        data-start-at="{{ $restartDate }}">@lang('course::common.change_date.button')</button>
                             @endif
                         </div>
                         <div class="course-details-box course-details-box-info course-details-box-info--small">
