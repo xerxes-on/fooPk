@@ -687,4 +687,5 @@ return [
         'purchase_food_points' => 'You can purchase Foodpoints in our  <a href=":link" target="_blank">online shop</a>',
         'extra_info'           => 'Just send us a screenshot of your review or the name of the person you recruited by email to <a href=":link">info@foodpunk.de</a> and get your Foodpoints as a thank you.',
     ],
+    'cs_count_message' =>'How many CS do you want to add?',
 ];

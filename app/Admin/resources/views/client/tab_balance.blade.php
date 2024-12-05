@@ -58,84 +58,15 @@
 @endif
 
 @push('footer-scripts')
-    {{-- TODO: better move to scripts --}}
     <script>
-        function deposit() {
-            Swal.fire({
-                title: 'Deposit',
-                text: 'How many CS do you want to add?',
-                input: 'number',
-                icon: 'question',
-            }).then(function (result) {
-                if (result.value) {
-
-                    let amount = result.value;
-
-                    Swal.fire({
-                        title: 'Please Wait..!',
-                        text: 'Is working..',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        allowEnterKey: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        },
-                    });
-
-                    $.ajax({
-                        type: 'POST',
-                        url: "{{ route('admin.client.deposit') }}",
-                        dataType: 'json',
-                        data: {
-                            _token: $('meta[name=csrf-token]').attr('content'),
-                            userId: '{{ $client->id }}',
-                            amount: amount,
-                        },
-                        success: function (result) {
-                            location.reload();
-                        },
-                    });
-                }
-            });
-        }
-
-        function withdraw() {
-            Swal.fire({
-                title: 'Withdraw',
-                text: 'How many CS do you want to withdraw?',
-                input: 'number',
-                icon: 'question',
-            }).then(function (result) {
-                if (result.value) {
-
-                    let amount = result.value;
-
-                    Swal.fire({
-                        title: 'Please Wait..!',
-                        text: 'Is working..',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        allowEnterKey: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        },
-                    });
-
-                    $.ajax({
-                        type: 'POST',
-                        url: "{{ route('admin.client.withdraw') }}",
-                        dataType: 'json',
-                        data: {
-                            _token: $('meta[name=csrf-token]').attr('content'),
-                            userId: '{{ $client->id }}',
-                            amount: amount,
-                        },
-                        success: function (result) {
-                            location.reload();
-                        },
-                    });
-                }
-            });
-        }
+        window.foodPunk.i18n = {
+            cs_count_message: "@lang('common.cs_count_message')",
+            deposit: "@lang('common.deposit')",
+            work_in_progress_wait: "@lang('common.work_in_progress_wait')",
+            message_in_progress: "@lang('admin.messages.in_progress')",
+            questionnaire_info_withdraw: "@lang('questionnaire.info.withdraw')",
+            questionnaire_info_withdraw_number: "@lang('questionnaire.info.withdraw_number')",
+        };
     </script>
+    <script src="{{ mix('js/admin/client/tab-balance.js') }}"></script>
 @endpush

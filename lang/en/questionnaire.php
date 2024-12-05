@@ -364,6 +364,8 @@ return [
         'update_confirmation' => 'Would you really like to update your questionnaire?',
         'withdraw_error'      => 'Unable to withdraw Foodpoints from your account. Please try again later',
         'not_saved_error'     => 'Data is not saved. Please try again later',
+        'withdraw'=> 'Withdraw',
+        'withdraw_number' =>'How many CS do you want to withdraw?',
     ],
 
     // Button texts
