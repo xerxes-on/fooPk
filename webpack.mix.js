@@ -164,8 +164,9 @@ mix.js(`${paths.modules.admin.js}/admin.js`,
     .js(`${paths.modules.ingredient.js}/admin/sections/ingredient-categories.js`, `${paths.dest.js}/admin/ingredients`)
     .js(`${paths.modules.admin.js}/recipes/recipes.js`, `${paths.dest.js}/admin/recipes`)
     .js(`${paths.modules.admin.js}/recipes/recipe-tags.js`, `${paths.dest.js}/admin/recipes`)
+	.js(`${paths.modules.admin.js}/client/formular.js`,`${paths.dest.js}/admin/client/`)
+
     .js([
-		`${paths.modules.admin.js}/client/formular.js`,
 		`${paths.modules.admin.js}/client/jobsStatus.js`,
 		`${paths.modules.admin.js}/client/tab-balance.js`,
 		`${paths.modules.admin.js}/client/tab-calculations.js`,
