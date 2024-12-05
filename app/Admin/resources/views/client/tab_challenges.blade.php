@@ -27,7 +27,7 @@
 </div>
 
 <h3 class="text-center">@lang('course::common.history')</h3>
-<div id="user-id" data-user-id="{{ $user_id }}"></div>
+<div id="user-id" data-user-id="{{ $client->id }}"></div>
 @if($userCourses->count() > 0)
     <table class="table table-striped">
         <thead>
