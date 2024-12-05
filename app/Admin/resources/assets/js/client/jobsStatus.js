@@ -13,7 +13,7 @@ const clientId = document.getElementById('client-data').dataset.clientId;
 function checkCalculationStatus() {
     $.ajax({
         type: 'GET',
-        url: ' /admin/recipes/check-job-status?userId='. clientId,
+        url: ' /admin/recipes/check-job-status?userId='+clientId,
         dataType: 'json',
         data: {
             _token: $('meta[name=csrf-token]').attr('content'),
