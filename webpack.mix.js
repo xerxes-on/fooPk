@@ -164,20 +164,22 @@ mix.js(`${paths.modules.admin.js}/admin.js`,
     .js(`${paths.modules.ingredient.js}/admin/sections/ingredient-categories.js`, `${paths.dest.js}/admin/ingredients`)
     .js(`${paths.modules.admin.js}/recipes/recipes.js`, `${paths.dest.js}/admin/recipes`)
     .js(`${paths.modules.admin.js}/recipes/recipe-tags.js`, `${paths.dest.js}/admin/recipes`)
-	.js(`${paths.modules.admin.js}/client/formular.js`, `${paths.dest.js}/admin/client`)
-	.js(`${paths.modules.admin.js}/client/jobsStatus.js`, `${paths.dest.js}/admin/client`)
-	.js(`${paths.modules.admin.js}/client/tab-balance.js`, `${paths.dest.js}/admin/client`)
-	.js(`${paths.modules.admin.js}/client/tab-calculations.js`, `${paths.dest.js}/admin/client`)
-	.js(`${paths.modules.admin.js}/client/tab-challenges.js`, `${paths.dest.js}/admin/client`)
-	.js(`${paths.modules.admin.js}/client/tab-chargebee-subscriptions.js`, `${paths.dest.js}/admin/client`)
+    .js([
+		`${paths.modules.admin.js}/client/formular.js`,
+		`${paths.modules.admin.js}/client/jobsStatus.js`,
+		`${paths.modules.admin.js}/client/tab-balance.js`,
+		`${paths.modules.admin.js}/client/tab-calculations.js`,
+		`${paths.modules.admin.js}/client/tab-challenges.js`,
+		`${paths.modules.admin.js}/client/tab-chargebee-subscriptions.js`,
+    ], `${paths.dest.js}/admin/client/main.js`)
 
     .sass(`${paths.modules.admin.sass}/switch.scss`,
-				`${paths.dest.css}/admin`).sass(`${paths.modules.admin.sass}/progressBar.scss`,
+    `${paths.dest.css}/admin`).sass(`${paths.modules.admin.sass}/progressBar.scss`,
     `${paths.dest.css}/admin`).sass(`${paths.modules.ingredient.sass}/ingredientCategories.scss`,
-				`${paths.dest.css}/admin`).sass(`${paths.modules.admin.sass}/dataTablesPagination.scss`,
-				`${paths.dest.css}/admin`).sass(`${paths.modules.admin.sass}/customImage.scss`,
-				`${paths.dest.css}/admin`).sass(`${paths.modules.admin.sass}/customAdmin.scss`,
-				`${paths.dest.css}/admin`);
+    `${paths.dest.css}/admin`).sass(`${paths.modules.admin.sass}/dataTablesPagination.scss`,
+    `${paths.dest.css}/admin`).sass(`${paths.modules.admin.sass}/customImage.scss`,
+    `${paths.dest.css}/admin`).sass(`${paths.modules.admin.sass}/customAdmin.scss`,
+    `${paths.dest.css}/admin`);
 
 /*
  |--------------------------------------------------------------------------
@@ -249,6 +251,3 @@ mix.copy(`${paths.folders.node}/jquery-colorbox/jquery.colorbox-min.js`,
 		options({processCssUrls: false}).
 		copy(`${paths.src.js}/sweetalert.min.js`,
 				`${paths.dest.vendor}/sweetalert`);
-
-// Sleeping owl css and js files didn't get published, thus I added the line below
-mix.copy('vendor/laravelrus/sleepingowl/public', 'public/packages/sleepingowl/')

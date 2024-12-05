@@ -53,6 +53,7 @@
         @endforeach
         </tbody>
     </table>
+    <div id="client_data" data-client-id="{{ $client->id }}"></div>
 @else
     <div>@lang('common.transaction_empty')</div>
 @endif
@@ -68,5 +69,5 @@
             questionnaire_info_withdraw_number: "@lang('questionnaire.info.withdraw_number')",
         };
     </script>
-    <script src="{{ mix('js/admin/client/tab-balance.js') }}"></script>
+    <script src="{{ mix('js/admin/client/main.js') }}"></script>
 @endpush

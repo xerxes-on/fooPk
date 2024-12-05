@@ -25,7 +25,7 @@ jQuery(document).ready(function ($) {
         }).then((result) => {
             if (result.value) {
                 Swal.fire({
-                    title: window.foodPunk.i18n/messages_wait,
+                    title: window.foodPunk.i18n.messages_wait,
                     text: window.foodPunk.i18n.messages_in_progress,
                     allowOutsideClick: false,
                     allowEscapeKey: false,
@@ -34,14 +34,14 @@ jQuery(document).ready(function ($) {
                         Swal.showLoading();
                     },
                 });
-
+                const userId = document.getElementById('user-id').dataset.userId;
                 $.ajax({
                     type: 'POST',
-                    url: "{{ route('admin.client.calc-auto') }}",
+                    url: "/admin/clients/calc-auto",
                     dataType: 'json',
                     data: {
                         _token: $('meta[name=csrf-token]').attr('content'),
-                        userId: '{{ $user_id }}',
+                        userId: userId,
                         approve: approve,
                     },
                     success: function (data) {

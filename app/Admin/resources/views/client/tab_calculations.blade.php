@@ -156,7 +156,6 @@
 @else
     <h3>@lang('common.formular_data_empty')</h3>
 @endif
-
 @push('footer-scripts')
     <script>
         window.foodPunk.i18n = {
@@ -167,5 +166,5 @@
             messages_saved: "@lang('admin.messages.saved')",
         };
     </script>
-    <script src="{{ mix('js/admin/client/tab-calculations.js') }}"></script>
+    <script src="{{ mix('js/admin/client/main.js') }}"></script>
 @endpush

@@ -22,7 +22,7 @@ function deposit() {
 
             $.ajax({
                 type: 'POST',
-                url: "{{ route('admin.client.deposit') }}",
+                url: "/admin/clients/deposit",
                 dataType: 'json',
                 data: {
                     _token: $('meta[name=csrf-token]').attr('content'),
@@ -47,7 +47,7 @@ function withdraw() {
         if (result.value) {
 
             let amount = result.value;
-
+            const clientId = document.getElementById('client_data').dataset.clientId;
             Swal.fire({
                 title: window.foodPunk.i18n.work_in_progress_wait,
                 text: window.foodPunk.i18n.message_in_progress,
@@ -61,11 +61,11 @@ function withdraw() {
 
             $.ajax({
                 type: 'POST',
-                url: "{{ route('admin.client.withdraw') }}",
+                url: "/admin/clients/withdraw",
                 dataType: 'json',
                 data: {
                     _token: $('meta[name=csrf-token]').attr('content'),
-                    userId: '{{ $client->id }}',
+                    userId: clientId,
                     amount: amount,
                 },
                 success: function (result) {

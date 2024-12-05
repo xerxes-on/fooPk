@@ -27,7 +27,7 @@
 </div>
 
 <h3 class="text-center">@lang('course::common.history')</h3>
-
+<div id="user-id" data-user-id="{{ $user_id }}"></div>
 @if($userCourses->count() > 0)
     <table class="table table-striped">
         <thead>
@@ -103,5 +103,5 @@
         messages_saved: "@lang('admin.messages.saved')",
         };
     </script>
-    <script src="{{ mix('js/admin/client/tab-challenges.js') }}"></script>
+    <script src="{{ mix('js/admin/client/main.js') }}"></script>
 @endpush

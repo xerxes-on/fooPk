@@ -38,7 +38,7 @@ jQuery(document).ready(function ($) {
 
             $.ajax({
                 type: 'POST',
-                url: "{{ route('admin.client.course.edit') }}",
+                url: "/admin/clients/course/edit",
                 dataType: 'json',
                 data: {
                     _token: $('meta[name=csrf-token]').attr('content'),
@@ -93,7 +93,7 @@ jQuery(document).ready(function ($) {
 
             $.ajax({
                 type: 'DELETE',
-                url: "{{ route('admin.client.course.destroy') }}",
+                url: "/admin/clients/course/destroy",
                 dataType: 'json',
                 data: {
                     _token: $('meta[name=csrf-token]').attr('content'),

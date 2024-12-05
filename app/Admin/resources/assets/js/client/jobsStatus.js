@@ -9,10 +9,11 @@ jQuery(document).ready(function ($) {
     }, 30000);
 });
 
+const clientId = document.getElementById('client-data').dataset.clientId;
 function checkCalculationStatus() {
     $.ajax({
         type: 'GET',
-        url: "{{ route('admin.recipes.check-calculation-status', ['userId' => $client->id]) }}",
+        url: ' /admin/recipes/check-job-status?userId='. clientId,
         dataType: 'json',
         data: {
             _token: $('meta[name=csrf-token]').attr('content'),
