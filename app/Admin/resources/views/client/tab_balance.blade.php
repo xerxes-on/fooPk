@@ -53,20 +53,23 @@
         @endforeach
         </tbody>
     </table>
-    <div id="client_data" data-client-id="{{ $client->id }}"></div>
 @else
     <div>@lang('common.transaction_empty')</div>
 @endif
 
 @push('footer-scripts')
     <script>
-        window.foodPunk.i18n = {
-            cs_count_message: "@lang('common.cs_count_message')",
+        const balance = {
+            csCountMessage: "@lang('common.cs_count_message')",
             deposit: "@lang('common.deposit')",
-            work_in_progress_wait: "@lang('common.work_in_progress_wait')",
-            message_in_progress: "@lang('admin.messages.in_progress')",
-            questionnaire_info_withdraw: "@lang('questionnaire.info.withdraw')",
-            questionnaire_info_withdraw_number: "@lang('questionnaire.info.withdraw_number')",
+            workInProgressWait: "@lang('common.work_in_progress_wait')",
+            messageInProgress: "@lang('admin.messages.in_progress')",
+            questionnaireInfoWithdraw: "@lang('questionnaire.info.withdraw')",
+            questionnaireInfoWithdrawNumber: "@lang('questionnaire.info.withdraw_number')",
+            clientId: {{$client->id}},
+            url: {{route('admin.clients.deposit')}},
+            urlWithdraw: {{route('admin.clients.withdraw')}},
+            userId: {{$client->id}}
         };
     </script>
     <script src="{{ mix('js/admin/client/main.js') }}"></script>

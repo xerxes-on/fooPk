@@ -1,7 +1,7 @@
 function deposit() {
     Swal.fire({
-        title: window.foodPunk.i18n.cs_count_message,
-        text: window.foodPunk.i18n.deposit,
+        title: balance.csCountMessage,
+        text: balance.deposit,
         input: 'number',
         icon: 'question',
     }).then(function (result) {
@@ -10,8 +10,8 @@ function deposit() {
             let amount = result.value;
 
             Swal.fire({
-                title: window.foodPunk.i18n.work_in_progress_wait,
-                text: window.foodPunk.i18n.message_in_progress,
+                title: balance.workInProgressWait,
+                text: balance.messageInProgress,
                 allowOutsideClick: false,
                 allowEscapeKey: false,
                 allowEnterKey: false,
@@ -22,11 +22,11 @@ function deposit() {
 
             $.ajax({
                 type: 'POST',
-                url: "/admin/clients/deposit",
+                url: balance.url,
                 dataType: 'json',
                 data: {
                     _token: $('meta[name=csrf-token]').attr('content'),
-                    userId: '{{ $client->id }}',
+                    userId: balance.userId,
                     amount: amount,
                 },
                 success: function (result) {
@@ -39,18 +39,17 @@ function deposit() {
 
 function withdraw() {
     Swal.fire({
-        title: window.foodPunk.i18n.questionnaire_info_withdraw,
-        text: window.foodPunk.i18n.questionnaire_info_withdraw_number,
+        title: balance.questionnaireInfoWithdraw,
+        text: balance.questionnaireInfoWithdrawNumber,
         input: 'number',
         icon: 'question',
     }).then(function (result) {
         if (result.value) {
 
             let amount = result.value;
-            const clientId = document.getElementById('client_data').dataset.clientId;
             Swal.fire({
-                title: window.foodPunk.i18n.work_in_progress_wait,
-                text: window.foodPunk.i18n.message_in_progress,
+                title: balance.workInProgressWait,
+                text: balance.messageInProgress,
                 allowOutsideClick: false,
                 allowEscapeKey: false,
                 allowEnterKey: false,
@@ -61,11 +60,11 @@ function withdraw() {
 
             $.ajax({
                 type: 'POST',
-                url: "/admin/clients/withdraw",
+                url: urlWithdraw,
                 dataType: 'json',
                 data: {
                     _token: $('meta[name=csrf-token]').attr('content'),
-                    userId: clientId,
+                    userId: balance.userId,
                     amount: amount,
                 },
                 success: function (result) {
