@@ -59,18 +59,3 @@
 @else
     <div>@lang('common.no_subscriptions')</div>
 @endif
-
-@push('footer-scripts')
-    <script>
-        window.foodPunk.i18n = {
-            messages_confirmation: "@lang('admin.messages.confirmation')",
-            messages_revert_info: "@lang('admin.messages.revert_info')",
-            messages_wait: "@lang('admin.messages.wait')",
-            messages_in_progress: "@lang('admin.messages.in_progress')",
-            common_change_date_title: "@lang('course::common.change_date.title')",
-            messages_saved: "@lang('admin.messages.saved')",
-        };
-    </script>
-    <script src="{{ mix('js/admin/client/main.js') }}"></script>
-
-@endpush

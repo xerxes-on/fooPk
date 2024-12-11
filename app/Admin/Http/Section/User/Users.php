@@ -129,6 +129,13 @@ final class Users extends Section implements Initializable
             $this->addCoursesTab($tabs);
         }
 
+        $elements = new \SleepingOwl\Admin\Form\FormElements([
+            AdminFormElement::view('admin::client.clients_edit_scripts', [
+                'client'=>$this->model_value,
+                'isConsultant'=>$this->isConsultant]),
+        ]);
+        $tabs->appendTab($elements, trans('common.client_information'));
+
         return $tabs;
     }
 

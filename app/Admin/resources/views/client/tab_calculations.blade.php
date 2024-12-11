@@ -156,15 +156,3 @@
 @else
     <h3>@lang('common.formular_data_empty')</h3>
 @endif
-@push('footer-scripts')
-    <script>
-        window.foodPunk.i18n = {
-            messages_confirmation: "@lang('admin.messages.confirmation')",
-            messages_revert_warning: "@lang('admin.messages.revert_warning')",
-            messages_wait: "@lang('admin.messages.wait')",
-            messages_in_progress: "@lang('admin.messages.in_progress')",
-            messages_saved: "@lang('admin.messages.saved')",
-        };
-    </script>
-    <script src="{{ mix('js/admin/client/main.js') }}"></script>
-@endpush

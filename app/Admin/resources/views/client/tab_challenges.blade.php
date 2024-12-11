@@ -93,15 +93,5 @@
     <script id="hidden-template" type="text/x-custom-template">
         <label for="datetimepicker" class="sr-only">@lang('course::common.date_start')</label>
         <input id="datetimepicker" class="form-control">
-
-        window.foodPunk.i18n = {
-        messages_confirmation: "@lang('admin.messages.confirmation')",
-        messages_revert_info: "@lang('admin.messages.revert_info')",
-        messages_wait: "@lang('admin.messages.wait')",
-        messages_in_progress: "@lang('admin.messages.in_progress')",
-        common_change_date_title: "@lang('course::common.change_date.title')",
-        messages_saved: "@lang('admin.messages.saved')",
-        };
     </script>
-    <script src="{{ mix('js/admin/client/main.js') }}"></script>
 @endpush

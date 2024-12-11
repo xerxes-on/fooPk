@@ -56,21 +56,3 @@
 @else
     <div>@lang('common.transaction_empty')</div>
 @endif
-
-@push('footer-scripts')
-    <script>
-        const balance = {
-            csCountMessage: "@lang('common.cs_count_message')",
-            deposit: "@lang('common.deposit')",
-            workInProgressWait: "@lang('common.work_in_progress_wait')",
-            messageInProgress: "@lang('admin.messages.in_progress')",
-            questionnaireInfoWithdraw: "@lang('questionnaire.info.withdraw')",
-            questionnaireInfoWithdrawNumber: "@lang('questionnaire.info.withdraw_number')",
-            clientId: {{$client->id}},
-            url: {{route('admin.clients.deposit')}},
-            urlWithdraw: {{route('admin.clients.withdraw')}},
-            userId: {{$client->id}}
-        };
-    </script>
-    <script src="{{ mix('js/admin/client/main.js') }}"></script>
-@endpush
