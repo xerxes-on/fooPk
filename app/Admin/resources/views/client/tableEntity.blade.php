@@ -150,7 +150,7 @@
         <th>@lang('admin.filters.status.title')</th>
         <th>@lang('admin.filters.language.title')</th>
         <th>@lang('common.registration_date')</th>
-        <th>{{$hideRecipesRandomizer}}</th>
+        <th></th>
     </tr>
     </thead>
 </table>
