@@ -5,7 +5,6 @@
 </div>
 
 <h3 class="text-center">@lang('common.subscription')</h3>
-<div id="client-id" data-client-id="{{ $client->id }}"></div>
 
 @if($subscriptions->count() > 0)
     <table class="table table-striped">

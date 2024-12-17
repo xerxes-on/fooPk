@@ -37,6 +37,7 @@ use SleepingOwl\Admin\Display\DisplayTabbed as NativeTabbed;
 use SleepingOwl\Admin\Form\Element\MultiSelect;
 use SleepingOwl\Admin\Form\FormElements;
 use SleepingOwl\Admin\Navigation\Page;
+use App\Enums\Admin\Permission\PermissionEnum;
 use SleepingOwl\Admin\Section;
 
 /**
@@ -74,11 +75,15 @@ final class Users extends Section implements Initializable
         Meta::loadPackage(['dataTables', 'ladda']);
         return AdminForm::elements(
             [
+                AdminFormElement::view('admin::client.clients_display_scripts',[
+                    'hideRecipesRandomizer' => !$isConsultant && auth()->user()->hasPermissionTo(PermissionEnum::ADD_RECIPES_TO_CLIENT->value),
+                ]),
                 AdminFormElement::custom()->setDisplay(
                     static fn() => view(
                         'admin::client.tableEntity',
                         [
                             'isConsultant'  => $isConsultant,
+                            'hideRecipesRandomizer' => !$isConsultant && auth()->user()->hasPermissionTo(PermissionEnum::ADD_RECIPES_TO_CLIENT->value),
                             'aboChallenges' => Course::get()->pluck('title', 'id')->toArray(),
                             'consultants'   => !$isConsultant ?
                                 Admin::role(RoleEnum::CONSULTANT->value, RoleEnum::ADMIN_GUARD)
@@ -128,11 +133,14 @@ final class Users extends Section implements Initializable
             $this->addChargebeeSubscriptionsTab($tabs);
             $this->addCoursesTab($tabs);
         }
-
-        $elements = new \SleepingOwl\Admin\Form\FormElements([
+        $elements = new FormElements([
             AdminFormElement::view('admin::client.clients_edit_scripts', [
                 'client'=>$this->model_value,
-                'isConsultant'=>$this->isConsultant]),
+                'isConsultant'=>$this->isConsultant,
+                'subscription'=>$this->model_value->subscription,
+                'canDeleteAllUserRecipes'=>auth()->user()->can(PermissionEnum::DELETE_ALL_USER_RECIPES->value),
+                'hideRecipesRandomizer' => !$this->isConsultant && auth()->user()->hasPermissionTo(PermissionEnum::ADD_RECIPES_TO_CLIENT->value)
+            ]),
         ]);
         $tabs->appendTab($elements, trans('common.client_information'));
 

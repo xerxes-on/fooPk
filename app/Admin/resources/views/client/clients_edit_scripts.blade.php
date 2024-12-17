@@ -1,45 +1,26 @@
-@php
-    use App\Enums\Admin\Permission\PermissionEnum;
-    use Modules\Chargebee\Enums\Admin\Client\Filters\ClientChargebeeSubscriptionFilterEnum;
-    use App\Enums\Admin\Client\Filters\ClientFormularFilterEnum;
-    use App\Enums\Admin\Client\Filters\ClientSubscriptionFilterEnum;
-    use App\Enums\Admin\Client\Filters\ClientConsultantFilterEnum;
-    use App\Models\Admin;
-
-    $hideRecipesRandomizer = !$isConsultant && $user->hasPermissionTo(PermissionEnum::ADD_RECIPES_TO_CLIENT->value);
-    $subscription = $client->subscription;
-
-    $canDeleteAllUserRecipes = $user->can(PermissionEnum::DELETE_ALL_USER_RECIPES->value);
-@endphp
 @push('scripts')
     <script>
         // tab recipes global vars
         let $tableRecipes;
         const selectedRecipesStorage = 'selected_recipes';
-
-        // tabEntity global vars
-        let $tablePopup, $tableUsers;
         const selectedPopupRecipesStorage = 'selected_popup_recipes';
-        const selectedUsersStorage = 'selected_users';
-        @if($hideRecipesRandomizer)
-            let element = document.querySelector('#submit-add-recipes');
-            if (element) {
-                let $SubmitAddRecipes = Ladda.create(element);
-            }
-        @endif
-        localStorage.removeItem(selectedPopupRecipesStorage);
+
     </script>
 @endpush
 
 @push('footer-scripts')
+    @php
+        use App\Enums\Admin\Permission\PermissionEnum;
+    @endphp
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
     <script>
+        let $SubmitAddRecipes = Ladda.create(document.querySelector('#submit-add-recipes'));
+
         // tab recipes From Subscription
         let $recipesByChallenge;
         // formular scripts
         $(document).ready(function () {
             let $form = $('#formularEdit');
-
             $form.validate({
                 lang: 'de',
                 ignore: [],
@@ -93,6 +74,7 @@
         }
 
         jQuery(document).ready(function ($) {
+
             var time = 30;
             setInterval(function () {
                 $('#js-check-refresh').html(--time);
@@ -751,138 +733,6 @@
                 }
 
             });
-            //     table Entity scripts
-            $(document).on('click change', 'input[type="radio"].random_recipe_distribution_type', function (el) {
-                let randomization_type = $(this).val();
-                $(document).find('.randomization_type_input').attr('disabled', 'disabled');
-                $(document).find('.randomization_type_' + randomization_type).removeAttr('disabled');
-            });
-
-            $tableUsers = $('#table-users')
-                .DataTable({
-                    searching: false,
-                    lengthChange: false,
-                    processing: true,
-                    serverSide: true,
-                    deferRender: true,
-                    pageLength: 20,
-                    paging: {
-                        type: 'input',
-                        buttons: 10,
-                    },
-                    select: {
-                        style: 'multi',
-                        selector: 'td:not(:last-child)',
-                    },
-                    order: [[0, 'desc']],
-                    ajax: {
-                        url: '/admin/datatable/async',
-                        data: function (d) {
-                            d.method = 'allUsers';
-                            d.filter = getFormData($('#user-filter'));
-                        },
-                    },
-                    layout: {
-                        topStart: null,
-                        topEnd: 'info',
-                        bottomStart: 'info',
-                        bottomEnd: 'paging'
-                    },
-                    columns: [
-                        {orderable: true, data: 'id'},
-                        {data: 'first_name'},
-                        {data: 'last_name'},
-                        {data: 'email'},
-                        {data: 'formular_approved', orderable: false},
-                        {data: 'subscription', orderable: false},
-                        {data: 'status', orderable: false},
-                        {data: 'lang'},
-                        {data: 'created_at'},
-                        {
-                            data: null,
-                            className: 'text-center',
-                            orderable: false,
-                            width: '80px',
-                            render: function (data, type, row) {
-                                return '<a href="{{ url('/') }}/admin/users/' + row.id +
-                                    '/edit" class="btn btn-xs btn-primary" title="Edit" data-toggle="tooltip">' +
-                                    '<span class="fas fa-pencil-alt"></span>' +
-                                    '</a>'
-                                        @can(PermissionEnum::DELETE_CLIENT->value, '\App\Models\Admin')
-                                    + ' ' +
-                                    '<form action="{{ url('/') }}/admin/users/' + row.id +
-                                    '/delete" method="POST" style="display:inline-block;">' +
-                                    '{{ csrf_field() }}' +
-                                    '<input type="hidden" name="_method" value="delete">' +
-                                    '<button class="btn btn-xs btn-danger btn-delete" title="Delete" data-toggle="tooltip">' +
-                                    '<i class="fas fa-trash-alt"></i>' +
-                                    '</button>' +
-                                    '</form>';
-                                @endcan
-                            },
-                        },
-                    ],
-                })
-                .on('draw', function (e, settings) {
-                    $tableUsers.rows().every(function () {
-                        let rowData = this.data();
-                        let alreadySelected = JSON.parse(localStorage.getItem(selectedUsersStorage));
-                        if (alreadySelected === null || alreadySelected.selected.length === 0) {
-                            return;
-                        }
-                        if (alreadySelected.selected.includes(rowData.id)) {
-                            this.select();
-                        }
-                    });
-                })
-                .on('select', function (e, dt, type, indexes) {
-                    let rowData = $tableUsers.rows(indexes).data();
-                    let alreadySelected = JSON.parse(localStorage.getItem(selectedUsersStorage))
-                    if (alreadySelected === null) {
-                        alreadySelected = {'selected': []};
-                    }
-
-                    // serialize selected rows
-                    $.each(rowData, function (index, row) {
-                        if (!alreadySelected.selected.includes(row.id)) {
-                            alreadySelected.selected.push(row.id);
-                        }
-                    });
-                    localStorage.setItem(selectedUsersStorage, JSON.stringify(alreadySelected));
-                })
-                .on('deselect', function (e, dt, type, indexes) {
-                    let rowData = $tableUsers.rows(indexes).data();
-                    let alreadySelected = JSON.parse(localStorage.getItem(selectedUsersStorage))
-                    if (alreadySelected === null) {
-                        return;
-                    }
-                    $.each(rowData, function (index, row) {
-                        let location = alreadySelected.selected.indexOf(row.id);
-
-                        if (location !== -1) {
-                            alreadySelected.selected.splice(location, 1);
-                        }
-                    });
-
-                    localStorage.setItem(selectedUsersStorage, JSON.stringify(alreadySelected));
-                });
-
-            $('#apply-filter').on('click', function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-                e.target.blur(); // button focus disabled
-
-                $tableUsers.draw();
-            });
-
-            $('#reset-filter').on('click', function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-                e.target.blur(); // button focus disabled
-
-                $('#user-filter')[0].reset();
-                $tableUsers.draw();
-            });
             // tab recipes scripts
             localStorage.removeItem(selectedRecipesStorage);
             localStorage.removeItem(selectedPopupRecipesStorage);
@@ -992,331 +842,459 @@
                         });
                 }
             });
-            //     tab recipes scripts
-            function addRecipes() {
-                $.colorbox({
-                    inline: true,
-                    width: '95%',
-                    top: 0,
-                    maxHeight: '98%',
-                    href: '#allRecipes-popup-wrapper',
-                    scrolling: true,
-                    onComplete: function () {
-                        if ($.fn.DataTable.isDataTable('#allRecipes-popup')) {
-                            return;
-                        }
-                        $tablePopup = $('#allRecipes-popup')
-                            .DataTable({
-                                processing: true,
-                                serverSide: true,
-                                autoWidth: false,
-                                select: {
-                                    style: 'multi',
-                                    info: false
-                                },
-                                searchDelay: 450,
-                                scrollY: '400px',
-                                pagingType: 'input',
-                                order: [[0, 'asc']],
-                                rowId: 'id',
-                                ajax: {
-                                    url: '/admin/datatable/async',
-                                    data: function (d) {
-                                        d.method = 'allRecipes';
-                                        d.userId = '{{ $client->id }}';
-                                        d.filters = {
-                                            ingestion: $('#recipeIngestionFilter').val(),
-                                            diet: $('#recipeDietFilter').val(),
-                                            complexity: $('#recipeComplexityFilter').val(),
-                                            cost: $('#recipeCostFilter').val(),
-                                            tag: $('#recipeTagFilter').val(),
-                                        };
-                                    },
-                                },
-                                drawCallback: function () {
-                                    setTimeout(function () {
-                                        $('#allRecipes-popup-wrapper').colorbox.resize();
-                                    }, 5);
-                                },
-                                columns: [
-                                    {
-                                        orderable: true,
-                                        paging: true,
-                                        data: 'id',
-                                        width: '5%',
-                                    },
-                                    {
-                                        data: 'title',
-                                        orderable: false,
-                                        width: '20%'
-                                    },
-                                    {
-                                        data: 'ingestions',
-                                        orderable: false,
-                                        width: '10%'
-                                    },
-                                    {
-                                        data: 'diets',
-                                        orderable: false,
-                                        width: '20%'
-                                    },
-                                    {
-                                        data: 'complexity',
-                                        orderable: false,
-                                        width: '8%'
-                                    },
-                                    {
-                                        data: 'price',
-                                        orderable: false,
-                                        width: '5%'
-                                    },
-                                    {
-                                        data: 'public_tags',
-                                        orderable: false,
-                                        width: '20%'
-                                    },
-                                    {
-                                        data: 'status',
-                                        orderable: false,
-                                        width: '5%'
-                                    },
-                                ],
-                            })
-                            .on('draw', function (e, settings) {
-                                $tablePopup.rows().every(function () {
-                                    let rowData = this.data();
-                                    let alreadySelected = JSON.parse(localStorage.getItem(selectedPopupRecipesStorage));
-                                    if (alreadySelected === null || alreadySelected.selected.length === 0) {
-                                        return;
-                                    }
-                                    if (alreadySelected.selected.includes(rowData.id)) {
-                                        this.select();
-                                    }
-                                });
-                            })
-                            .on('select', function (e, dt, type, indexes) {
-                                let rowData = $tablePopup.rows(indexes).data();
-                                let alreadySelected = JSON.parse(localStorage.getItem(selectedPopupRecipesStorage))
-                                if (alreadySelected === null) {
-                                    alreadySelected = {'selected': []};
-                                }
+        });
 
-                                // serialize selected rows
-                                $.each(rowData, function (index, row) {
-                                    if (!alreadySelected.selected.includes(row.id)) {
-                                        alreadySelected.selected.push(row.id);
-                                    }
-                                });
-                                localStorage.setItem(selectedPopupRecipesStorage, JSON.stringify(alreadySelected));
-                            })
-                            .on('deselect', function (e, dt, type, indexes) {
-                                let rowData = $tablePopup.rows(indexes).data();
-                                let alreadySelected = JSON.parse(localStorage.getItem(selectedPopupRecipesStorage))
-                                if (alreadySelected === null) {
-                                    return;
-                                }
-                                $.each(rowData, function (index, row) {
-                                    let location = alreadySelected.selected.indexOf(row.id);
-
-                                    if (location !== -1) {
-                                        alreadySelected.selected.splice(location, 1);
-                                    }
-                                });
-
-                                localStorage.setItem(selectedPopupRecipesStorage, JSON.stringify(alreadySelected));
-                            });
-
-                        // trigger filter TODO: maybe lock the btn and unlock on filter change?
-                        $('#js-dt-filter').click(function () {
-                            $tablePopup.ajax.reload();
-                        });
-                    }
-                });
-            }
-
-            function deleteRecipe(elem) {
-                let recipeId = $(elem).attr('data-id');
-
-                Swal.fire({
-                    title: '@lang('admin.messages.confirmation')',
-                    text: '@lang('admin.messages.revert_warning')',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    allowEnterKey: false,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes',
-                    cancelButtonText: 'No',
-                }).then((result) => {
-                    if (result.value) {
-                        Swal.fire({
-                            title: '{{trans('admin.messages.wait')}}',
-                            text: '{{trans('admin.messages.in_progress')}}',
-                            allowOutsideClick: false,
-                            allowEscapeKey: false,
-                            allowEnterKey: false,
-                            didOpen: () => {
-                                Swal.showLoading();
-                            },
-                        });
-
-                        let route = '{{ route('admin.recipes.delete-by-user', ['recipeId' => '%', 'userId' => $client->id]) }}';
-                        route = route.replace('%', recipeId);
-                        $.ajax({
-                            type: 'DELETE',
-                            url: route,
-                            dataType: 'json',
-                            success: function (result) {
-                                $tableRecipes.ajax.reload();
-                                renderCounterToolbarData();
-                                Swal.hideLoading();
-
-                                if (result.success) {
-                                    Swal.fire({
-                                        title: 'Success!',
-                                        html: result.message ? result.message : 'Success',
-                                        icon: 'success',
-                                    });
-                                    return;
-                                }
-
-                                Swal.fire({
-                                    title: 'Error!',
-                                    html: result.message ? result.message : 'Something went wrong',
-                                    icon: 'error',
-                                });
-                                console.error(result);
-                            },
-                            error: function (result) {
-                                Swal.hideLoading();
-                                Swal.fire({
-                                    title: 'Error!',
-                                    html: result.responseJSON.message ? result.responseJSON.message : 'Something went wrong.',
-                                    icon: 'error',
-                                });
-                            },
-                        });
-                    }
-                });
-            }
-
-            function deleteAllRecipes() {
-                Swal.fire({
-                    title: 'Are you sure to delete all recipes for this user?',
-                    text: '{{trans('admin.messages.revert_warning')}}',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    allowEnterKey: false,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes',
-                    cancelButtonText: 'No',
-                }).then((result) => {
-                    if (result.value) {
-                        Swal.fire({
-                            title: '{{trans('admin.messages.wait')}}',
-                            text: '{{trans('admin.messages.in_progress')}}',
-                            allowOutsideClick: false,
-                            allowEscapeKey: false,
-                            allowEnterKey: false,
-                            didOpen: () => {
-                                Swal.showLoading();
-                            },
-                        });
-
-                        $.ajax({
-                            type: 'DELETE',
-                            url: "{{ route('admin.recipes.delete-all-recipes', [ 'userId'=> $client->id]) }}",
-                            dataType: 'json',
-                            success: function (result) {
-                                // refresh DataTable
-                                $tableRecipes.ajax.reload();
-                                $('#counterToolbar').html('');
-                                Swal.hideLoading();
-                                Swal.fire({
-                                    title: 'Deleted!',
-                                    html: result.message,
-                                    icon: result.success ? 'success' : 'error',
-                                });
-                            },
-                            error: function (result) {
-                                Swal.hideLoading();
-                                Swal.fire({
-                                    title: 'Error!',
-                                    html: result.responseJSON.message ? result.responseJSON.message : 'Something went wrong.',
-                                    icon: 'error',
-                                });
-                            },
-                        });
-                    }
-                });
-            }
-
-            function toggleSelect(element) {
-                const status = $(element).prop('checked');
-                const elements = $('.js-delete-recipes');
-                if (elements.length === 0) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'No item!',
-                    });
-                    $('#delete-all-selected-recipes').hide();
-                    return;
-                }
-                if (status) {
-                    $('#delete-all-selected-recipes').show();
-                } else {
-                    $('#delete-all-selected-recipes').hide();
-                }
-
-                let alreadySelected = JSON.parse(localStorage.getItem(selectedRecipesStorage));
-                elements.each(function (index, item) {
-                    if (status === true) {
-                        alreadySelected.selected.push(item.dataset.id);
-                    } else {
-                        alreadySelected.selected = alreadySelected.selected.filter(function (value) {
-                            return value !== item.dataset.id;
-                        });
-                    }
-
-                    $(this).prop('checked', status);
-                });
-                alreadySelected.selected = alreadySelected.selected.filter(function (value, index, array) {
-                    return array.indexOf(value) === index;
-                });
-                localStorage.setItem(selectedRecipesStorage, JSON.stringify(alreadySelected));
-            }
-
-            function deleteSelectedRecipes() {
-                const data = JSON.parse(localStorage.getItem(selectedRecipesStorage));
-                if (data.selected.length === 0) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'No item selected!',
-                    });
-                    return;
-                }
-                // prompt for confirmation and proceed to delete items
-                Swal.fire({
-                    title: 'Are you sure to delete selected recipes for this user?',
-                    text: '{{trans('admin.messages.revert_warning')}}',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    allowEnterKey: false,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes',
-                    cancelButtonText: 'No',
-                }).then((result) => {
-                    if (!result.value) {
+        //     tab recipes scripts
+        function addRecipes() {
+            $.colorbox({
+                inline: true,
+                width: '95%',
+                top: 0,
+                maxHeight: '98%',
+                href: '#allRecipes-popup-wrapper',
+                scrolling: true,
+                onComplete: function () {
+                    if ($.fn.DataTable.isDataTable('#allRecipes-popup')) {
                         return;
                     }
+                    $tablePopup = $('#allRecipes-popup')
+                        .DataTable({
+                            processing: true,
+                            serverSide: true,
+                            autoWidth: false,
+                            select: {
+                                style: 'multi',
+                                info: false
+                            },
+                            searchDelay: 450,
+                            scrollY: '400px',
+                            pagingType: 'input',
+                            order: [[0, 'asc']],
+                            rowId: 'id',
+                            ajax: {
+                                url: '/admin/datatable/async',
+                                data: function (d) {
+                                    d.method = 'allRecipes';
+                                    d.userId = '{{ $client->id }}';
+                                    d.filters = {
+                                        ingestion: $('#recipeIngestionFilter').val(),
+                                        diet: $('#recipeDietFilter').val(),
+                                        complexity: $('#recipeComplexityFilter').val(),
+                                        cost: $('#recipeCostFilter').val(),
+                                        tag: $('#recipeTagFilter').val(),
+                                    };
+                                },
+                            },
+                            drawCallback: function () {
+                                setTimeout(function () {
+                                    $('#allRecipes-popup-wrapper').colorbox.resize();
+                                }, 5);
+                            },
+                            columns: [
+                                {
+                                    orderable: true,
+                                    paging: true,
+                                    data: 'id',
+                                    width: '5%',
+                                },
+                                {
+                                    data: 'title',
+                                    orderable: false,
+                                    width: '20%'
+                                },
+                                {
+                                    data: 'ingestions',
+                                    orderable: false,
+                                    width: '10%'
+                                },
+                                {
+                                    data: 'diets',
+                                    orderable: false,
+                                    width: '20%'
+                                },
+                                {
+                                    data: 'complexity',
+                                    orderable: false,
+                                    width: '8%'
+                                },
+                                {
+                                    data: 'price',
+                                    orderable: false,
+                                    width: '5%'
+                                },
+                                {
+                                    data: 'public_tags',
+                                    orderable: false,
+                                    width: '20%'
+                                },
+                                {
+                                    data: 'status',
+                                    orderable: false,
+                                    width: '5%'
+                                },
+                            ],
+                        })
+                        .on('draw', function (e, settings) {
+                            $tablePopup.rows().every(function () {
+                                let rowData = this.data();
+                                let alreadySelected = JSON.parse(localStorage.getItem(selectedPopupRecipesStorage));
+                                if (alreadySelected === null || alreadySelected.selected.length === 0) {
+                                    return;
+                                }
+                                if (alreadySelected.selected.includes(rowData.id)) {
+                                    this.select();
+                                }
+                            });
+                        })
+                        .on('select', function (e, dt, type, indexes) {
+                            let rowData = $tablePopup.rows(indexes).data();
+                            let alreadySelected = JSON.parse(localStorage.getItem(selectedPopupRecipesStorage))
+                            if (alreadySelected === null) {
+                                alreadySelected = {'selected': []};
+                            }
+
+                            // serialize selected rows
+                            $.each(rowData, function (index, row) {
+                                if (!alreadySelected.selected.includes(row.id)) {
+                                    alreadySelected.selected.push(row.id);
+                                }
+                            });
+                            localStorage.setItem(selectedPopupRecipesStorage, JSON.stringify(alreadySelected));
+                        })
+                        .on('deselect', function (e, dt, type, indexes) {
+                            let rowData = $tablePopup.rows(indexes).data();
+                            let alreadySelected = JSON.parse(localStorage.getItem(selectedPopupRecipesStorage))
+                            if (alreadySelected === null) {
+                                return;
+                            }
+                            $.each(rowData, function (index, row) {
+                                let location = alreadySelected.selected.indexOf(row.id);
+
+                                if (location !== -1) {
+                                    alreadySelected.selected.splice(location, 1);
+                                }
+                            });
+
+                            localStorage.setItem(selectedPopupRecipesStorage, JSON.stringify(alreadySelected));
+                        });
+
+                    // trigger filter TODO: maybe lock the btn and unlock on filter change?
+                    $('#js-dt-filter').click(function () {
+                        $tablePopup.ajax.reload();
+                    });
+                }
+            });
+        }
+
+        function deleteRecipe(elem) {
+            let recipeId = $(elem).attr('data-id');
+
+            Swal.fire({
+                title: '@lang('admin.messages.confirmation')',
+                text: '@lang('admin.messages.revert_warning')',
+                icon: 'warning',
+                showCancelButton: true,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                allowEnterKey: false,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No',
+            }).then((result) => {
+                if (result.value) {
+                    Swal.fire({
+                        title: '{{trans('admin.messages.wait')}}',
+                        text: '{{trans('admin.messages.in_progress')}}',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        allowEnterKey: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        },
+                    });
+
+                    let route = '{{ route('admin.recipes.delete-by-user', ['recipeId' => '%', 'userId' => $client->id]) }}';
+                    route = route.replace('%', recipeId);
+                    $.ajax({
+                        type: 'DELETE',
+                        url: route,
+                        dataType: 'json',
+                        success: function (result) {
+                            $tableRecipes.ajax.reload();
+                            renderCounterToolbarData();
+                            Swal.hideLoading();
+
+                            if (result.success) {
+                                Swal.fire({
+                                    title: 'Success!',
+                                    html: result.message ? result.message : 'Success',
+                                    icon: 'success',
+                                });
+                                return;
+                            }
+
+                            Swal.fire({
+                                title: 'Error!',
+                                html: result.message ? result.message : 'Something went wrong',
+                                icon: 'error',
+                            });
+                            console.error(result);
+                        },
+                        error: function (result) {
+                            Swal.hideLoading();
+                            Swal.fire({
+                                title: 'Error!',
+                                html: result.responseJSON.message ? result.responseJSON.message : 'Something went wrong.',
+                                icon: 'error',
+                            });
+                        },
+                    });
+                }
+            });
+        }
+
+        function deleteAllRecipes() {
+            Swal.fire({
+                title: 'Are you sure to delete all recipes for this user?',
+                text: '{{trans('admin.messages.revert_warning')}}',
+                icon: 'warning',
+                showCancelButton: true,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                allowEnterKey: false,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No',
+            }).then((result) => {
+                if (result.value) {
+                    Swal.fire({
+                        title: '{{trans('admin.messages.wait')}}',
+                        text: '{{trans('admin.messages.in_progress')}}',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        allowEnterKey: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        },
+                    });
+
+                    $.ajax({
+                        type: 'DELETE',
+                        url: "{{ route('admin.recipes.delete-all-recipes', [ 'userId'=> $client->id]) }}",
+                        dataType: 'json',
+                        success: function (result) {
+                            // refresh DataTable
+                            $tableRecipes.ajax.reload();
+                            $('#counterToolbar').html('');
+                            Swal.hideLoading();
+                            Swal.fire({
+                                title: 'Deleted!',
+                                html: result.message,
+                                icon: result.success ? 'success' : 'error',
+                            });
+                        },
+                        error: function (result) {
+                            Swal.hideLoading();
+                            Swal.fire({
+                                title: 'Error!',
+                                html: result.responseJSON.message ? result.responseJSON.message : 'Something went wrong.',
+                                icon: 'error',
+                            });
+                        },
+                    });
+                }
+            });
+        }
+
+        function toggleSelect(element) {
+            const status = $(element).prop('checked');
+            const elements = $('.js-delete-recipes');
+            if (elements.length === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'No item!',
+                });
+                $('#delete-all-selected-recipes').hide();
+                return;
+            }
+            if (status) {
+                $('#delete-all-selected-recipes').show();
+            } else {
+                $('#delete-all-selected-recipes').hide();
+            }
+
+            let alreadySelected = JSON.parse(localStorage.getItem(selectedRecipesStorage));
+            elements.each(function (index, item) {
+                if (status === true) {
+                    alreadySelected.selected.push(item.dataset.id);
+                } else {
+                    alreadySelected.selected = alreadySelected.selected.filter(function (value) {
+                        return value !== item.dataset.id;
+                    });
+                }
+
+                $(this).prop('checked', status);
+            });
+            alreadySelected.selected = alreadySelected.selected.filter(function (value, index, array) {
+                return array.indexOf(value) === index;
+            });
+            localStorage.setItem(selectedRecipesStorage, JSON.stringify(alreadySelected));
+        }
+
+        function deleteSelectedRecipes() {
+            const data = JSON.parse(localStorage.getItem(selectedRecipesStorage));
+            if (data.selected.length === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'No item selected!',
+                });
+                return;
+            }
+            // prompt for confirmation and proceed to delete items
+            Swal.fire({
+                title: 'Are you sure to delete selected recipes for this user?',
+                text: '{{trans('admin.messages.revert_warning')}}',
+                icon: 'warning',
+                showCancelButton: true,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                allowEnterKey: false,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No',
+            }).then((result) => {
+                if (!result.value) {
+                    return;
+                }
+                Swal.fire({
+                    title: '{{trans('admin.messages.wait')}}',
+                    text: '{{trans('admin.messages.in_progress')}}',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    allowEnterKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    },
+                });
+
+                $.ajax({
+                    type: 'POST',
+                    url: "{{ route('admin.recipes.delete-selected-recipes') }}",
+                    dataType: 'json',
+                    data: {
+                        _token: $('meta[name=csrf-token]').attr('content'),
+                        _method: 'DELETE',
+                        userId: {{$client->id}},
+                        recipes: data.selected,
+                    },
+                    success: function (result) {
+                        // refresh DataTable
+                        $tableRecipes.ajax.reload();
+                        renderCounterToolbarData();
+                        Swal.hideLoading();
+                        Swal.fire({
+                            title: 'Deleted!',
+                            html: result.message,
+                            icon: result.status,
+                        });
+
+                        localStorage.removeItem(selectedRecipesStorage);
+                        $('#delete-all-selected-recipes').hide();
+                    },
+                    error: function (result) {
+                        Swal.hideLoading();
+                        Swal.fire({
+                            title: 'Error!',
+                            html: result.responseJSON.message ? result.responseJSON.message : 'Something went wrong.',
+                            icon: 'error',
+                        });
+                    },
+                });
+            });
+        }
+
+        function submitAdding() {
+            let rowsSelected = JSON.parse(localStorage.getItem(selectedPopupRecipesStorage));
+
+            // check selected rows
+            if (rowsSelected === null || rowsSelected.selected.length === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'No item selected!',
+                });
+                return false;
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: "{{ route('admin.recipes.add-to-user') }}",
+                dataType: 'json',
+                data: {
+                    _token: $('meta[name=csrf-token]').attr('content'),
+                    userIds: [{{ $client->id }}],
+                    recipeIds: rowsSelected.selected,
+                },
+                beforeSend: function () {
+                    $.colorbox.close();
+                    Swal.fire({
+                        title: '{{trans('admin.messages.wait')}}',
+                        text: '{{trans('admin.messages.in_progress')}}',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        allowEnterKey: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        },
+                    });
+                    $SubmitAddRecipes.start();
+                },
+                success: function (data) {
+                    if (data.success === true) {
+                        Swal.hideLoading();
+                        Swal.fire({
+                            icon: 'success',
+                            title: '{{trans('admin.messages.saved')}}',
+                            html: data.message,
+                        });
+                    } else {
+                        Swal.hideLoading();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            html: data.message,
+                        });
+                    }
+                    // refresh DataTable
+                    $tableRecipes.ajax.reload();
+                    renderCounterToolbarData();
+                    $SubmitAddRecipes.stop();
+                    localStorage.removeItem(selectedPopupRecipesStorage);
+                },
+                error: function (data) {
+                    console.error(data);
+                    $SubmitAddRecipes.stop();
+                },
+            });
+        }
+
+        function recalculateUserRecipes() {
+            Swal.fire({
+                title: '{{trans('admin.messages.confirmation')}}',
+                text: '{{trans('admin.messages.revert_warning')}}',
+                icon: 'warning',
+                showCancelButton: true,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                allowEnterKey: false,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No',
+            }).then((result) => {
+                if (result.value) {
                     Swal.fire({
                         title: '{{trans('admin.messages.wait')}}',
                         text: '{{trans('admin.messages.in_progress')}}',
@@ -1330,340 +1308,212 @@
 
                     $.ajax({
                         type: 'POST',
-                        url: "{{ route('admin.recipes.delete-selected-recipes') }}",
+                        url: "{{ route('admin.recipes.recalculate-to-user') }}",
                         dataType: 'json',
                         data: {
                             _token: $('meta[name=csrf-token]').attr('content'),
-                            _method: 'DELETE',
-                            userId: {{$client->id}},
-                            recipes: data.selected,
+                            userId: '{{ $client->id }}',
                         },
-                        success: function (result) {
-                            // refresh DataTable
-                            $tableRecipes.ajax.reload();
-                            renderCounterToolbarData();
-                            Swal.hideLoading();
-                            Swal.fire({
-                                title: 'Deleted!',
-                                html: result.message,
-                                icon: result.status,
-                            });
-
-                            localStorage.removeItem(selectedRecipesStorage);
-                            $('#delete-all-selected-recipes').hide();
-                        },
-                        error: function (result) {
-                            Swal.hideLoading();
-                            Swal.fire({
-                                title: 'Error!',
-                                html: result.responseJSON.message ? result.responseJSON.message : 'Something went wrong.',
-                                icon: 'error',
-                            });
-                        },
-                    });
-                });
-            }
-
-            function submitAdding() {
-                let rowsSelected = JSON.parse(localStorage.getItem(selectedPopupRecipesStorage));
-
-                // check selected rows
-                if (rowsSelected === null || rowsSelected.selected.length === 0) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'No item selected!',
-                    });
-                    return false;
-                }
-
-                $.ajax({
-                    type: 'POST',
-                    url: "{{ route('admin.recipes.add-to-user') }}",
-                    dataType: 'json',
-                    data: {
-                        _token: $('meta[name=csrf-token]').attr('content'),
-                        userIds: [{{ $client->id }}],
-                        recipeIds: rowsSelected.selected,
-                    },
-                    beforeSend: function () {
-                        $.colorbox.close();
-                        Swal.fire({
-                            title: '{{trans('admin.messages.wait')}}',
-                            text: '{{trans('admin.messages.in_progress')}}',
-                            allowOutsideClick: false,
-                            allowEscapeKey: false,
-                            allowEnterKey: false,
-                            didOpen: () => {
-                                Swal.showLoading();
-                            },
-                        });
-                        $SubmitAddRecipes.start();
-                    },
-                    success: function (data) {
-                        if (data.success === true) {
-                            Swal.hideLoading();
-                            Swal.fire({
-                                icon: 'success',
-                                title: '{{trans('admin.messages.saved')}}',
-                                html: data.message,
-                            });
-                        } else {
-                            Swal.hideLoading();
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Oops...',
-                                html: data.message,
-                            });
-                        }
-                        // refresh DataTable
-                        $tableRecipes.ajax.reload();
-                        renderCounterToolbarData();
-                        $SubmitAddRecipes.stop();
-                        localStorage.removeItem(selectedPopupRecipesStorage);
-                    },
-                    error: function (data) {
-                        console.error(data);
-                        $SubmitAddRecipes.stop();
-                    },
-                });
-            }
-
-            function recalculateUserRecipes() {
-                Swal.fire({
-                    title: '{{trans('admin.messages.confirmation')}}',
-                    text: '{{trans('admin.messages.revert_warning')}}',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    allowEnterKey: false,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes',
-                    cancelButtonText: 'No',
-                }).then((result) => {
-                    if (result.value) {
-                        Swal.fire({
-                            title: '{{trans('admin.messages.wait')}}',
-                            text: '{{trans('admin.messages.in_progress')}}',
-                            allowOutsideClick: false,
-                            allowEscapeKey: false,
-                            allowEnterKey: false,
-                            didOpen: () => {
-                                Swal.showLoading();
-                            },
-                        });
-
-                        $.ajax({
-                            type: 'POST',
-                            url: "{{ route('admin.recipes.recalculate-to-user') }}",
-                            dataType: 'json',
-                            data: {
-                                _token: $('meta[name=csrf-token]').attr('content'),
-                                userId: '{{ $client->id }}',
-                            },
-                            success: function (data) {
-                                if (data.success === true) {
-                                    Swal.hideLoading();
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Recalculated!',
-                                        text: 'All recipes recalculated.',
-                                        html: data.message,
-                                    });
-                                } else {
-                                    Swal.hideLoading();
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Oops...',
-                                        html: data.message,
-                                    });
-                                }
-                                // refresh DataTable
-                                $tableRecipes.ajax.reload();
-                            }, error: function (data) {
+                        success: function (data) {
+                            if (data.success === true) {
+                                Swal.hideLoading();
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Recalculated!',
+                                    text: 'All recipes recalculated.',
+                                    html: data.message,
+                                });
+                            } else {
                                 Swal.hideLoading();
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Oops...',
-                                    html: data.responseJSON.message,
+                                    html: data.message,
                                 });
-                                $tableRecipes.ajax.reload();
-                            },
-                        });
-                    }
-                });
-            }
-
-            const inputRecipeAmount = async function () {
-                const {value: formValues} = await Swal.fire({
-                    title: 'Randomize recipes settings',
-                    icon: 'question',
-                    html: `<div id="randomizeRecipeComponent"></div>`,
-                    willOpen: () => {
-                        Swal.showLoading();
-                        $.get(
-                            '{{route('admin.client.randomize-recipe-template')}}',
-                            {}, (payload) => {
-                                Swal.hideLoading();
-                                Swal.getHtmlContainer().querySelector('#randomizeRecipeComponent').innerHTML = payload;
-                            });
-                    },
-                    preConfirm: () => {
-                        const container = Swal.getHtmlContainer();
-                        let seasons = [];
-                        let items = container.getElementsByClassName('selected_seasons');
-                        for (let i = 0; i < items.length; i++) {
-                            let val = items[i].value;
-                            if (items[i].checked && val.length > 0) {
-                                seasons.push(val);
                             }
-                        }
-                        return {
-                            amount: container.querySelector('input[name="amount_of_recipes"]').value,
-                            seasons: seasons,
-                            distribution_type: container.querySelector('input[name="distribution_type"]:checked').value,
-                            breakfast_snack: container.querySelector('input[name="breakfast_snack"]').value,
-                            lunch_dinner: container.querySelector('input[name="lunch_dinner"]').value,
-                            recipes_tag: container.querySelector('input[name="recipes_tag"]:checked').value,
-                            distribution_mode: container.querySelector('input[name="distribution_mode"]:checked').value,
-                        };
-                    },
-                });
-
-                return formValues;
-            };
-
-            function renderCounterToolbarData() {
-                $.ajax({
-                    type: 'GET',
-                    url: '{{route('admin.client.recipes.count-data')}}',
-                    dataType: 'json',
-                    data: {
-                        _token: $('meta[name=csrf-token]').attr('content'),
-                        userId: '{{ $client->id }}',
-                    },
-                    success: function (data) {
-                        $('#counterToolbar').html(data.success === true ? data.message : '');
-                    },
-                    error: function (jqXHR) {
-                        $('#counterToolbar').html(`Error: <b>${jqXHR.responseJSON.message}</b>`);
-                    },
-                });
-            }
-
-            function openInfoModal(element, recipeId) {
-                let route = "{{ route('admin.search-recipes.preview', ['recipeId' => '%', 'userId' => $client->id]) }}";
-                route = route.replace('%', recipeId);
-                $.ajax({
-                    type: 'GET',
-                    url: route,
-                    dataType: 'json',
-                    beforeSend: function () {
-                        $(element).append('<span class="fa fa-spinner fa-spin" aria-hidden="true"></span>');
-                    },
-                    success: function (data) {
-                        $(element).find('span.fa.fa-spinner.fa-spin').remove();
-                        if (!data.success) {
+                            // refresh DataTable
+                            $tableRecipes.ajax.reload();
+                        }, error: function (data) {
+                            Swal.hideLoading();
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Oops...',
-                                html: data.message,
+                                html: data.responseJSON.message,
                             });
-                            return;
+                            $tableRecipes.ajax.reload();
+                        },
+                    });
+                }
+            });
+        }
+
+        const inputRecipeAmount = async function () {
+            const {value: formValues} = await Swal.fire({
+                title: 'Randomize recipes settings',
+                icon: 'question',
+                html: `<div id="randomizeRecipeComponent"></div>`,
+                willOpen: () => {
+                    Swal.showLoading();
+                    $.get(
+                        '{{route('admin.client.randomize-recipe-template')}}',
+                        {}, (payload) => {
+                            Swal.hideLoading();
+                            Swal.getHtmlContainer().querySelector('#randomizeRecipeComponent').innerHTML = payload;
+                        });
+                },
+                preConfirm: () => {
+                    const container = Swal.getHtmlContainer();
+                    let seasons = [];
+                    let items = container.getElementsByClassName('selected_seasons');
+                    for (let i = 0; i < items.length; i++) {
+                        let val = items[i].value;
+                        if (items[i].checked && val.length > 0) {
+                            seasons.push(val);
                         }
-                        const modal = $('#recipeDetailsModal');
-                        modal.modal('show');
-                        modal.find('.modal-title').html(data.title);
-                        modal.find('.modal-body').html(data.data);
-                    },
-                    error: function (jqXHR) {
-                        $(element).find('span.fa.fa-spinner.fa-spin').remove();
+                    }
+                    return {
+                        amount: container.querySelector('input[name="amount_of_recipes"]').value,
+                        seasons: seasons,
+                        distribution_type: container.querySelector('input[name="distribution_type"]:checked').value,
+                        breakfast_snack: container.querySelector('input[name="breakfast_snack"]').value,
+                        lunch_dinner: container.querySelector('input[name="lunch_dinner"]').value,
+                        recipes_tag: container.querySelector('input[name="recipes_tag"]:checked').value,
+                        distribution_mode: container.querySelector('input[name="distribution_mode"]:checked').value,
+                    };
+                },
+            });
+
+            return formValues;
+        };
+
+        function renderCounterToolbarData() {
+            $.ajax({
+                type: 'GET',
+                url: '{{route('admin.client.recipes.count-data')}}',
+                dataType: 'json',
+                data: {
+                    _token: $('meta[name=csrf-token]').attr('content'),
+                    userId: '{{ $client->id }}',
+                },
+                success: function (data) {
+                    $('#counterToolbar').html(data.success === true ? data.message : '');
+                },
+                error: function (jqXHR) {
+                    $('#counterToolbar').html(`Error: <b>${jqXHR.responseJSON.message}</b>`);
+                },
+            });
+        }
+
+        function openInfoModal(element, recipeId) {
+            let route = "{{ route('admin.search-recipes.preview', ['recipeId' => '%', 'userId' => $client->id]) }}";
+            route = route.replace('%', recipeId);
+            $.ajax({
+                type: 'GET',
+                url: route,
+                dataType: 'json',
+                beforeSend: function () {
+                    $(element).append('<span class="fa fa-spinner fa-spin" aria-hidden="true"></span>');
+                },
+                success: function (data) {
+                    $(element).find('span.fa.fa-spinner.fa-spin').remove();
+                    if (!data.success) {
                         Swal.fire({
                             icon: 'error',
                             title: 'Oops...',
-                            html: jqXHR.responseJSON.message,
+                            html: data.message,
                         });
-                        console.error(jqXHR);
-                    },
-                });
-            }
-            const addRandomizeRecipes = async function () {
-                let userIds = [{{ $client->id }}];
+                        return;
+                    }
+                    const modal = $('#recipeDetailsModal');
+                    modal.modal('show');
+                    modal.find('.modal-title').html(data.title);
+                    modal.find('.modal-body').html(data.data);
+                },
+                error: function (jqXHR) {
+                    $(element).find('span.fa.fa-spinner.fa-spin').remove();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        html: jqXHR.responseJSON.message,
+                    });
+                    console.error(jqXHR);
+                },
+            });
+        }
+        const addRandomizeRecipes = async function () {
+            let userIds = [{{ $client->id }}];
 
-                // get recipe amount
-                const initFormData = await inputRecipeAmount();
+            // get recipe amount
+            const initFormData = await inputRecipeAmount();
 
-                if (initFormData === undefined) return false;
+            if (initFormData === undefined) return false;
 
-                let amount = initFormData.amount;
-                let seasons = initFormData.seasons;
-                let distribution_type = initFormData.distribution_type;
-                let breakfast_snack = initFormData.breakfast_snack;
-                let lunch_dinner = initFormData.lunch_dinner;
-                let recipes_tag = initFormData.recipes_tag;
-                let distribution_mode = initFormData.distribution_mode;
+            let amount = initFormData.amount;
+            let seasons = initFormData.seasons;
+            let distribution_type = initFormData.distribution_type;
+            let breakfast_snack = initFormData.breakfast_snack;
+            let lunch_dinner = initFormData.lunch_dinner;
+            let recipes_tag = initFormData.recipes_tag;
+            let distribution_mode = initFormData.distribution_mode;
 
-                // check amount
-                if (amount === undefined || amount === 0) return false;
+            // check amount
+            if (amount === undefined || amount === 0) return false;
 
-                $.ajax({
-                    type: 'POST',
-                    url: "{{ route('admin.recipes.add-to-user-random') }}",
-                    dataType: 'json',
-                    data: {
-                        _token: $('meta[name=csrf-token]').attr('content'),
-                        userIds: userIds,
-                        amount: amount,
-                        seasons: seasons,
-                        distribution_type: distribution_type,
-                        breakfast_snack: breakfast_snack,
-                        lunch_dinner: lunch_dinner,
-                        recipes_tag: recipes_tag,
-                        distribution_mode: distribution_mode,
-                    },
-                    beforeSend: function () {
+            $.ajax({
+                type: 'POST',
+                url: "{{ route('admin.recipes.add-to-user-random') }}",
+                dataType: 'json',
+                data: {
+                    _token: $('meta[name=csrf-token]').attr('content'),
+                    userIds: userIds,
+                    amount: amount,
+                    seasons: seasons,
+                    distribution_type: distribution_type,
+                    breakfast_snack: breakfast_snack,
+                    lunch_dinner: lunch_dinner,
+                    recipes_tag: recipes_tag,
+                    distribution_mode: distribution_mode,
+                },
+                beforeSend: function () {
+                    Swal.fire({
+                        title: '{{trans('admin.messages.wait')}}',
+                        text: '{{trans('admin.messages.in_progress')}}',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        allowEnterKey: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        },
+                    });
+                },
+                success: function (data) {
+                    if (data.success === true) {
+                        Swal.hideLoading();
                         Swal.fire({
-                            title: '{{trans('admin.messages.wait')}}',
-                            text: '{{trans('admin.messages.in_progress')}}',
-                            allowOutsideClick: false,
-                            allowEscapeKey: false,
-                            allowEnterKey: false,
-                            didOpen: () => {
-                                Swal.showLoading();
-                            },
+                            icon: 'success',
+                            title: 'Your work has been saved!',
+                            html: data.message,
                         });
-                    },
-                    success: function (data) {
-                        if (data.success === true) {
-                            Swal.hideLoading();
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Your work has been saved!',
-                                html: data.message,
-                            });
-                        } else {
-                            Swal.hideLoading();
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Oops...',
-                                html: data.message,
-                            });
-                        }
-                    },
-                    error: function (jqXHR) {
+                    } else {
                         Swal.hideLoading();
                         Swal.fire({
                             icon: 'error',
                             title: 'Oops...',
-                            html: jqXHR.responseJSON.message,
+                            html: data.message,
                         });
-                        console.error(jqXHR);
-                    },
-                });
-            };
-
-        });
+                    }
+                },
+                error: function (jqXHR) {
+                    Swal.hideLoading();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        html: jqXHR.responseJSON.message,
+                    });
+                    console.error(jqXHR);
+                },
+            });
+        };
         //     tab-balance scripts
         function deposit() {
             Swal.fire({
@@ -1865,232 +1715,6 @@
                     });
                 });
         }
-
-        //      table Entity scripts
-        function getFormData($form) {
-            let unIndexed_array = $form.serializeArray(),
-                indexed_array = {};
-
-            $.map(unIndexed_array, function (item) {
-                if (!item.value) return null;
-                indexed_array[item.name] = item.value;
-            });
-
-            return indexed_array;
-        }
-
-        function addRecipes2selectUsers() {
-            let usersSelected = JSON.parse(localStorage.getItem(selectedUsersStorage));
-
-            // check selected rows
-            if (usersSelected === null || usersSelected.selected.length === 0) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'No User selected!',
-                });
-                return false;
-            }
-
-            $.colorbox({
-                inline: true,
-                top: '0',
-                width: '96%',
-                maxHeight: '96%',
-                href: '#allRecipes-popup-wrapper',
-                scrolling: false,
-                onComplete: function () {
-                    if ($.fn.DataTable.isDataTable('#allRecipes-popup')) {
-                        return;
-                    }
-                    // TODO: only on click
-                    $tablePopup = $('#allRecipes-popup').DataTable({
-                        lengthChange: true,
-                        autoWidth: false,
-                        processing: true,
-                        serverSide: true,
-                        searchDelay: 450,
-                        select: {
-                            style: 'multi'
-                        },
-                        paging: {
-                            type: 'input',
-                            buttons: 10,
-                        },
-                        order: [[0, 'asc']],
-                        ajax: {
-                            url: '/admin/datatable/async',
-                            data: function (d) {
-                                d.method = 'allRecipes';
-                            },
-                        },
-                        drawCallback: function () {
-                            setTimeout(function () {
-                                $('#allRecipes-popup-wrapper').colorbox.resize();
-                            }, 5);
-                        },
-                        columns: [
-                            {
-                                searchable: false,
-                                data: 'id',
-                                width: '5%',
-                            },
-                            {
-                                data: 'title',
-                                width: '30%',
-                                orderable: false,
-                            },
-                            {
-                                data: 'ingestions',
-                                width: '15%',
-                                orderable: false,
-                            },
-                            {
-                                data: 'diets',
-                                width: '30%',
-                                orderable: false,
-                            },
-                            {
-                                data: 'status',
-                                width: '5%',
-                            },
-                        ],
-                    }).on('draw', function (e, settings) {
-                        $tablePopup.rows().every(function () {
-                            let rowData = this.data();
-                            let alreadySelected = JSON.parse(localStorage.getItem(selectedPopupRecipesStorage));
-                            if (alreadySelected === null || alreadySelected.selected.length === 0) {
-                                return;
-                            }
-                            if (alreadySelected.selected.includes(rowData.id)) {
-                                this.select();
-                            }
-                        });
-                    })
-                        .on('select', function (e, dt, type, indexes) {
-                            let rowData = $tablePopup.rows(indexes).data();
-                            let alreadySelected = JSON.parse(localStorage.getItem(selectedPopupRecipesStorage))
-                            if (alreadySelected === null) {
-                                alreadySelected = {'selected': []};
-                            }
-
-                            // serialize selected rows
-                            $.each(rowData, function (index, row) {
-                                if (!alreadySelected.selected.includes(row.id)) {
-                                    alreadySelected.selected.push(row.id);
-                                }
-                            });
-                            localStorage.setItem(selectedPopupRecipesStorage, JSON.stringify(alreadySelected));
-                        })
-                        .on('deselect', function (e, dt, type, indexes) {
-                            let rowData = $tablePopup.rows(indexes).data();
-                            let alreadySelected = JSON.parse(localStorage.getItem(selectedPopupRecipesStorage))
-                            if (alreadySelected === null) {
-                                return;
-                            }
-                            $.each(rowData, function (index, row) {
-                                let location = alreadySelected.selected.indexOf(row.id);
-
-                                if (location !== -1) {
-                                    alreadySelected.selected.splice(location, 1);
-                                }
-                            });
-
-                            localStorage.setItem(selectedPopupRecipesStorage, JSON.stringify(alreadySelected));
-                        });
-                }
-            });
-        }
-
-        const addRandomizeRecipes2selectUsers = async function () {
-            let usersSelected = $tableUsers.rows({selected: true}).data();
-            let userIds = [];
-
-            // check selected rows
-            if (usersSelected.length === 0) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'No User selected!',
-                });
-                return false;
-            }
-
-            // get recipe amount
-            const initFormData = await inputRecipeAmount();
-
-            if (initFormData === undefined) return false;
-
-            let amount = initFormData.amount;
-            let seasons = initFormData.seasons;
-            let distribution_type = initFormData.distribution_type;
-            let breakfast_snack = initFormData.breakfast_snack;
-            let lunch_dinner = initFormData.lunch_dinner;
-            let recipes_tag = initFormData.recipes_tag;
-            let distribution_mode = initFormData.distribution_mode;
-
-            // check amount
-            if (amount === undefined || amount === 0) return false;
-
-            // serialize selected users
-            $.each(usersSelected, function (index, row) {
-                userIds.push(row.id);
-            });
-
-            $.ajax({
-                type: 'POST',
-                url: "{{ route('admin.recipes.add-to-user-random') }}",
-                dataType: 'json',
-                data: {
-                    _token: $('meta[name=csrf-token]').attr('content'),
-                    userIds: userIds,
-                    amount: amount,
-                    seasons: seasons,
-                    distribution_type: distribution_type,
-                    breakfast_snack: breakfast_snack,
-                    lunch_dinner: lunch_dinner,
-                    recipes_tag: recipes_tag,
-                    distribution_mode: distribution_mode,
-                },
-                beforeSend: function () {
-                    Swal.fire({
-                        title: '{{trans('admin.messages.wait')}}',
-                        text: '{{trans('admin.messages.in_progress')}}',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        allowEnterKey: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        },
-                    });
-                },
-                success: function (data) {
-                    if (data.success === true) {
-                        Swal.hideLoading();
-                        Swal.fire({
-                            icon: 'success',
-                            title: '{{trans('admin.messages.saved')}}',
-                            html: data.message,
-                        });
-                    } else {
-                        Swal.hideLoading();
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            html: data.message,
-                        });
-                    }
-                    $tableUsers.rows({selected: true}).data();
-                },
-                error: function (jqXHR) {
-                    Swal.hideLoading();
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        html: jqXHR.responseJSON.message,
-                    });
-                    console.error(jqXHR);
-                },
-            });
-        };
 
     </script>
 @endpush

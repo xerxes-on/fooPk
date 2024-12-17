@@ -1,7 +1,9 @@
 @php
-    use Modules\Chargebee\Enums\Admin\Client\Filters\ClientChargebeeSubscriptionFilterEnum;use App\Enums\Admin\Client\Filters\ClientFormularFilterEnum;use App\Enums\Admin\Client\Filters\ClientSubscriptionFilterEnum;use App\Enums\Admin\Client\Filters\ClientConsultantFilterEnum;use App\Enums\Admin\Permission\PermissionEnum;
-
-    $hideRecipesRandomizer = !$isConsultant && $user->hasPermissionTo(PermissionEnum::ADD_RECIPES_TO_CLIENT->value);
+    use Modules\Chargebee\Enums\Admin\Client\Filters\ClientChargebeeSubscriptionFilterEnum;
+    use App\Enums\Admin\Client\Filters\ClientFormularFilterEnum;
+    use App\Enums\Admin\Client\Filters\ClientSubscriptionFilterEnum;
+    use App\Enums\Admin\Client\Filters\ClientConsultantFilterEnum;
+    use App\Enums\Admin\Permission\PermissionEnum;
 @endphp
 <div class="text-left mb-3">
     @can(PermissionEnum::CREATE_CLIENT->value, '\App\Models\Admin')
@@ -148,7 +150,7 @@
         <th>@lang('admin.filters.status.title')</th>
         <th>@lang('admin.filters.language.title')</th>
         <th>@lang('common.registration_date')</th>
-        <th></th>
+        <th>{{$hideRecipesRandomizer}}</th>
     </tr>
     </thead>
 </table>
@@ -159,7 +161,7 @@
                 <thead>
                 <tr>
                     <th>#</th>
-                    <th>@lang('common.title')</th>
+                    <th>@lang('subscription')</th>
                     <th>@lang('common.day_category')</th>
                     <th>@lang('common.diets')</th>
                     <th>@lang('common.status')</th>
@@ -177,128 +179,3 @@
         </div>
     </div>
 @endif
-@push('footer-scripts')
-    <script>
-        const inputRecipeAmount = async function () {
-            const {value: formValues} = await Swal.fire({
-                title: 'Randomize recipes settings',
-                icon: 'question',
-                html: `<div id="randomizeRecipeComponent"></div>`,
-                willOpen: () => {
-                    Swal.showLoading();
-                    $.get(
-                        '{{route('admin.client.randomize-recipe-template')}}',
-                        {}, (payload) => {
-                            Swal.hideLoading();
-                            Swal.getHtmlContainer().querySelector('#randomizeRecipeComponent').innerHTML = payload;
-                        });
-                },
-                preConfirm: () => {
-                    const container = Swal.getHtmlContainer();
-                    let seasons = [];
-                    let items = container.getElementsByClassName('selected_seasons');
-                    for (let i = 0; i < items.length; i++) {
-                        let val = items[i].value;
-                        if (items[i].checked && val.length > 0) {
-                            seasons.push(val);
-                        }
-                    }
-                    return {
-                        amount: container.querySelector('input[name="amount_of_recipes"]').value,
-                        seasons: seasons,
-                        distribution_type: container.querySelector('input[name="distribution_type"]:checked').value,
-                        breakfast_snack: container.querySelector('input[name="breakfast_snack"]').value,
-                        lunch_dinner: container.querySelector('input[name="lunch_dinner"]').value,
-                        recipes_tag: container.querySelector('input[name="recipes_tag"]:checked').value,
-                        distribution_mode: container.querySelector('input[name="distribution_mode"]:checked').value,
-                    };
-                },
-            });
-
-            return formValues;
-        };
-
-        function submitAdding() {
-            let rowsSelected = JSON.parse(localStorage.getItem(selectedPopupRecipesStorage));
-            let usersSelected = JSON.parse(localStorage.getItem(selectedUsersStorage));
-
-            // check selected rows
-            if (rowsSelected === null || rowsSelected.selected.length === 0) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'No item selected!',
-                });
-                return false;
-            }
-
-            // check selected rows
-            if (usersSelected === null || usersSelected.selected.length === 0) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'No User selected!',
-                });
-                return false;
-            }
-
-            $.ajax({
-                type: 'POST',
-                url: "{{ route('admin.recipes.add-to-user') }}",
-                dataType: 'json',
-                data: {
-                    _token: $('meta[name=csrf-token]').attr('content'),
-                    userIds: usersSelected.selected,
-                    recipeIds: rowsSelected.selected,
-                },
-                beforeSend: function () {
-                    $.colorbox.close();
-                    Swal.fire({
-                        title: '{{trans('admin.messages.wait')}}',
-                        text: '{{trans('admin.messages.in_progress')}}',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        allowEnterKey: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        },
-                    });
-                    @if($hideRecipesRandomizer)
-                    $SubmitAddRecipes.start();
-                    @endif
-                },
-                success: function (data) {
-                    if (data.success === true) {
-                        Swal.hideLoading();
-                        Swal.fire({
-                            icon: 'success',
-                            title: '{{trans('admin.messages.saved')}}',
-                            html: data.message,
-                        });
-                    } else {
-                        Swal.hideLoading();
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            html: data.message,
-                        });
-                    }
-                    // refresh DataTable
-                    @if($hideRecipesRandomizer)
-                    $SubmitAddRecipes.stop();
-                    @endif
-                    localStorage.removeItem(selectedPopupRecipesStorage);
-                    localStorage.removeItem(selectedUsersStorage);
-                },
-                error: function (data) {
-                    Swal.hideLoading();
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        html: jqXHR.responseJSON.message,
-                    });
-                    console.error(jqXHR);
-                    $SubmitAddRecipes.stop();
-                },
-            });
-        }
-    </script>
-@endpush

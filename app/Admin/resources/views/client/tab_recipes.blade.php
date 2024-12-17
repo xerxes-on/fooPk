@@ -1,7 +1,6 @@
 @php
-    use App\Enums\Admin\Permission\PermissionEnum;
+    use App\Enums\Admin\Permission\PermissionEnum;use App\Models\Admin;
     $canDeleteAllUserRecipes = $user->can(PermissionEnum::DELETE_ALL_USER_RECIPES->value);
-
 @endphp
 <div class="text-left" style="margin-bottom: 10px">
     @can(PermissionEnum::ADD_RECIPES_TO_CLIENT->value, Admin::class)
