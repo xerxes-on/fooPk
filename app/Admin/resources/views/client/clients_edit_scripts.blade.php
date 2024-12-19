@@ -92,7 +92,8 @@
                 let approve = $(this).prop('checked');
 
                 Swal.fire({
-                    title: '{{trans('admin.messages.confirmation')}}',
+                    title: 'Bitch',
+                    {{--title: '{{trans('admin.messages.confirmation')}}',--}}
                     text: '{{trans('admin.messages.revert_warning')}}',
                     icon: 'warning',
                     showCancelButton: true,
