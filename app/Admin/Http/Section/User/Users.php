@@ -72,18 +72,20 @@ final class Users extends Section implements Initializable
     public function onDisplay(): FormElements
     {
         $isConsultant = auth()->user()->hasRole(RoleEnum::CONSULTANT->value);
+        $hideRecipesRandomizer = !$isConsultant && auth()->user()->hasPermissionTo(PermissionEnum::ADD_RECIPES_TO_CLIENT->value);
+
         Meta::loadPackage(['dataTables', 'ladda']);
         return AdminForm::elements(
             [
                 AdminFormElement::view('admin::client.clients_display_scripts',[
-                    'hideRecipesRandomizer' => !$isConsultant && auth()->user()->hasPermissionTo(PermissionEnum::ADD_RECIPES_TO_CLIENT->value),
+                    'hideRecipesRandomizer' => $hideRecipesRandomizer,
                 ]),
                 AdminFormElement::custom()->setDisplay(
                     static fn() => view(
                         'admin::client.tableEntity',
                         [
                             'isConsultant'  => $isConsultant,
-                            'hideRecipesRandomizer' => !$isConsultant && auth()->user()->hasPermissionTo(PermissionEnum::ADD_RECIPES_TO_CLIENT->value),
+                            'hideRecipesRandomizer' => $hideRecipesRandomizer,
                             'aboChallenges' => Course::get()->pluck('title', 'id')->toArray(),
                             'consultants'   => !$isConsultant ?
                                 Admin::role(RoleEnum::CONSULTANT->value, RoleEnum::ADMIN_GUARD)

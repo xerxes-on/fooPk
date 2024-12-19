@@ -3,15 +3,6 @@
         use App\Enums\Admin\Permission\PermissionEnum;
     @endphp
     <script>
-        // define global variable
-        let $tablePopup, $tableUsers;
-        const selectedPopupRecipesStorage = 'selected_popup_recipes';
-        const selectedUsersStorage = 'selected_users';
-        @if($hideRecipesRandomizer)
-        let $SubmitAddRecipes = Ladda.create(document.querySelector('#submit-add-recipes'));
-        @endif
-        localStorage.removeItem(selectedPopupRecipesStorage);
-        localStorage.removeItem(selectedPopupRecipesStorage);
         jQuery(document).ready(function ($) {
             $(document).on('click change', 'input[type="radio"].random_recipe_distribution_type', function (el) {
                 let randomization_type = $(this).val();
@@ -37,7 +28,7 @@
                     },
                     order: [[0, 'desc']],
                     ajax: {
-                        url: '/admin/datatable/async',
+                        url: "{{ route('admin.datatable.async')}}",
                         data: function (d) {
                             d.method = 'allUsers';
                             d.filter = getFormData($('#user-filter'));
@@ -166,7 +157,7 @@
             if (usersSelected === null || usersSelected.selected.length === 0) {
                 Swal.fire({
                     icon: 'error',
-                    title: 'No User selected!',
+                    title: "{{ __('admin.messages.no_user_selected')}}",
                 });
                 return false;
             }
@@ -198,7 +189,7 @@
                         },
                         order: [[0, 'asc']],
                         ajax: {
-                            url: '/admin/datatable/async',
+                            url: "{{ route('admin.datatable.async')}}",
                             data: function (d) {
                                 d.method = 'allRecipes';
                             },

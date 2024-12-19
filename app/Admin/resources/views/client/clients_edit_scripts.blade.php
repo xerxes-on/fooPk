@@ -4,7 +4,6 @@
         let $tableRecipes;
         const selectedRecipesStorage = 'selected_recipes';
         const selectedPopupRecipesStorage = 'selected_popup_recipes';
-
     </script>
 @endpush
 
@@ -14,6 +13,7 @@
     @endphp
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
     <script>
+        const clientId = '{{ $client->id }}';
         let $SubmitAddRecipes = Ladda.create(document.querySelector('#submit-add-recipes'));
 
         // tab recipes From Subscription
@@ -55,9 +55,7 @@
                 type: 'GET',
                 url: "{{ route('admin.recipes.check-calculation-status', ['userId' => $client->id]) }}",
                 dataType: 'json',
-                data: {
-                    _token: $('meta[name=csrf-token]').attr('content'),
-                }, beforeSend: function () {
+                beforeSend: function () {
                     $('#calculation-status').html('<span class="fa fa-spinner fa-spin" aria-hidden="true"></span>');
                 },
                 success: function (data) {
@@ -74,7 +72,6 @@
         }
 
         jQuery(document).ready(function ($) {
-
             var time = 30;
             setInterval(function () {
                 $('#js-check-refresh').html(--time);
@@ -104,8 +101,8 @@
                     allowEnterKey: false,
                     confirmButtonColor: '#3085d6',
                     cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes',
-                    cancelButtonText: 'No',
+                    confirmButtonText: '{{ __('admin.filters.defaults.exist') }}',
+                    cancelButtonText: '{{ __('admin.filters.defaults.missing') }}',
                 }).then((result) => {
                     if (result.value) {
                         Swal.fire({
@@ -125,7 +122,7 @@
                             dataType: 'json',
                             data: {
                                 _token: $('meta[name=csrf-token]').attr('content'),
-                                userId: '{{ $client->id }}',
+                                userId: clientId,
                                 approve: approve,
                             },
                             success: function (data) {
@@ -206,8 +203,8 @@
                         error: function (result) {
                             Swal.hideLoading();
                             Swal.fire({
-                                title: 'Error!',
-                                html: result.responseJSON.message ? result.responseJSON.message : 'Something went wrong.',
+                                title: '{{__('admin.messages.error')}}',
+                                html: result.responseJSON.message ? result.responseJSON.message : '{{__('admin.messages.something_went_wrong')}}',
                                 icon: 'error',
                             });
                         },
@@ -228,8 +225,8 @@
                     allowEnterKey: false,
                     confirmButtonColor: '#3085d6',
                     cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes',
-                    cancelButtonText: 'No',
+                    confirmButtonText: '{{ __('admin.filters.defaults.exist') }}',
+                    cancelButtonText: '{{ __('admin.filters.defaults.missing') }}',
                 }).then((result) => {
                     if (!result.value) {
                         return;
@@ -258,8 +255,8 @@
                         }, error: function (result) {
                             Swal.hideLoading();
                             Swal.fire({
-                                title: 'Error!',
-                                html: result.responseJSON.message ? result.responseJSON.message : 'Something went wrong.',
+                                title:  "{{ __('admin.messages.error') }}",
+                                html: result.responseJSON.message ? result.responseJSON.message : '{{__('admin.messages.something_went_wrong')}}',
                                 icon: 'error',
                             });
                         },
@@ -270,11 +267,8 @@
             $('#chargebee-subscription-add').on('click', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
-
-                let url = '{{ route("admin.client.assign-chargebee-subscription" ) }}';
-
                 Swal.fire({
-                    title: 'Enter Chargebee subscription id',
+                    title:  '{{ __('admin.messages.subscription_id') }}',
                     html: '<input id="chargebee-subscription-id" class="form-control" /><span id="chargebee-subscription-id-info-text"></span>',
                     icon: 'question',
                     didOpen: function () {
@@ -286,8 +280,8 @@
                         let subscriptionId = $('#chargebee-subscription-id').val();
 
                         Swal.fire({
-                            title: 'Please Wait..!',
-                            text: 'Is working..',
+                            title:  '{{ __('admin.messages.wait') }}',
+                            text:  '{{ __('admin.messages.in_progress') }}',
                             allowOutsideClick: false,
                             allowEscapeKey: false,
                             allowEnterKey: false,
@@ -298,12 +292,12 @@
 
                         $.ajax({
                             type: 'POST',
-                            url: url,
+                            url: '{{ route("admin.client.assign-chargebee-subscription" ) }}',
                             dataType: 'json',
                             data: {
                                 _token: $('meta[name=csrf-token]').attr('content'),
                                 chargebee_subscription_id: subscriptionId,
-                                client_id: {{ $client->id }}
+                                client_id: clientId,
                             },
                             success: function (result) {
                                 location.reload();
@@ -341,8 +335,8 @@
                     allowEnterKey: false,
                     confirmButtonColor: '#3085d6',
                     cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes',
-                    cancelButtonText: 'No',
+                    confirmButtonText: '{{ __('admin.filters.defaults.exist') }}',
+                    cancelButtonText:'{{ __('admin.filters.defaults.missing') }}',
                 }).then((result) => {
                     if (result.value) {
                         Swal.fire({
@@ -362,7 +356,7 @@
                             dataType: 'json',
                             data: {
                                 _token: $('meta[name=csrf-token]').attr('content'),
-                                userId: '{{ $client->id }}',
+                                userId: clientId,
                                 approve: approve,
                             },
                             success: function (data) {
@@ -409,8 +403,8 @@
                     allowEnterKey: false,
                     confirmButtonColor: '#3085d6',
                     cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes',
-                    cancelButtonText: 'No',
+                    confirmButtonText: '{{ __('admin.filters.defaults.exist') }}',
+                    cancelButtonText: '{{ __('admin.filters.defaults.missing') }}',
                 }).then((result) => {
                     if (result.value) {
                         Swal.fire({
@@ -430,7 +424,7 @@
                             dataType: 'json',
                             data: {
                                 _token: $('meta[name=csrf-token]').attr('content'),
-                                clientId: {{$client->id }},
+                                clientId: clientId,
                                 is_editable: currentState,
                             },
                             success: function (data) {
@@ -438,7 +432,7 @@
                                     Swal.hideLoading();
                                     Swal.fire({
                                         icon: 'success',
-                                        title: 'Changes has been applied!',
+                                        title: '{{__('admin.messages.changes_applied')}}',
                                         html: data.message,
                                     });
                                 } else {
@@ -513,7 +507,7 @@
                 url = url.replace(':id', subscriptionId);
 
                 Swal.fire({
-                    title: 'Confirm details?',
+                    title: '{{__('admin.messages.confirm_details')}}',
                     html: '<input id="datetimepicker" class="form-control">',
                     icon: 'question',
                     showCancelButton: true,
@@ -586,8 +580,8 @@
                     allowEnterKey: false,
                     confirmButtonColor: '#3085d6',
                     cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes',
-                    cancelButtonText: 'No',
+                    confirmButtonText: '{{ __('admin.filters.defaults.exist') }}',
+                    cancelButtonText: '{{ __('admin.filters.defaults.missing') }}',
                 }).then((result) => {
 
                     if (result.value) {
@@ -648,8 +642,8 @@
                     allowEnterKey: false,
                     confirmButtonColor: '#3085d6',
                     cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes',
-                    cancelButtonText: 'No',
+                    confirmButtonText: '{{ __('admin.filters.defaults.exist') }}',
+                    cancelButtonText: '{{ __('admin.filters.defaults.missing') }}',
                 }).then((result) => {
 
                     if (result.value) {
@@ -701,7 +695,7 @@
                 if (activeChallenge > 0) {
                     Swal.fire({
                         title: "@lang('admin.messages.confirmation')",
-                        text: 'Active subscription will be stopped!',
+                        text: '{{ __('admin.messages.subscription_stopped')}}',
                         icon: 'warning',
                         showCancelButton: true,
                         allowOutsideClick: false,
@@ -709,8 +703,8 @@
                         allowEnterKey: false,
                         confirmButtonColor: '#3085d6',
                         cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes',
-                        cancelButtonText: 'No',
+                        confirmButtonText: '{{ __('admin.filters.defaults.exist') }}',
+                        cancelButtonText: '{{ __('admin.filters.defaults.missing') }}',
                     }).then((result) => {
 
                         if (result.value) {
@@ -766,10 +760,10 @@
                             }
                         },
                         ajax: {
-                            url: '/admin/datatable/async',
+                            url: "{{ route('admin.datatable.async')}}",
                             data: function (d) {
                                 d.method = 'recipesByUser';
-                                d.userId = '{{ $client->id }}';
+                                d.userId = clientId;
                             },
                         },
                         order: [[1, 'desc']],
@@ -872,10 +866,10 @@
                             order: [[0, 'asc']],
                             rowId: 'id',
                             ajax: {
-                                url: '/admin/datatable/async',
+                                url: "{{ route('admin.datatable.async')}}",
                                 data: function (d) {
                                     d.method = 'allRecipes';
-                                    d.userId = '{{ $client->id }}';
+                                    d.userId = clientId;
                                     d.filters = {
                                         ingestion: $('#recipeIngestionFilter').val(),
                                         diet: $('#recipeDietFilter').val(),
@@ -999,8 +993,8 @@
                 allowEnterKey: false,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes',
-                cancelButtonText: 'No',
+                confirmButtonText: '{{ __('admin.filters.defaults.exist') }}',
+                cancelButtonText: '{{ __('admin.filters.defaults.missing') }}',
             }).then((result) => {
                 if (result.value) {
                     Swal.fire({
@@ -1019,6 +1013,9 @@
                     $.ajax({
                         type: 'DELETE',
                         url: route,
+                        data: {
+                            _token: $('meta[name=csrf-token]').attr('content'),
+                        },
                         dataType: 'json',
                         success: function (result) {
                             $tableRecipes.ajax.reload();
@@ -1027,7 +1024,7 @@
 
                             if (result.success) {
                                 Swal.fire({
-                                    title: 'Success!',
+                                    title: '{{__('admin.messages.success')}}',
                                     html: result.message ? result.message : 'Success',
                                     icon: 'success',
                                 });
@@ -1035,7 +1032,7 @@
                             }
 
                             Swal.fire({
-                                title: 'Error!',
+                                title:  "{{ __('admin.messages.error') }}",
                                 html: result.message ? result.message : 'Something went wrong',
                                 icon: 'error',
                             });
@@ -1044,8 +1041,8 @@
                         error: function (result) {
                             Swal.hideLoading();
                             Swal.fire({
-                                title: 'Error!',
-                                html: result.responseJSON.message ? result.responseJSON.message : 'Something went wrong.',
+                                title:  "{{ __('admin.messages.error') }}",
+                                html: result.responseJSON.message ? result.responseJSON.message : '{{__('admin.messages.something_went_wrong')}}',
                                 icon: 'error',
                             });
                         },
@@ -1056,7 +1053,7 @@
 
         function deleteAllRecipes() {
             Swal.fire({
-                title: 'Are you sure to delete all recipes for this user?',
+                title: '{{__('admin.messages.delete_all_recipes_user')}}',
                 text: '{{trans('admin.messages.revert_warning')}}',
                 icon: 'warning',
                 showCancelButton: true,
@@ -1065,8 +1062,8 @@
                 allowEnterKey: false,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes',
-                cancelButtonText: 'No',
+                confirmButtonText: '{{ __('admin.filters.defaults.exist') }}',
+                cancelButtonText: '{{ __('admin.filters.defaults.missing') }}',
             }).then((result) => {
                 if (result.value) {
                     Swal.fire({
@@ -1083,6 +1080,9 @@
                     $.ajax({
                         type: 'DELETE',
                         url: "{{ route('admin.recipes.delete-all-recipes', [ 'userId'=> $client->id]) }}",
+                        data: {
+                            _token: $('meta[name=csrf-token]').attr('content'),
+                        },
                         dataType: 'json',
                         success: function (result) {
                             // refresh DataTable
@@ -1090,7 +1090,7 @@
                             $('#counterToolbar').html('');
                             Swal.hideLoading();
                             Swal.fire({
-                                title: 'Deleted!',
+                                title: '{{ __('admin.messages.deleted') }}',
                                 html: result.message,
                                 icon: result.success ? 'success' : 'error',
                             });
@@ -1098,8 +1098,8 @@
                         error: function (result) {
                             Swal.hideLoading();
                             Swal.fire({
-                                title: 'Error!',
-                                html: result.responseJSON.message ? result.responseJSON.message : 'Something went wrong.',
+                                title: "{{ __('admin.messages.error') }}",
+                                html: result.responseJSON.message ? result.responseJSON.message : '{{__('admin.messages.something_went_wrong')}}',
                                 icon: 'error',
                             });
                         },
@@ -1114,7 +1114,7 @@
             if (elements.length === 0) {
                 Swal.fire({
                     icon: 'error',
-                    title: 'No item!',
+                    title: '{{ __('admin.messages.no_item')}}',
                 });
                 $('#delete-all-selected-recipes').hide();
                 return;
@@ -1148,13 +1148,13 @@
             if (data.selected.length === 0) {
                 Swal.fire({
                     icon: 'error',
-                    title: 'No item selected!',
+                    title: '{{ __('admin.messages.no_item_selected') }}',
                 });
                 return;
             }
             // prompt for confirmation and proceed to delete items
             Swal.fire({
-                title: 'Are you sure to delete selected recipes for this user?',
+                title: '{{ __('admin.messages.are_you_sure') }}',
                 text: '{{trans('admin.messages.revert_warning')}}',
                 icon: 'warning',
                 showCancelButton: true,
@@ -1163,8 +1163,8 @@
                 allowEnterKey: false,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes',
-                cancelButtonText: 'No',
+                confirmButtonText: '{{ __('admin.filters.defaults.exist') }}',
+                cancelButtonText: '{{ __('admin.filters.defaults.missing') }}',
             }).then((result) => {
                 if (!result.value) {
                     return;
@@ -1187,7 +1187,7 @@
                     data: {
                         _token: $('meta[name=csrf-token]').attr('content'),
                         _method: 'DELETE',
-                        userId: {{$client->id}},
+                        userId: clientId,
                         recipes: data.selected,
                     },
                     success: function (result) {
@@ -1196,7 +1196,7 @@
                         renderCounterToolbarData();
                         Swal.hideLoading();
                         Swal.fire({
-                            title: 'Deleted!',
+                            title: '{{ __('admin.messages.deleted') }}',
                             html: result.message,
                             icon: result.status,
                         });
@@ -1207,8 +1207,8 @@
                     error: function (result) {
                         Swal.hideLoading();
                         Swal.fire({
-                            title: 'Error!',
-                            html: result.responseJSON.message ? result.responseJSON.message : 'Something went wrong.',
+                            title:  "{{ __('admin.messages.error') }}",
+                            html: result.responseJSON.message ? result.responseJSON.message : '{{__('admin.messages.something_went_wrong')}}',
                             icon: 'error',
                         });
                     },
@@ -1223,7 +1223,7 @@
             if (rowsSelected === null || rowsSelected.selected.length === 0) {
                 Swal.fire({
                     icon: 'error',
-                    title: 'No item selected!',
+                    title: '{{ __('admin.messages.no_item_selected') }}',
                 });
                 return false;
             }
@@ -1234,7 +1234,7 @@
                 dataType: 'json',
                 data: {
                     _token: $('meta[name=csrf-token]').attr('content'),
-                    userIds: [{{ $client->id }}],
+                    userIds: [clientId],
                     recipeIds: rowsSelected.selected,
                 },
                 beforeSend: function () {
@@ -1291,8 +1291,8 @@
                 allowEnterKey: false,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes',
-                cancelButtonText: 'No',
+                confirmButtonText: '{{ __('admin.filters.defaults.exist') }}',
+                cancelButtonText: '{{ __('admin.filters.defaults.missing') }}',
             }).then((result) => {
                 if (result.value) {
                     Swal.fire({
@@ -1312,15 +1312,15 @@
                         dataType: 'json',
                         data: {
                             _token: $('meta[name=csrf-token]').attr('content'),
-                            userId: '{{ $client->id }}',
+                            userId: clientId,
                         },
                         success: function (data) {
                             if (data.success === true) {
                                 Swal.hideLoading();
                                 Swal.fire({
                                     icon: 'success',
-                                    title: 'Recalculated!',
-                                    text: 'All recipes recalculated.',
+                                    title: "{{ __('common.success') }}",
+                                    text: '{{__('common.record_recalculated_successfully')}}',
                                     html: data.message,
                                 });
                             } else {
@@ -1349,7 +1349,7 @@
 
         const inputRecipeAmount = async function () {
             const {value: formValues} = await Swal.fire({
-                title: 'Randomize recipes settings',
+                title: '{{ __('admin.messages.randomize_recipes_settings') }}',
                 icon: 'question',
                 html: `<div id="randomizeRecipeComponent"></div>`,
                 willOpen: () => {
@@ -1393,7 +1393,7 @@
                 dataType: 'json',
                 data: {
                     _token: $('meta[name=csrf-token]').attr('content'),
-                    userId: '{{ $client->id }}',
+                    userId: clientId,
                 },
                 success: function (data) {
                     $('#counterToolbar').html(data.success === true ? data.message : '');
@@ -1441,8 +1441,6 @@
             });
         }
         const addRandomizeRecipes = async function () {
-            let userIds = [{{ $client->id }}];
-
             // get recipe amount
             const initFormData = await inputRecipeAmount();
 
@@ -1465,7 +1463,7 @@
                 dataType: 'json',
                 data: {
                     _token: $('meta[name=csrf-token]').attr('content'),
-                    userIds: userIds,
+                    userIds: [clientId],
                     amount: amount,
                     seasons: seasons,
                     distribution_type: distribution_type,
@@ -1491,7 +1489,7 @@
                         Swal.hideLoading();
                         Swal.fire({
                             icon: 'success',
-                            title: 'Your work has been saved!',
+                            title: '{{ __('admin.messages.saved') }}',
                             html: data.message,
                         });
                     } else {
@@ -1517,8 +1515,8 @@
         //     tab-balance scripts
         function deposit() {
             Swal.fire({
-                title: 'Deposit',
-                text: 'How many CS do you want to add?',
+                title: '{{__('common.deposit')}}',
+                text: '{{__('common.cs_count_message')}}',
                 input: 'number',
                 icon: 'question',
             }).then(function (result) {
@@ -1527,8 +1525,8 @@
                     let amount = result.value;
 
                     Swal.fire({
-                        title: 'Please Wait..!',
-                        text: 'Is working..',
+                        title: "{{ __('admin.messages.wait')}}",
+                        text: "{{__('admin.messages.in_progress')}}",
                         allowOutsideClick: false,
                         allowEscapeKey: false,
                         allowEnterKey: false,
@@ -1543,7 +1541,7 @@
                         dataType: 'json',
                         data: {
                             _token: $('meta[name=csrf-token]').attr('content'),
-                            userId: '{{ $client->id }}',
+                            userId: clientId,
                             amount: amount,
                         },
                         success: function (result) {
@@ -1582,7 +1580,7 @@
                         dataType: 'json',
                         data: {
                             _token: $('meta[name=csrf-token]').attr('content'),
-                            userId: '{{ $client->id }}',
+                            userId: clientId,
                             amount: amount,
                         },
                         success: function (result) {
@@ -1608,10 +1606,10 @@
                         buttons: 10,
                     },
                     ajax: {
-                        url: '/admin/datatable/async',
+                        url:"{{ route('admin.datatable.async')}}",
                         data: function (d) {
                             d.method = 'recipesByUserFromActiveChallenge';
-                            d.userId = '{{ $client->id }}';
+                            d.userId = clientId;
                         },
                     },
                     order: [[4, 'asc']],
@@ -1667,8 +1665,8 @@
                 allowEnterKey: false,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes',
-                cancelButtonText: 'No',
+                confirmButtonText: '{{ __('admin.filters.defaults.exist') }}',
+                cancelButtonText: '{{ __('admin.filters.defaults.missing') }}',
             })
                 .then((result) => {
                     if (!result.value) {
@@ -1691,7 +1689,7 @@
                         dataType: 'json',
                         data: {
                             _token: $('meta[name=csrf-token]').attr('content'),
-                            userId: '{{ $client->id }}',
+                            userId: clientId,
                         },
                         success: function (data) {
                             if (data.success === true) {

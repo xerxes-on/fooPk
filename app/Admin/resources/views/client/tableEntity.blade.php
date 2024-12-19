@@ -161,7 +161,7 @@
                 <thead>
                 <tr>
                     <th>#</th>
-                    <th>@lang('subscription')</th>
+                    <th>@lang('common.title')</th>
                     <th>@lang('common.day_category')</th>
                     <th>@lang('common.diets')</th>
                     <th>@lang('common.status')</th>
@@ -179,3 +179,16 @@
         </div>
     </div>
 @endif
+@push('footer-scripts')
+    <script>
+        // define global variable
+        let $tablePopup, $tableUsers;
+        const selectedPopupRecipesStorage = 'selected_popup_recipes';
+        const selectedUsersStorage = 'selected_users';
+        @if($hideRecipesRandomizer)
+            let $SubmitAddRecipes = Ladda.create(document.querySelector('#submit-add-recipes'));
+        @endif
+        localStorage.removeItem(selectedPopupRecipesStorage);
+        localStorage.removeItem(selectedPopupRecipesStorage);
+    </script>
+@endpush
