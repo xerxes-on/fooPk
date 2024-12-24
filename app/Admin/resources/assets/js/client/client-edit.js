@@ -1050,7 +1050,7 @@ jQuery(document).ready(function ($) {
                     error: function (result) {
                         Swal.hideLoading();
                         Swal.fire({
-                            title: "{{ __('admin.messages.error') }}",
+                            title: window.FoodPunk.i18n.error,
                             html: result.responseJSON.message ? result.responseJSON.message : window.FoodPunk.i18n.somethingWentWrong,
                             icon: 'error',
                         });
