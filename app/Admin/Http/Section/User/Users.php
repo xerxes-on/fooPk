@@ -73,7 +73,7 @@ final class Users extends Section implements Initializable
     {
         $isConsultant = auth()->user()->hasRole(RoleEnum::CONSULTANT->value);
         $hideRecipesRandomizer = !$isConsultant && auth()->user()->hasPermissionTo(PermissionEnum::ADD_RECIPES_TO_CLIENT->value);
-
+        Meta::addJs('client-display.js', mix('js/admin/client/client-display.js'));
         Meta::loadPackage(['dataTables', 'ladda']);
         return AdminForm::elements(
             [
@@ -135,17 +135,6 @@ final class Users extends Section implements Initializable
             $this->addChargebeeSubscriptionsTab($tabs);
             $this->addCoursesTab($tabs);
         }
-        $elements = new FormElements([
-            AdminFormElement::view('admin::client.clients_edit_scripts', [
-                'client'=>$this->model_value,
-                'isConsultant'=>$this->isConsultant,
-                'subscription'=>$this->model_value->subscription,
-                'canDeleteAllUserRecipes'=>auth()->user()->can(PermissionEnum::DELETE_ALL_USER_RECIPES->value),
-                'hideRecipesRandomizer' => !$this->isConsultant && auth()->user()->hasPermissionTo(PermissionEnum::ADD_RECIPES_TO_CLIENT->value)
-            ]),
-        ]);
-        $tabs->appendTab($elements, trans('common.client_information'));
-
         return $tabs;
     }
 
@@ -158,9 +147,15 @@ final class Users extends Section implements Initializable
             ->addStyle('switch.css', mix('css/admin/switch.css'))
             ->withPackage(['dataTables', 'ladda'])
             ->addScript('admin.js', mix('js/admin/admin.js'))
+            ->addScript('client-edit.js', mix('js/admin/client/client-edit.js'))
             ->setAction(route('admin.client.store', ['id' => $id]));
         $leftColumn = [
-            AdminFormElement::view('admin::client.jobsStatus', ['client' => $this->model_value]),
+            AdminFormElement::view('admin::client.jobsStatus', [
+                'client' => $this->model_value,
+                'subscription'=>$this->model_value->subscription,
+                'canDeleteAllUserRecipes'=>auth()->user()->can(PermissionEnum::DELETE_ALL_USER_RECIPES->value),
+                'hideRecipesRandomizer' => !auth()->user()->hasRole(RoleEnum::CONSULTANT->value) && auth()->user()->hasPermissionTo(PermissionEnum::ADD_RECIPES_TO_CLIENT->value),
+            ]),
             AdminFormElement::checkbox('status', trans('common.enable_user'))->setView(view('admin::custom.switch')),
             AdminFormElement::checkbox('mark_tested', 'Set as test user')
                 ->setExactValue($this->model_value->hasRole(RoleEnum::TEST_USER->value))

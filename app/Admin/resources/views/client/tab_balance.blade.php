@@ -13,11 +13,11 @@
     </div>
     @can(\App\Enums\Admin\Permission\PermissionEnum::MANAGE_CLIENT_BALANCE->value, '\App\Models\Admin')
         <div class="col-md-12">
-            <button type="button" id="add-deposit" class="btn btn-info" onclick="deposit()">
+            <button type="button" id="add-deposit" class="btn btn-info" onclick="window.FoodPunk.functions.deposit()">
                 <span class="ladda-label">@lang('common.deposit')</span>
             </button>
 
-            <button type="button" id="withdraw-balance" class="btn btn-info" onclick="withdraw()">
+            <button type="button" id="withdraw-balance" class="btn btn-info" onclick="window.FoodPunk.functions.withdraw()">
                 <span class="ladda-label">@lang('common.withdraw')</span>
             </button>
         </div>

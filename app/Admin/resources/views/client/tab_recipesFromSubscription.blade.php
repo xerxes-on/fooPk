@@ -1,6 +1,6 @@
 <div class="text-left" style="margin-bottom: 10px">
     <button type="button" id="generate-recipes" class="btn btn-info ladda-button" data-style="expand-right"
-            onclick="generateRecipe()">
+            onclick="window.FoodPunk.functions.generateRecipe()">
         <span class="ladda-label">@lang('common.subscription_recipes_generate')</span>
     </button>
 </div>

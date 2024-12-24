@@ -1,32 +1,32 @@
 @php
     use App\Enums\Admin\Permission\PermissionEnum;use App\Models\Admin;
-    $canDeleteAllUserRecipes = $user->can(PermissionEnum::DELETE_ALL_USER_RECIPES->value);
+    $canDeleteAllUserRecipes = auth()->user()->can(PermissionEnum::DELETE_ALL_USER_RECIPES->value);
 @endphp
 <div class="text-left" style="margin-bottom: 10px">
     @can(PermissionEnum::ADD_RECIPES_TO_CLIENT->value, Admin::class)
         <button type="button" id="add-recipes" class="btn btn-info ladda-button" data-style="expand-right"
-                onclick="addRecipes()">
+                onclick="window.FoodPunk.functions.addRecipes()">
             <span class="ladda-label">+ @lang('common.add_recipe')</span>
         </button>
 
         <button type="button" id="add-randomize-recipes-to-select-users" class="btn btn-info"
-                onclick="addRandomizeRecipes()">
+                onclick="window.FoodPunk.functions.addRandomizeRecipes()">
             <i class="fas fa-plus" aria-hidden="true"></i> @lang('admin.buttons.add_random_recipes')
         </button>
     @endif
 
     <button type="button" id="recalculate-user-recipes" class="btn btn-info ladda-button" data-style="expand-right"
-            onclick="recalculateUserRecipes()">
+            onclick="window.FoodPunk.functions.recalculateUserRecipes()">
         <span class="ladda-label">@lang('common.recalculate')</span>
     </button>
 
     @if($canDeleteAllUserRecipes)
         <button type="button" id="delete-all-selected-recipes" class="btn btn-danger" style="display: none"
-                onclick="deleteSelectedRecipes()">
+                onclick="window.FoodPunk.functions.deleteSelectedRecipes()">
             <span class="fa fa-info-circle" aria-hidden="true"></span>
             <span class="ladda-label">@lang('common.delete_selected')</span>
         </button>
-        <button type="button" id="delete-all-user-recipes" class="btn btn-danger" onclick="deleteAllRecipes()">
+        <button type="button" id="delete-all-user-recipes" class="btn btn-danger" onclick="window.FoodPunk.functions.deleteAllRecipes()">
             <span class="ladda-label">@lang('common.delete_all_recipe')</span>
         </button>
     @endif
@@ -35,7 +35,7 @@
 <table id="recipesByUser" class="table table-striped table-bordered" style="width:100%">
     <thead>
     <tr>
-        <th><label><input type="checkbox" readonly onclick="toggleSelect(this)"></label></th>
+        <th><label><input type="checkbox" readonly onclick="window.FoodPunk.functions.toggleSelect(this)"></label></th>
         <th>#</th>
         <th>@lang('common.image')</th>
         <th>@lang('common.title')</th>
@@ -149,7 +149,7 @@
                     id="submit-add-recipes"
                     class="btn btn-info ladda-button"
                     data-style="expand-right"
-                    onclick="submitAdding()">
+                    onclick="window.FoodPunk.functions.submitAdding()">
                 <span class="ladda-label">@lang('common.submit')</span>
             </button>
         </div>

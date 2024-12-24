@@ -2,7 +2,7 @@
     <div class="col-md-11">
         <div class="form-group">
             <select class="form-control js-data-ajax-article" name="wp_article_id">
-                @if($article->isNotEmpty())
+                @if(isset($article) && $article->isNotEmpty())
                     <option value="{{ $article['ID'] }}">{{ $article['post_title'] }}</option>
                 @endif
             </select>
