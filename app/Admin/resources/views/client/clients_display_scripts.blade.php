@@ -19,7 +19,7 @@
             randomizeRecipeTemplate: '{{ route('admin.client.randomize-recipe-template')}}',
             addToUser: "{{ route('admin.recipes.add-to-user') }}"
         }
-        window.FoodPunk.static = {
+        window.FoodPunk.pageInfo = {
             url: '{{ url('/')  }}',
             canDelete: {{ auth()->user()->can(PermissionEnum::DELETE_CLIENT->value, Admin::class)}},
             hideRecipesRandomizer: {{$hideRecipesRandomizer}}

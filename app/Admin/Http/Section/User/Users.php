@@ -73,8 +73,8 @@ final class Users extends Section implements Initializable
     {
         $isConsultant = auth()->user()->hasRole(RoleEnum::CONSULTANT->value);
         $hideRecipesRandomizer = !$isConsultant && auth()->user()->hasPermissionTo(PermissionEnum::ADD_RECIPES_TO_CLIENT->value);
-        Meta::addJs('client-display.js', mix('js/admin/client/client-display.js'));
         Meta::loadPackage(['dataTables', 'ladda']);
+        Meta::addJs('client-display.js', mix('js/admin/client/display/index.js'));
         return AdminForm::elements(
             [
                 AdminFormElement::view('admin::client.clients_display_scripts',[
@@ -147,7 +147,7 @@ final class Users extends Section implements Initializable
             ->addStyle('switch.css', mix('css/admin/switch.css'))
             ->withPackage(['dataTables', 'ladda'])
             ->addScript('admin.js', mix('js/admin/admin.js'))
-            ->addScript('client-edit.js', mix('js/admin/client/client-edit.js'))
+            ->addScript('client-edit.js', mix('js/admin/client/edit/index.js'))
             ->setAction(route('admin.client.store', ['id' => $id]));
         $leftColumn = [
             AdminFormElement::view('admin::client.jobsStatus', [

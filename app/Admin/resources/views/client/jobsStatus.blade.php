@@ -7,7 +7,6 @@
 @endpush
 @push('scripts')
     <script>
-        let $tableRecipes;
         const selectedRecipesStorage = 'selected_recipes';
         const selectedPopupRecipesStorage = 'selected_popup_recipes';
         window.FoodPunk = {};
@@ -67,7 +66,7 @@
             recipesGenerateToSub: "{{ route('admin.recipes.generate-to-subscription') }}",
             clientCalcAuto: "{{ route('admin.client.calc-auto') }}",
         }
-        window.FoodPunk.static = {
+        window.FoodPunk.pageInfo = {
             clientId : '{{ $client->id }}',
             activeChallenge: {{ $subscription ? $subscription->id : 0 }},
             canDeleteAllUserRecipes: {{$canDeleteAllUserRecipes}},
