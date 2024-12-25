@@ -13,8 +13,8 @@ export function initRecipes() {
     localStorage.removeItem(selectedRecipesStorage);
 
     $(document)
-        .bind('cbox_open', () => $('html').css({ overflow: 'hidden' }))
-        .bind('cbox_cleanup', () => $('html').css({ overflow: 'auto' }));
+        .bind('cbox_open', () => $('html').css({overflow: 'hidden'}))
+        .bind('cbox_cleanup', () => $('html').css({overflow: 'auto'}));
 
     window.FoodPunk.functions.addRecipes = function () {
         $.colorbox({
@@ -208,7 +208,7 @@ export function initRecipes() {
                         }
 
                         Swal.fire({
-                            title:  window.FoodPunk.i18n.error,
+                            title: window.FoodPunk.i18n.error,
                             html: result.message ? result.message : 'Something went wrong',
                             icon: 'error',
                         });
@@ -217,7 +217,7 @@ export function initRecipes() {
                     error: function (result) {
                         Swal.hideLoading();
                         Swal.fire({
-                            title:  window.FoodPunk.i18n.error,
+                            title: window.FoodPunk.i18n.error,
                             html: result.responseJSON.message ? result.responseJSON.message : window.FoodPunk.i18n.somethingWentWrong,
                             icon: 'error',
                         });
@@ -380,7 +380,7 @@ export function initRecipes() {
                 error: function (result) {
                     Swal.hideLoading();
                     Swal.fire({
-                        title:  window.FoodPunk.i18n.error,
+                        title: window.FoodPunk.i18n.error,
                         html: result.responseJSON.message ? result.responseJSON.message : window.FoodPunk.i18n.somethingWentWrong,
                         icon: 'error',
                     });
@@ -526,7 +526,7 @@ export function initRecipes() {
             },
         });
     };
-    window.FoodPunk.functions.generateRecipe = function() {
+    window.FoodPunk.functions.generateRecipe = function () {
         Swal.fire({
             title: window.FoodPunk.i18n.confirmation,
             text: window.FoodPunk.i18n.revertWarning,
@@ -652,7 +652,7 @@ export function initRecipes() {
             },
         });
     }
-    window.FoodPunk.functions.openInfoModal = function(element, recipeId) {
+    window.FoodPunk.functions.openInfoModal = function (element, recipeId) {
         let route = window.FoodPunk.route.searchRecipesPreview
         route = route.replace('%', recipeId);
         $.ajax({
@@ -705,7 +705,7 @@ export function initRecipes() {
                     buttons: 10,
                 },
                 ajax: {
-                    url:window.FoodPunk.route.datatableAsync,
+                    url: window.FoodPunk.route.datatableAsync,
                     data: function (d) {
                         d.method = 'recipesByUserFromActiveChallenge';
                         d.userId = window.FoodPunk.pageInfo.clientId;
@@ -810,7 +810,7 @@ export function initRecipes() {
                         width: '7%',
                         orderable: false,
                         render: function (data, type, row) {
-                            return '<button type="button" class="btn btn-xs btn-secondary" onclick="window.FoodPunk.functions.openInfoModal(this, ' + row.id + ')"> ' + window.FoodPunk.i18n.notificationInfoModalButton +' </button>';
+                            return '<button type="button" class="btn btn-xs btn-secondary" onclick="window.FoodPunk.functions.openInfoModal(this, ' + row.id + ')"> ' + window.FoodPunk.i18n.notificationInfoModalButton + ' </button>';
                         },
                     },
                     {
@@ -891,6 +891,7 @@ export function initRecipes() {
 
         return formValues;
     };
+
     function renderCounterToolbarData() {
         $.ajax({
             type: 'GET',
@@ -908,5 +909,6 @@ export function initRecipes() {
             },
         });
     }
+
     window.FoodPunk.functions.renderCounterToolbarData = renderCounterToolbarData;
 }

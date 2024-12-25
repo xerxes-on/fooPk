@@ -1,8 +1,8 @@
 import $ from 'jquery';
-import { initUserSelection } from './userSelection.js';
-import { initFilters } from './filters.js';
-import { addRecipes2selectUsers, submitAdding } from './recipeSelection.js';
-import { addRandomizeRecipes2selectUsers } from './randomizeRecipes.js';
+import {initUserSelection} from './userSelection.js';
+import {initFilters} from './filters.js';
+import {addRecipes2selectUsers, submitAdding} from './recipeSelection.js';
+import {addRandomizeRecipes2selectUsers} from './randomizeRecipes.js';
 
 window.$SubmitAddRecipes = null;
 if (window.FoodPunk?.static?.hideRecipesRandomizer) {

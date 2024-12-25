@@ -7,6 +7,7 @@ namespace App\Admin\Http\Section\User;
 use AdminForm;
 use AdminFormElement;
 use App\Admin\Http\Section\Display\DisplayTabbed;
+use App\Enums\Admin\Permission\PermissionEnum;
 use App\Enums\Admin\Permission\RoleEnum;
 use App\Enums\Admin\SectionPagesEnum;
 use App\Enums\Questionnaire\QuestionnaireSourceRequestTypesEnum;
@@ -37,7 +38,6 @@ use SleepingOwl\Admin\Display\DisplayTabbed as NativeTabbed;
 use SleepingOwl\Admin\Form\Element\MultiSelect;
 use SleepingOwl\Admin\Form\FormElements;
 use SleepingOwl\Admin\Navigation\Page;
-use App\Enums\Admin\Permission\PermissionEnum;
 use SleepingOwl\Admin\Section;
 
 /**
@@ -71,23 +71,23 @@ final class Users extends Section implements Initializable
 
     public function onDisplay(): FormElements
     {
-        $isConsultant = auth()->user()->hasRole(RoleEnum::CONSULTANT->value);
+        $isConsultant          = auth()->user()->hasRole(RoleEnum::CONSULTANT->value);
         $hideRecipesRandomizer = !$isConsultant && auth()->user()->hasPermissionTo(PermissionEnum::ADD_RECIPES_TO_CLIENT->value);
         Meta::loadPackage(['dataTables', 'ladda']);
         Meta::addJs('client-display.js', mix('js/admin/client/display/index.js'));
         return AdminForm::elements(
             [
-                AdminFormElement::view('admin::client.clients_display_scripts',[
+                AdminFormElement::view('admin::client.clients_display_scripts', [
                     'hideRecipesRandomizer' => $hideRecipesRandomizer,
                 ]),
                 AdminFormElement::custom()->setDisplay(
                     static fn() => view(
                         'admin::client.tableEntity',
                         [
-                            'isConsultant'  => $isConsultant,
+                            'isConsultant'          => $isConsultant,
                             'hideRecipesRandomizer' => $hideRecipesRandomizer,
-                            'aboChallenges' => Course::get()->pluck('title', 'id')->toArray(),
-                            'consultants'   => !$isConsultant ?
+                            'aboChallenges'         => Course::get()->pluck('title', 'id')->toArray(),
+                            'consultants'           => !$isConsultant ?
                                 Admin::role(RoleEnum::CONSULTANT->value, RoleEnum::ADMIN_GUARD)
                                     ->pluck('name', 'id')
                                     ->toArray() :
@@ -151,10 +151,10 @@ final class Users extends Section implements Initializable
             ->setAction(route('admin.client.store', ['id' => $id]));
         $leftColumn = [
             AdminFormElement::view('admin::client.jobsStatus', [
-                'client' => $this->model_value,
-                'subscription'=>$this->model_value->subscription,
-                'canDeleteAllUserRecipes'=>auth()->user()->can(PermissionEnum::DELETE_ALL_USER_RECIPES->value),
-                'hideRecipesRandomizer' => !auth()->user()->hasRole(RoleEnum::CONSULTANT->value) && auth()->user()->hasPermissionTo(PermissionEnum::ADD_RECIPES_TO_CLIENT->value),
+                'client'                  => $this->model_value,
+                'subscription'            => $this->model_value->subscription,
+                'canDeleteAllUserRecipes' => auth()->user()->can(PermissionEnum::DELETE_ALL_USER_RECIPES->value),
+                'hideRecipesRandomizer'   => !auth()->user()->hasRole(RoleEnum::CONSULTANT->value) && auth()->user()->hasPermissionTo(PermissionEnum::ADD_RECIPES_TO_CLIENT->value),
             ]),
             AdminFormElement::checkbox('status', trans('common.enable_user'))->setView(view('admin::custom.switch')),
             AdminFormElement::checkbox('mark_tested', 'Set as test user')

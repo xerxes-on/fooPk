@@ -1,4 +1,4 @@
-export default function initFormular(){
+export default function initFormular() {
     $('#approve_formular').change(function () {
         let approve = $(this).prop('checked');
 

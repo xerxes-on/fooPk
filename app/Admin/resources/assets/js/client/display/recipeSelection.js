@@ -99,7 +99,7 @@ export function addRecipes2selectUsers() {
                 .on('select', function (e, dt, type, indexes) {
                     let alreadySelected = JSON.parse(localStorage.getItem(selectedPopupRecipesStorage));
                     if (!alreadySelected) {
-                        alreadySelected = { selected: [] };
+                        alreadySelected = {selected: []};
                     }
 
                     const rowData = $tablePopup.rows(indexes).data();

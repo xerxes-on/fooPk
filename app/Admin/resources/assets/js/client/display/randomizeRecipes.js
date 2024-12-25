@@ -1,11 +1,11 @@
-import { getUserTable } from './userSelection.js';
+import {getUserTable} from './userSelection.js';
 
 /**
  * Opens a SweetAlert to ask for random recipe distribution info.
  * Returns an object with user-selected values or undefined if canceled.
  */
 export async function inputRecipeAmount() {
-    const { value: formValues } = await Swal.fire({
+    const {value: formValues} = await Swal.fire({
         title: window.FoodPunk.i18n.randomizeRecipesSettings,
         icon: 'question',
         html: `<div id="randomizeRecipeComponent"></div>`,
@@ -43,7 +43,7 @@ export async function inputRecipeAmount() {
 
 export async function addRandomizeRecipes2selectUsers() {
     const $tableUsers = getUserTable();
-    const usersSelected = $tableUsers.rows({ selected: true }).data();
+    const usersSelected = $tableUsers.rows({selected: true}).data();
 
     if (usersSelected.length === 0) {
         Swal.fire({

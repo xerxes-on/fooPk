@@ -1,11 +1,11 @@
 import $ from 'jquery';
 
-import { setupValidations } from './validations.js';
-import { initCalculationStatusCheck } from './jobStatus.js';
-import { initChallenges } from './challenges.js';
-import { initSubscriptions } from './subscriptions.js';
-import { initRecipes } from './recipes.js';
-import { initDeposit }  from "./deposit";
+import {setupValidations} from './validations.js';
+import {initCalculationStatusCheck} from './jobStatus.js';
+import {initChallenges} from './challenges.js';
+import {initSubscriptions} from './subscriptions.js';
+import {initRecipes} from './recipes.js';
+import {initDeposit} from "./deposit";
 import initFormular from "./formular";
 
 if (window.FoodPunk.pageInfo.hideRecipesRandomizer) {

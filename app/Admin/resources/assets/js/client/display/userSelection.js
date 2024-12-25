@@ -1,4 +1,4 @@
-import { getFormData } from './filters.js';
+import {getFormData} from './filters.js';
 
 const selectedUsersStorage = 'selected_users';
 let $tableUsers = null;
@@ -71,7 +71,7 @@ export function initUserSelection() {
                                 '</form>';
                         }
 
-                        return editButton + deleteButton;
+                        return editButton +' '+ deleteButton;
                     },
                 },
             ],
@@ -121,6 +121,7 @@ export function initUserSelection() {
 
     return $tableUsers;
 }
+
 export function getUserTable() {
     return $tableUsers;
 }
