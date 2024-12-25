@@ -63,6 +63,7 @@
             searchRecipesPreview: "{{ route('admin.search-recipes.preview', ['recipeId' => '%', 'userId' => $client->id]) }}",
             recipesAddToUserRandom: "{{ route('admin.recipes.add-to-user-random') }}",
             clientDeposit: "{{ route('admin.client.deposit') }}",
+            clientWithdraw:  "{{ route('admin.client.withdraw') }}",
             recipesGenerateToSub: "{{ route('admin.recipes.generate-to-subscription') }}",
             clientCalcAuto: "{{ route('admin.client.calc-auto') }}",
         }
