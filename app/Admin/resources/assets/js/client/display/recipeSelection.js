@@ -85,7 +85,6 @@ export function addRecipes2selectUsers() {
                 ],
             })
                 .on('draw', function () {
-                    // Re-select previously chosen recipes
                     const alreadySelected = JSON.parse(localStorage.getItem(selectedPopupRecipesStorage));
                     if (!alreadySelected || alreadySelected.selected.length === 0) return;
 
@@ -126,11 +125,6 @@ export function addRecipes2selectUsers() {
         },
     });
 }
-
-/**
- * Submits the selected recipes to the selected users via AJAX.
- * If `window.FoodPunk.pageInfo.hideRecipesRandomizer` is true, starts/stops the Ladda button.
- */
 export function submitAdding() {
     const selectedPopupRecipesStorage = 'selected_popup_recipes';
     const usersStorage = 'selected_users';

@@ -71,7 +71,7 @@ export function initUserSelection() {
                                 '</form>';
                         }
 
-                        return editButton +' '+ deleteButton;
+                        return editButton + ' ' + deleteButton;
                     },
                 },
             ],
