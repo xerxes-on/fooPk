@@ -6,8 +6,8 @@ import {addRecipes2selectUsers, submitAdding} from './recipeSelection.js';
 import {addRandomizeRecipes2selectUsers} from './randomizeRecipes.js';
 
 window.$SubmitAddRecipes = null;
-if (window.FoodPunk?.static?.hideRecipesRandomizer) {
-    window.$SubmitAddRecipes = Ladda.create(document.querySelector('#submit-add-recipes'));
+if (window.FoodPunk?.pageInfo?.hideRecipesRandomizer) {
+    window.FoodPunk.pageInfo.$SubmitAddRecipes = Ladda.create(document.querySelector('#submit-add-recipes'));
 }
 
 $(document).ready(function () {
