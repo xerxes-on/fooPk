@@ -1,3 +1,4 @@
+// Triggers a recalculation of recipes for the user. Updates the DataTable and provides success/error feedback using SweetAlert
 import {$tableRecipes} from './recipesConst.js';
 
 export function recalculateUserRecipes() {

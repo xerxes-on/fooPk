@@ -1,3 +1,4 @@
+// Fetches and updates recipe count in the #counterToolbar using server data
 export function renderCounterToolbarData() {
     $.ajax({
         type: 'GET',

@@ -1,3 +1,4 @@
+// Initializes DataTables for "Recipes By Challenge" and "Recipes By User" on tab changes.
 import {selectedRecipesStorage} from './recipesConst.js';
 import {renderCounterToolbarData} from './renderCounterToolbarData.js';
 

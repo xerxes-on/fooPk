@@ -1,3 +1,4 @@
+// Manages recipe selection via a Colorbox popup. Allows selecting/deselecting recipes in a DataTable and submitting selected recipes to users
 const selectedPopupRecipesStorage = 'selected_popup_recipes';
 const selectedUsersStorage = 'selected_users';
 let $tablePopup = null;

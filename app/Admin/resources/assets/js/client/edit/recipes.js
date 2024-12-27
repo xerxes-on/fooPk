@@ -1,3 +1,4 @@
+// Main initializer for recipe functionality. Cleans up localStorage, binds DOM events, registers recipe-related functions to window.FoodPunk.functions, and initializes recipe DataTables
 import {selectedPopupRecipesStorage, selectedRecipesStorage} from './recipes/recipesConst.js';
 import {renderCounterToolbarData} from './recipes/renderCounterToolbarData.js';
 import {addRecipes} from './recipes/addRecipes.js';

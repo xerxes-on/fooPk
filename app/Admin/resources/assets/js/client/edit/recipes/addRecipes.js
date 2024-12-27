@@ -1,3 +1,4 @@
+//  Manages the "Add Recipes" popup, initializes a DataTable for displaying recipes, and synchronizes selected recipes with localStorage.
 import {selectedPopupRecipesStorage} from './recipesConst.js';
 
 export function addRecipes() {

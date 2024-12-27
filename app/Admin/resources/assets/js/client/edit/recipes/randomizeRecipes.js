@@ -1,3 +1,4 @@
+// Displays a form for configuring random recipe generation. Collects user input and sends a request to generate recipes based on the provided settings
 export async function addRandomizeRecipes() {
     const initFormData = await inputRecipeAmount();
     if (!initFormData) return false;

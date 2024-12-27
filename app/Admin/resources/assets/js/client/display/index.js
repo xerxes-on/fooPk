@@ -1,3 +1,4 @@
+// Main initializer for user and recipe selection. Sets up the user DataTable, filters, and recipe-related actions like selection and randomization
 import $ from 'jquery';
 import {initUserSelection} from './userSelection.js';
 import {initFilters} from './filters.js';

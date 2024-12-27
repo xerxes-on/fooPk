@@ -1,3 +1,4 @@
+// Provides functionality for deleting a single recipe or all recipes. Prompts the user for confirmation and sends AJAX requests to delete recipes
 import {$tableRecipes} from './recipesConst.js';
 import {renderCounterToolbarData} from './renderCounterToolbarData.js';
 

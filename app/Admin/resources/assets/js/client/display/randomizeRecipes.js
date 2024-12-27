@@ -1,3 +1,4 @@
+// Handles random recipe distribution. Displays a SweetAlert form for randomization options and submits the settings to generate recipes for selected users
 import {getUserTable} from './userSelection.js';
 
 /**

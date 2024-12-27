@@ -1,3 +1,4 @@
+// Handles bulk operations on selected recipes. Toggles checkbox states for all recipes on a page and deletes all selected recipes after confirmation.
 import {$tableRecipes, selectedRecipesStorage} from './recipesConst.js';
 import {renderCounterToolbarData} from './renderCounterToolbarData.js';
 

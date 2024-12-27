@@ -1,3 +1,4 @@
+// Handles filtering logic for the user DataTable. Provides utilities to serialize form data and bind "Apply" and "Reset" filter buttons.
 export function getFormData($form) {
     const unindexedArray = $form.serializeArray();
     const indexedObject = {};

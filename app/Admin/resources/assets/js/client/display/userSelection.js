@@ -1,3 +1,4 @@
+// Manages the user selection DataTable. Allows users to select rows, syncs selections to localStorage, and provides utilities to retrieve the table instance
 import {getFormData} from './filters.js';
 
 const selectedUsersStorage = 'selected_users';

@@ -1,3 +1,4 @@
+// Handles submission of selected recipes to a user, showing feedback via SweetAlert
 import {$SubmitAddRecipes, selectedPopupRecipesStorage, selectedUsersStorage} from './recipesConst.js';
 
 export function submitAdding() {

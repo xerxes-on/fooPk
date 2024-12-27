@@ -1,3 +1,4 @@
+// Displays recipe details in a modal by fetching data from the server
 export function openInfoModal(element, recipeId) {
     let route = window.FoodPunk.route.searchRecipesPreview;
     route = route.replace('%', recipeId);

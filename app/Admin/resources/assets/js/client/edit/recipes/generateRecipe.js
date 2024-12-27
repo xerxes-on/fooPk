@@ -1,3 +1,4 @@
+// Generates new recipes for a user. Sends a request to the server and reloads the "Recipes By Challenge" table upon success
 import {$recipesByChallenge} from './recipesConst.js';
 
 export function generateRecipe() {
