@@ -1,4 +1,16 @@
-// Displays recipe details in a modal by fetching data from the server
+/**
+ * Opens a modal displaying detailed information about a specific recipe.
+ *
+ * @function openInfoModal
+ * @param {HTMLElement} element - The button or element triggering the modal.
+ * @param {number|string} recipeId - The ID of the recipe to fetch details for.
+ *
+ * @description
+ * - Sends a GET request to fetch recipe details from the server.
+ * - Displays a loading spinner on the triggering element during the request.
+ * - Populates and shows the modal with the fetched recipe details on success.
+ * - Displays an error alert if the request fails or the response indicates an error.
+ */
 export function openInfoModal(element, recipeId) {
     let route = window.FoodPunk.route.searchRecipesPreview;
     route = route.replace('%', recipeId);

@@ -1,7 +1,17 @@
-// Provides functionality for deleting a single recipe or all recipes. Prompts the user for confirmation and sends AJAX requests to delete recipes
 import {$tableRecipes} from './recipesConst.js';
 import {renderCounterToolbarData} from './renderCounterToolbarData.js';
 
+/**
+ * Deletes a specific recipe by its ID after user confirmation.
+ *
+ * @function deleteRecipe
+ * @param {HTMLElement} elem - The element triggering the delete action, containing a `data-id` attribute with the recipe ID.
+ *
+ * @description
+ * - Prompts the user for confirmation before deleting the recipe.
+ * - Sends a DELETE request to the server and reloads the recipes table upon success.
+ * - Displays success or error messages based on the server response.
+ */
 export function deleteRecipe(elem) {
     const recipeId = $(elem).attr('data-id');
 
@@ -75,6 +85,17 @@ export function deleteRecipe(elem) {
     });
 }
 
+
+/**
+ * Deletes all recipes for the current user after user confirmation.
+ *
+ * @function deleteAllRecipes
+ *
+ * @description
+ * - Prompts the user for confirmation before deleting all recipes.
+ * - Sends a DELETE request to the server and reloads the recipes table upon success.
+ * - Displays success or error messages based on the server response.
+ */
 export function deleteAllRecipes() {
     Swal.fire({
         title: window.FoodPunk.i18n.deleteAllRecipesUser,

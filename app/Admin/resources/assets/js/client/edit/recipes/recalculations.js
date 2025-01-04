@@ -1,5 +1,18 @@
-// Triggers a recalculation of recipes for the user. Updates the DataTable and provides success/error feedback using SweetAlert
 import {$tableRecipes} from './recipesConst.js';
+
+/**
+ * Recalculates user recipes based on updated data.
+ *
+ * @function recalculateUserRecipes
+ *
+ * @description
+ * - Prompts the user for confirmation before recalculating recipes.
+ * - Sends a POST request to the server to trigger the recalculation process.
+ * - Displays success or error messages based on the server's response.
+ * - Reloads the recipes table after the operation completes.
+ *
+ * @returns {void}
+ */
 
 export function recalculateUserRecipes() {
     Swal.fire({

@@ -1,4 +1,16 @@
-// Fetches and updates recipe count in the #counterToolbar using server data
+/**
+ * Updates the counter toolbar with user-specific recipe data.
+ *
+ * @function renderCounterToolbarData
+ *
+ * @description
+ * - Sends a GET request to retrieve recipe count data for the current user.
+ * - Updates the `#counterToolbar` element with the retrieved data on success.
+ * - Displays an error message in the toolbar if the request fails.
+ *
+ * @returns {void}
+ */
+
 export function renderCounterToolbarData() {
     $.ajax({
         type: 'GET',

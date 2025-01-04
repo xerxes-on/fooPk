@@ -1,7 +1,17 @@
-// Handles bulk operations on selected recipes. Toggles checkbox states for all recipes on a page and deletes all selected recipes after confirmation.
 import {$tableRecipes, selectedRecipesStorage} from './recipesConst.js';
 import {renderCounterToolbarData} from './renderCounterToolbarData.js';
 
+/**
+ * Toggles the selection of recipes and updates the selected recipes in localStorage.
+ *
+ * @function toggleSelect
+ * @param {HTMLElement} element - The element triggering the toggle action, typically a checkbox.
+ *
+ * @description
+ * - Updates the selection state of all recipe checkboxes based on the triggering element.
+ * - Manages the `selectedRecipesStorage` in localStorage to persist selections.
+ * - Shows or hides the "Delete All Selected Recipes" button based on selection status.
+ */
 export function toggleSelect(element) {
     const status = $(element).prop('checked');
     const elements = $('.js-delete-recipes');
@@ -48,6 +58,18 @@ export function toggleSelect(element) {
     localStorage.setItem(selectedRecipesStorage, JSON.stringify(alreadySelected));
 }
 
+
+/**
+ * Deletes the selected recipes after user confirmation.
+ *
+ * @function deleteSelectedRecipes
+ *
+ * @description
+ * - Retrieves selected recipes from localStorage and prompts the user for confirmation.
+ * - Sends a DELETE request to the server to remove the selected recipes.
+ * - Reloads the recipes table and updates the UI upon success or failure.
+ * - Displays appropriate success or error messages based on the server response.
+ */
 export function deleteSelectedRecipes() {
     const data = JSON.parse(localStorage.getItem(selectedRecipesStorage));
     if (!data?.selected?.length) {

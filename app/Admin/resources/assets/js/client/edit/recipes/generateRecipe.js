@@ -1,6 +1,16 @@
-// Generates new recipes for a user. Sends a request to the server and reloads the "Recipes By Challenge" table upon success
 import {$recipesByChallenge} from './recipesConst.js';
 
+/**
+ * Generates a recipe for a specific user after user confirmation.
+ *
+ * @function generateRecipe
+ *
+ * @description
+ * - Prompts the user for confirmation before initiating recipe generation.
+ * - Sends a POST request to the server to generate a recipe for the specified user.
+ * - Displays success or error messages based on the server response.
+ * - Reloads the recipes table if `$recipesByChallenge` is available.
+ */
 export function generateRecipe() {
     Swal.fire({
         title: window.FoodPunk.i18n.confirmation,

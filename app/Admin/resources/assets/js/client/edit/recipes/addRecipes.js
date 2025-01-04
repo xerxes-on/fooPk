@@ -1,5 +1,17 @@
-//  Manages the "Add Recipes" popup, initializes a DataTable for displaying recipes, and synchronizes selected recipes with localStorage.
 import {selectedPopupRecipesStorage} from './recipesConst.js';
+
+/**
+ * Opens a popup to select recipes and initializes a DataTable for managing recipe selection.
+ *
+ * @function addRecipes
+ *
+ * @description
+ * - Displays a modal popup with a DataTable for recipe selection.
+ * - Filters recipes based on user-defined criteria.
+ * - Supports multi-row selection, persisting selected rows in `localStorage`.
+ * - Dynamically reloads the DataTable with updated filters.
+ * - Binds events for select/deselect actions to maintain selected state across interactions.
+ */
 
 export function addRecipes() {
     $.colorbox({

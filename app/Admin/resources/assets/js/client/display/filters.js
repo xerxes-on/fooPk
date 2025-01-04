@@ -1,4 +1,10 @@
-// Handles filtering logic for the user DataTable. Provides utilities to serialize form data and bind "Apply" and "Reset" filter buttons.
+/**
+ * Serializes form data into an object for use with DataTables filtering.
+ *
+ * @function getFormData
+ * @param {jQuery} $form - A jQuery object representing the form to serialize.
+ * @returns {Object} An object containing the form's data where keys are input names and values are their respective values.
+ */
 export function getFormData($form) {
     const unindexedArray = $form.serializeArray();
     const indexedObject = {};
@@ -11,6 +17,17 @@ export function getFormData($form) {
     return indexedObject;
 }
 
+/**
+ * Initializes the filter functionality for the user DataTable. Binds actions to "Apply" and "Reset" buttons.
+ *
+ * @function initFilters
+ * @param {Object} userDataTable - A DataTable instance for which the filters are applied.
+ *
+ * @description
+ * - The "Apply" button triggers the table redraw with the current filter criteria.
+ * - The "Reset" button clears the form and redraws the table with no filters applied.
+
+ */
 export function initFilters(userDataTable) {
     // "Apply" filter
     $('#apply-filter').on('click', function (e) {

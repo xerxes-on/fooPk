@@ -1,9 +1,15 @@
-// Manages the user selection DataTable. Allows users to select rows, syncs selections to localStorage, and provides utilities to retrieve the table instance
 import {getFormData} from './filters.js';
 
 const selectedUsersStorage = 'selected_users';
 let $tableUsers = null;
 
+/**
+ * Initializes the user selection DataTable with server-side processing and multi-row selection.
+ *
+ * @function initUserSelection
+ * @returns {DataTable} The initialized DataTable instance for user selection.
+ *
+ */
 export function initUserSelection() {
     localStorage.removeItem(selectedUsersStorage);
 

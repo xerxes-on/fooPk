@@ -1,6 +1,18 @@
-// Initializes DataTables for "Recipes By Challenge" and "Recipes By User" on tab changes.
 import {selectedRecipesStorage} from './recipesConst.js';
 import {renderCounterToolbarData} from './renderCounterToolbarData.js';
+
+/**
+ * Initializes DataTables for "Recipes By Challenge" and "Recipes By User" tabs.
+ *
+ * @function initRecipesTables
+ *
+ * @description
+ * - Binds DataTable initialization to the activation of corresponding tabs.
+ * - Configures "Recipes By Challenge" DataTable with server-side processing and challenge-specific data.
+ * - Configures "Recipes By User" DataTable with server-side processing, user-specific data, and toolbar features.
+ * - Manages state persistence for selected recipes and updates the UI accordingly.
+ * - Provides functionality for deleting individual recipes and accessing detailed recipe information.
+ */
 
 export function initRecipesTables() {
     // Recipes By Challenge tab

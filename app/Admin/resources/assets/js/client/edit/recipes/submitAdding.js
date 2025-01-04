@@ -1,5 +1,18 @@
-// Handles submission of selected recipes to a user, showing feedback via SweetAlert
 import {$SubmitAddRecipes, selectedPopupRecipesStorage, selectedUsersStorage} from './recipesConst.js';
+
+/**
+ * Submits selected recipes to be added to a user.
+ *
+ * @function submitAdding
+ *
+ * @description
+ * - Retrieves selected recipes and users from localStorage.
+ * - Sends a POST request to associate the selected recipes with the specified user.
+ * - Displays a loading indicator during the request and success or error messages based on the response.
+ * - Clears the selected recipes and users from localStorage after the operation completes.
+ *
+ * @returns {void}
+ */
 
 export function submitAdding() {
     const rowsSelected = JSON.parse(localStorage.getItem(selectedPopupRecipesStorage));

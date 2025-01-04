@@ -1,9 +1,11 @@
-// Handles random recipe distribution. Displays a SweetAlert form for randomization options and submits the settings to generate recipes for selected users
 import {getUserTable} from './userSelection.js';
 
 /**
- * Opens a SweetAlert to ask for random recipe distribution info.
- * Returns an object with user-selected values or undefined if canceled.
+ * Prompts the user to input randomization settings for recipes.
+ *
+ * @async
+ * @function inputRecipeAmount
+ * @returns {Promise<Object|null>} A promise resolving to an object containing recipe settings or `null` if the dialog is canceled.
  */
 export async function inputRecipeAmount() {
     const {value: formValues} = await Swal.fire({
@@ -42,6 +44,14 @@ export async function inputRecipeAmount() {
     return formValues;
 }
 
+/**
+ * Adds randomized recipes to the selected users based on input criteria.
+ *
+ * @async
+ * @function addRandomizeRecipes2selectUsers
+ * @returns {Promise<void>} Resolves after the process completes or fails with an error dialog.
+ *
+ */
 export async function addRandomizeRecipes2selectUsers() {
     const $tableUsers = getUserTable();
     const usersSelected = $tableUsers.rows({selected: true}).data();

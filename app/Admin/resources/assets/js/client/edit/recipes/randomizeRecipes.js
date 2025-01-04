@@ -1,4 +1,16 @@
-// Displays a form for configuring random recipe generation. Collects user input and sends a request to generate recipes based on the provided settings
+/**
+ * Adds randomized recipes to a user based on input criteria.
+ *
+ * @async
+ * @function addRandomizeRecipes
+ *
+ * @description
+ * - Prompts the user to input randomization settings using `inputRecipeAmount`.
+ * - Sends a POST request to the server with the randomization parameters.
+ * - Displays success or error messages based on the server's response.
+ *
+ * @returns {Promise<void>} Resolves when the process completes or fails.
+ */
 export async function addRandomizeRecipes() {
     const initFormData = await inputRecipeAmount();
     if (!initFormData) return false;
@@ -70,6 +82,19 @@ export async function addRandomizeRecipes() {
     });
 }
 
+/**
+ * Displays a form for the user to input randomization settings for recipes.
+ *
+ * @async
+ * @function inputRecipeAmount
+ *
+ * @description
+ * - Displays a Swal modal with randomization settings form.
+ * - Fetches the form template via an AJAX GET request.
+ * - Collects and returns the user-inputted values from the form.
+ *
+ * @returns {Promise<Object|null>} Resolves to an object containing the form values or `null` if canceled.
+ */
 async function inputRecipeAmount() {
     const {value: formValues} = await Swal.fire({
         title: window.FoodPunk.i18n.randomizeRecipesSettings,

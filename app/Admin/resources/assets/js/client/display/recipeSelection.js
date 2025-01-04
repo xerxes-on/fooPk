@@ -1,11 +1,12 @@
-// Manages recipe selection via a Colorbox popup. Allows selecting/deselecting recipes in a DataTable and submitting selected recipes to users
 const selectedPopupRecipesStorage = 'selected_popup_recipes';
 const selectedUsersStorage = 'selected_users';
 let $tablePopup = null;
 
 /**
- * Opens a Colorbox popup that shows all recipes in a DataTable, and
- * allows selecting/deselecting them, storing in localStorage.
+ * Displays a popup for selecting recipes to assign to users.
+ * Initializes a DataTable for recipe selection and handles row selection persistence.
+ *
+ * @function addRecipes2selectUsers
  */
 export function addRecipes2selectUsers() {
     const usersSelected = JSON.parse(localStorage.getItem(selectedUsersStorage));
@@ -126,6 +127,14 @@ export function addRecipes2selectUsers() {
         },
     });
 }
+
+/**
+ * Submits selected recipes to the selected users.
+ * Sends an AJAX request to associate the chosen recipes with the selected users and displays success or error messages.
+ *
+ * @function submitAdding
+ * @returns {boolean} Returns `false` if no recipes or users are selected.
+ */
 export function submitAdding() {
     const selectedPopupRecipesStorage = 'selected_popup_recipes';
     const usersStorage = 'selected_users';
