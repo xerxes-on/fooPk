@@ -65,7 +65,7 @@ final class IngredientTagAdminSection extends Section implements Initializable
                         trans('common.title')
                     )->setWidth('20%')->setOrderable(false),
                     AdminColumn::custom(
-                        trans('common.ingredients'),
+                        trans('ingredient::common.ingredients'),
                         static function (IngredientTagModel $model) {
                             $model->loadCount('ingredients');
                             return view('admin::collapsedList', [

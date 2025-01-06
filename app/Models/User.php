@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Enums\DatabaseTableEnum;
+use App\Http\Traits\HasAllowedIngestions;
 use App\Http\Traits\HasProfileImage;
 use App\Http\Traits\Questionnaire\Model\HasQuestionnaire;
 use App\Http\Traits\Recipe\Model\HasExcludedRecipes;
@@ -98,12 +98,15 @@ use Spatie\Permission\Traits\HasRoles;
  * @property-read int|null $foodpoints_distribution_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Formular> $formulars
  * @property-read int|null $formulars_count
+ * @property-read array $allowed_ingestion_ids
+ * @property-read array $allowed_ingestion_keys
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Ingestion> $allowed_ingestions
  * @property-read string|null $avatar_url
  * @property-read string $avatar_url_or_blank
  * @property-read string $balance
  * @property-read int $balance_int
  * @property-read \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\HasMany|object|null $challenge
- * @property-read mixed $course
+ * @property-read \Modules\Course\Models\Course|null $course
  * @property-read mixed $formular
  * @property-read string $full_name
  * @property-read bool $has_changed_meal_per_day
@@ -225,6 +228,7 @@ final class User extends Authenticatable implements Wallet, HasLocalePreference,
     use HasExcludedRecipes;
     use HasSubscription;
     use HasPushNotifications;
+    use HasAllowedIngestions;
 
     /**
      * The table associated with the model.
@@ -531,13 +535,5 @@ final class User extends Authenticatable implements Wallet, HasLocalePreference,
     public function foodpointsDistribution(): HasMany
     {
         return $this->hasMany(FoodpointsDistribution::class);
-    }
-
-    public function allowedIngestionsId()
-    {
-        $allowedIngestions = array_keys(array_filter($this->dietdata['ingestion'], function ($ingestion) {
-            return ($ingestion['percents'] != 0);
-        }));
-        return \DB::table(DatabaseTableEnum::INGESTIONS)->whereIn('key', $allowedIngestions)->pluck('id')->toArray();
     }
 }

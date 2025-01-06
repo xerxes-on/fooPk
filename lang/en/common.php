@@ -99,7 +99,6 @@ return [
     'recipe_complexity'   => 'Recipe Complexity',
     'recipe_distribution' => 'Recipe Distribution',
 
-    'ingredients'          => 'Ingredients',
     'ingredients_preview'  => 'Ingredients preview',
     'new_ingredient'       => 'New ingredient',
     'import_ingredients'   => 'Import ingredients',
@@ -243,7 +242,7 @@ return [
     'category'           => 'Category',
     'unit'               => 'Unit',
     'name'               => 'Name',
-    'names'               => 'Names (plural form)',
+    'names'              => 'Names (plural form)',
     'replace_ingredient' => 'Replace ingredient',
 
     // Ingredient categories
@@ -687,5 +686,4 @@ return [
         'purchase_food_points' => 'You can purchase Foodpoints in our  <a href=":link" target="_blank">online shop</a>',
         'extra_info'           => 'Just send us a screenshot of your review or the name of the person you recruited by email to <a href=":link">info@foodpunk.de</a> and get your Foodpoints as a thank you.',
     ],
-    'cs_count_message' =>'How many CS do you want to add?',
 ];

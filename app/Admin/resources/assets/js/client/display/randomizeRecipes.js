@@ -1,4 +1,4 @@
-import {getUserTable} from './userSelection.js';
+import {getUserTable} from './userSelection';
 
 /**
  * Prompts the user to input randomization settings for recipes.
@@ -50,7 +50,6 @@ export async function inputRecipeAmount() {
  * @async
  * @function addRandomizeRecipes2selectUsers
  * @returns {Promise<void>} Resolves after the process completes or fails with an error dialog.
- *
  */
 export async function addRandomizeRecipes2selectUsers() {
     const $tableUsers = getUserTable();
@@ -61,12 +60,12 @@ export async function addRandomizeRecipes2selectUsers() {
             icon: 'error',
             title: window.FoodPunk.i18n.noUserSelected,
         });
-        return false;
+        return;
     }
 
     // Prompt for randomization details
     const initFormData = await inputRecipeAmount();
-    if (!initFormData) return false;
+    if (!initFormData) return;
 
     const {
         amount,
@@ -79,7 +78,7 @@ export async function addRandomizeRecipes2selectUsers() {
     } = initFormData;
 
     if (!amount || parseInt(amount) === 0) {
-        return false;
+        return;
     }
 
     // Collect user IDs
@@ -124,22 +123,23 @@ export async function addRandomizeRecipes2selectUsers() {
                     title: window.FoodPunk.i18n.saved,
                     html: data.message,
                 });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    html: data.message,
-                });
+                return;
             }
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                html: data.message,
+            });
         },
         error: function (jqXHR) {
+            console.error(jqXHR);
             Swal.hideLoading();
             Swal.fire({
                 icon: 'error',
                 title: 'Oops...',
                 html: jqXHR.responseJSON?.message || 'Request Failed',
             });
-            console.error(jqXHR);
         },
     });
 }

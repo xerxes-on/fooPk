@@ -46,7 +46,7 @@ final class IngredientsAdminSection extends SectionWithImage implements Initiali
 
     public function getTitle(): string
     {
-        return trans('common.ingredients');
+        return trans('ingredient::common.ingredients');
     }
 
     public function initialize(): void

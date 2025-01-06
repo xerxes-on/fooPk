@@ -88,8 +88,8 @@
                         if (result.value) {
 
                             Swal.fire({
-                                title: 'Please Wait..!',
-                                text: 'Is working..',
+                                title: '{{trans('admin.messages.wait')}}',
+                                text: '{{trans('admin.messages.in_progress')}}',
                                 allowOutsideClick: false,
                                 allowEscapeKey: false,
                                 allowEnterKey: false,

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Services\Subscription;
 
-use App\Enums\ChargeBeeSubscriptionStatusEnum;
-use Modules\Chargebee\Models\ChargebeeSubscription;
 use App\Models\User;
 use App\Models\UserSubscription;
 use Carbon\Carbon;
+use Modules\Chargebee\Enums\ChargebeeSubscriptionStatus;
+use Modules\Chargebee\Models\ChargebeeSubscription;
 
 final class UserSubscriptionCreationService
 {
@@ -38,10 +38,10 @@ final class UserSubscriptionCreationService
         try {
             $chargebee = $model->chargebeeSubscriptions()
                 ->where(function ($query) {
-                    $query->whereJsonContains('data->status', ChargeBeeSubscriptionStatusEnum::FUTURE->value)
-                        ->orWhereJsonContains('data->status', ChargeBeeSubscriptionStatusEnum::IN_TRIAL->value)
-                        ->orWhereJsonContains('data->status', ChargeBeeSubscriptionStatusEnum::ACTIVE->value)
-                        ->orWhereJsonContains('data->status', ChargeBeeSubscriptionStatusEnum::NON_RENEWING->value);
+                    $query->whereJsonContains('data->status', ChargebeeSubscriptionStatus::FUTURE->value)
+                        ->orWhereJsonContains('data->status', ChargebeeSubscriptionStatus::IN_TRIAL->value)
+                        ->orWhereJsonContains('data->status', ChargebeeSubscriptionStatus::ACTIVE->value)
+                        ->orWhereJsonContains('data->status', ChargebeeSubscriptionStatus::NON_RENEWING->value);
 
                 })->get(['data'])->map(function (ChargebeeSubscription $item) {
                     if (isset($item['next_billing_at'])) {

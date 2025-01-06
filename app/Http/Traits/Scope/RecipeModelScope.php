@@ -173,6 +173,11 @@ trait RecipeModelScope
         return $query->where('status', RecipeStatusEnum::ACTIVE->value);
     }
 
+    public function scopeInActiveStatus(Builder $query): Builder
+    {
+        return $query->whereIn('status', [RecipeStatusEnum::ACTIVE->value, RecipeStatusEnum::OUTDATED->value]);
+    }
+
     public function scopeIsOutdated(Builder $query): Builder
     {
         return $query->where('status', RecipeStatusEnum::OUTDATED->value);

@@ -3,13 +3,16 @@
 namespace Modules\Chargebee\Services;
 
 use App\Enums\Admin\Permission\RoleEnum;
-use App\Enums\ChargeBeeSubscriptionStatusEnum;
+use App\Enums\DatabaseTableEnum;
 use App\Enums\User\UserStatusEnum;
+use App\Events\UserQuestionnaireChanged;
 use App\Helpers\CacheKeys;
 use App\Helpers\Calculation;
+use App\Jobs\AutomationUserCreation;
+use App\Jobs\RecalculateRecipes;
 use App\Mail\MailMailable;
 use App\Models\User;
-use App\Notifications\UserHasTwoActiveChargebeeSubscriptionsNotification;
+use App\Services\Users\UserService;
 use Bavix\Wallet\Internal\Exceptions\ExceptionInterface;
 use Carbon\Carbon;
 use ChargeBee\ChargeBee\Environment as ChargeBee_Environment;
@@ -24,26 +27,31 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Mail;
+use Modules\Chargebee\Enums\ChargebeeSubscriptionStatus;
 use Modules\Chargebee\Enums\CurrenciesEnum;
 use Modules\Chargebee\Exceptions\ChargebeeConfigurationFailure;
 use Modules\Chargebee\Exceptions\ChargebeeEventFailed;
 use Modules\Chargebee\Models\ChargebeeInvoice as ChargebeeInvoiceModel;
 use Modules\Chargebee\Models\ChargebeeSubscription;
+use Modules\Chargebee\Notifications\UserHasTwoActiveChargebeeSubscriptionsNotification;
 use Modules\Course\Enums\CourseId;
+use Modules\Course\Models\Course;
+use Modules\Ingredient\Jobs\SyncUserExcludedIngredientsJob;
+use Modules\Internal\Models\AdminStorage;
 use Password;
 use Throwable;
 
 /**
  * TODO: refactor to simplify. Another god class is bad for mental health...
- * TODO: class has 1059 lines of code.  Avoid really long classes.
+ * TODO: class has 1053 lines of code.  Avoid really long classes.
  * TODO: class has 11 public methods. Consider refactoring ChargebeeService to keep number of public methods under 10.
- * TODO: class has a coupling between objects value of 31. Consider to reduce the number of dependencies under 13.
- * TODO: class has an overall complexity of 169 which is very high.
+ * TODO: class has a coupling between objects value of 33. Consider to reduce the number of dependencies under 13.
+ * TODO: class has an overall complexity of 165 which is very high.
  * TODO: Typehint missing
  */
 class ChargebeeService
 {
-    private array $webhooksHandlersMap;
+    private array $webhooksHandlersMap; // todo: totally unnecessary property
 
     /**
      * @param User $user
@@ -261,8 +269,10 @@ class ChargebeeService
      * @throws ChargebeeEventFailed
      * @throws \Exception
      */
-    public function handleSubscriptionCreated($eventData)
+    public function handleSubscriptionCreated($eventData, $checkExistingTheSameUUIDPlanId = true)
     {
+
+        $currentDateTime = Carbon::now()->format('Y-m-d H:i:s');
         if (
             empty($eventData['content']) ||
             empty($eventData['content']['subscription']) ||
@@ -307,25 +317,38 @@ class ChargebeeService
         ];
         $customerEmail = trim(strtolower($order['email']));
 
-        $_user                               = User::ofEmail($customerEmail)->orderBy('status', 'DESC')->first();
-        $chargebeeSubscriptionWithSamePlanID = false;
-        if ($_user) {
-            $planId = $order['plan_id'];
+        $_user = User::ofEmail($customerEmail)->orderBy('status', 'DESC')->first();
 
+        // reactivation user checking place
+        $reactivationConditions = false;
+        if (!empty($_user)){
+            $reactivationConditions = $this->userMetReactivationConditions($order, $_user);
+        }
+
+
+        // check if user already has subscription with the same UUID and plan_id
+        $chargebeeSubscriptionWithSameUUIDAndPlanID = false;
+        if ($_user && $checkExistingTheSameUUIDPlanId) {
             $subscriptions = $_user->assignedChargebeeSubscriptions()->get();
             foreach ($subscriptions as $subscription) {
-                if ($chargebeeSubscriptionWithSamePlanID) {
-                    break;
-                }
-
-
-                // TODO:: please review that @NickMost, do we need that still?
                 $planIdOld = self::getChargebeePlanIdFromSubscriptionData($subscription->data);
-                if ($planIdOld == $planId) {
-                    $chargebeeSubscriptionWithSamePlanID = true;
+                if ($subscription->uuid == $order['id'] && $planIdOld == $order['plan_id']) {
+                    $chargebeeSubscriptionWithSameUUIDAndPlanID = true;
+                    break;
                 }
             }
         }
+
+        /// debug part
+//        $subscriptions = $_user->assignedChargebeeSubscriptions()->get()->toArray();
+//        $conditionsStr = json_encode($reactivationConditions,JSON_PRETTY_PRINT);
+//        $conditionsStr = nl2br(stripcslashes($conditionsStr));
+//        $msg = 'DEBUG:: User reactivation allowed, #' . $subscriptionId . ' plan_id=' . $order['plan_id'] . ' USER_ID=' . $_user->id.' Conditions:'.$conditionsStr;
+//        $msg .= var_export($subscriptions,true);
+//        Log::info($msg);
+        /// debug part
+
+
 
         $msg = 'ChargeBee import #' . $subscriptionId . ', plan_id=' . $order['plan_id'] . ' processing!';
         Log::info($msg);
@@ -337,12 +360,14 @@ class ChargebeeService
         if (
             (!empty($userCreationPlans) && in_array($trimmedChargebeePlanId, $userCreationPlans)) ||
             (
+                // if user not exists but challenge exists by chargebee plan_id, it's case when not all plan_ids are in config
                 (
                     empty($_user)
                     &&
                     self::issetChallengeIdByChargebeePlanId($trimmedChargebeePlanId) !== false
                 )
                 ||
+                // if user not exists but challenge exists by chargebee plan_id and user's lang
                 (
                     !empty($_user)
                     &&
@@ -360,7 +385,7 @@ class ChargebeeService
             $customerData['chargebee_id'] = $subscriptionId;
 
             $_user       = $this->getOrCreateUser($customerData);
-            $challengeId = self::getChallengeIdByChargebeePlanId($trimmedChargebeePlanId, $_user->lang);
+            $courseId = self::getChallengeIdByChargebeePlanId($trimmedChargebeePlanId, $_user->lang);
 
 
             // probably could be place of issue with double subscriptions
@@ -369,6 +394,10 @@ class ChargebeeService
 
             // TODO:: review challenges @NickMost???
             if (!$existUser) {
+
+                // Totally new user
+                $_user->setFirstTimeCourse();
+                $_user->addCourseIfNotExists($courseId);
 
                 # create subscription
                 $_user->maybeCreateSubscription();
@@ -396,37 +425,84 @@ class ChargebeeService
                 // TODO:: to think about welcome email in this case, does it need to be sent?
 
                 // the same function called in $_user
-//                $this->refreshSubs2criptionData($_user);
-//                $this->checkAndCreateInternalSubscription($_user);
+                //                $this->refreshSubs2criptionData($_user);
+                //                $this->checkAndCreateInternalSubscription($_user);
 
-                $_user->status = true;
-                $_user->save();
+//                $_user->status = true;
+//                $_user->save();
             }
 
 
-            $_user->setFirstTimeCourse();
-
-            $_user->addCourseIfNotExists($challengeId);
-
-            // TODO:: please review that @NickMost, do we need that still?
-            if ($existUser && !$chargebeeSubscriptionWithSamePlanID) {
+            // user exists and subscription hasn't been processed yet
+            if ($existUser && !$chargebeeSubscriptionWithSameUUIDAndPlanID) {
                 // user hasn't subscription with the same UUID, it's reactivation or activation for user who hasn't before subscription
                 // reactivation notification
 
-                $msg = 'ChargeBee import #' . $subscriptionId . ' user account already exists, plan_id=' . $order['plan_id'] . ' USER_ID=' . $_user->id;
+                $conditionsStr = json_encode($reactivationConditions,JSON_PRETTY_PRINT);
+                $conditionsStr = nl2br(stripcslashes($conditionsStr));
+                $conditionsStr = str_replace(['    '],['&ensp;&ensp;&ensp;'],$conditionsStr);
+
+                $msg = 'User reactivation allowed, #' . $subscriptionId . ' plan_id=' . $order['plan_id'] . ' USER_ID=' . $_user->id.' Conditions:'.$conditionsStr;
                 Log::info($msg);
 
-                $to = $notificationsEmails;
-                # send email
-                $mailObject = new MailMailable('emails.importAccountAlreadyExists', ['order' => $order]);
+                if (is_array($reactivationConditions) && $reactivationConditions['can_be_reactivated']){
 
-                $mailObject->from(config('mail.from.address'), config('mail.from.name'))
-                    ->to($to)
-                    ->subject('Chargebee order, account duplication founded.')
-                    ->onQueue('emails');
+                    $this->reactivateUser($_user,$conditionsStr, $currentDateTime);
 
-                Mail::queue($mailObject);
+                    $msg = 'User reactivation done , #' . $subscriptionId . ' plan_id=' . $order['plan_id'] . ' USER_ID=' . $_user->id.' Conditions:'.$conditionsStr;
+                    Log::info($msg);
+                }
+                // if not exists active subscription but subscriptions presents
+                elseif(
+                    is_array($reactivationConditions)
+                    &&
+                    !empty($reactivationConditions['required']['chargebee_no_active_no_nonrenewing_subscriptions'])
+                    &&
+                    !empty($reactivationConditions['required']['chargebee_subscription_presents'])
+                )
+                    {
+
+                    $msg = 'User reactivation NOT allowed , #' . $subscriptionId . ' plan_id=' . $order['plan_id'] . ' USER_ID=' . $_user->id.' Conditions:'.$conditionsStr;
+                    Log::info($msg);
+
+                    $notificationsEmails    = config('chargebee.adminNotificationEmails');
+                    $mailObject = new MailMailable('emails.userReactivationAdminNotAllowed', [
+                        'mailBodySubject'=>__('email.userReactivationAdminNotAllowed.mail_subject'),
+                        'user'=>$_user,
+                        'orderId'=>$order['order_id'],
+                        'planId'=>$order['plan_id'],
+                        'reactivationDate'=>$currentDateTime,
+                        'reactivationConditions'=>$conditionsStr
+                    ]);
+                    $mailObject->from(config('mail.from.address'), config('mail.from.name'))
+                        ->to($notificationsEmails)
+                        ->subject(__('email.userReactivationAdminNotAllowed.mail_subject'))
+                        ->onQueue('emails');
+                    Mail::queue($mailObject);
+                }
+                // other cases when user exists, but issues with subsction
+                else{
+                    $msg = 'ChargeBee import #' . $subscriptionId . ' user account already exists, plan_id=' . $order['plan_id'] . ' USER_ID=' . $_user->id;
+                    Log::info($msg);
+
+                    $to = $notificationsEmails;
+                    # send email
+                    $mailObject = new MailMailable('emails.importAccountAlreadyExists', ['order' => $order]);
+
+                    $mailObject->from(config('mail.from.address'), config('mail.from.name'))
+                        ->to($to)
+                        ->subject('Chargebee order, account duplication founded.')
+                        ->onQueue('emails');
+
+                    Mail::queue($mailObject);
+                }
+
             }
+
+
+            // sync for users who haven't reactivation
+            $_user->setFirstTimeCourse();
+            $_user->addCourseIfNotExists($courseId);
 
             // TODO:: need to generate meal plan?
 
@@ -447,6 +523,12 @@ class ChargebeeService
 
         $msg = 'ChargeBee import #' . $subscriptionId . ' done!';
         Log::info($msg);
+
+        // update subscription status and processed time
+
+        if (!empty($subscriptionId)){
+            ChargebeeSubscription::where('uuid', $subscriptionId)->update(['processed' => Carbon::now(),'status'=>$order['eventData']['content']['subscription']['status']]);
+        }
     }
 
     /**
@@ -493,11 +575,11 @@ class ChargebeeService
 
     /**
      * Internal method, set First time challenge,
-
-
-    //--== END HOOK HANDLERS ==--
-
-    /**
+     *
+     *
+     * //--== END HOOK HANDLERS ==--
+     *
+     * /**
      * @throws \Exception
      */
     public function refreshSubscriptionData(User $user): bool
@@ -571,11 +653,11 @@ class ChargebeeService
                         }
                     }
 
-//                    return true;
+                    //                    return true;
                 }
             );
 
-        $this->checkAndCreateInternalSubscription($user);
+//        $this->checkAndCreateInternalSubscription($user);
         return true;
     }
 
@@ -643,25 +725,47 @@ class ChargebeeService
             }
 
             if (!empty($newSubscriptions)) {
-                \DB::table('chargebee_subscriptions')
+                \DB::table(DatabaseTableEnum::CHARGEBEE_SUBSCRIPTIONS)
                     ->whereIn('id', array_column($newSubscriptions, 'id'))
                     ->update(['assigned_user_id' => $user->id]);
             }
 
             //remove from db subscription which not presented in the chargebee
             // TODO:: temporary dissabled, need to be investigated
-//            ChargebeeSubscription::query()
-//                ->where('user_id', $user->id)
-//                ->whereNotIn(
-//                    'uuid',
-//                    array_column($subscriptions, 'id')
-//                )
-//                ->delete();
+            //            ChargebeeSubscription::query()
+            //                ->where('user_id', $user->id)
+            //                ->whereNotIn(
+            //                    'uuid',
+            //                    array_column($subscriptions, 'id')
+            //                )
+            //                ->delete();
 
             //send notification to admins if user has two active subscription assigned to him
             if (!$silence) {
                 $this->notifyAdminsAboutTwoActiveSubscriptionsIfRequired($user);
             }
+        }
+    }
+
+    /** uses for reactivation flow, sync only exists in the system */
+    public function updateUserExistsSubscriptions(User $user, $subscriptions = null)
+    {
+        if (!is_null($subscriptions)) {
+            $subscriptions = $this->prepareSubscriptionDataFromChargebee($subscriptions);
+            foreach ($subscriptions as $subscriptionData) {
+                if ($subscriptionObject = ChargebeeSubscription::query()
+                    ->where('uuid','=',$subscriptionData['id'])
+                    ->where('user_id','=', $user->id)->first()
+                ) {
+                    $subscriptionObject->data = $subscriptionData;
+                    //set or update payment_method if presented
+                    if (!empty($subscriptionData['payment_method'])) {
+                        $subscriptionObject->payment_method = data_get($subscriptionData, 'payment_method');
+                    }
+                    $subscriptionObject->save();
+                }
+            }
+
         }
     }
 
@@ -681,7 +785,7 @@ class ChargebeeService
 
             if ($subscriptionStatus && in_array(
                 $subscriptionStatus,
-                ChargeBeeSubscriptionStatusEnum::renewableStatus()
+                ChargebeeSubscriptionStatus::renewableStatus()
             )) {
                 if ($renewalEstimateData = $this->getSubscriptionRenewalEstimate(
                     data_get(
@@ -808,6 +912,7 @@ class ChargebeeService
         }
     }
 
+    // TODO:: check and replace where it's required, probably subscription create, changed, resumed, reactivated etc.
     protected function checkAndCreateInternalSubscription($user)
     {
         if (empty($user->subscription)) {
@@ -816,8 +921,8 @@ class ChargebeeService
             if (empty($chargebeePlanId)) {
                 return;
             }
-            $challengeId = self::getChallengeIdByChargebeePlanId($chargebeePlanId, $user->lang);
-            $user->addCourseIfNotExists($challengeId);
+            $courseId = self::getChallengeIdByChargebeePlanId($chargebeePlanId, $user->lang);
+            $user->addCourseIfNotExists($courseId);
 
             $user->maybeCreateSubscription();
         }
@@ -853,7 +958,7 @@ class ChargebeeService
                         fn($item) => (
                             in_array(
                                 $item->data['status'],
-                                ChargeBeeSubscriptionStatusEnum::potentiallyActiveStatus()
+                                ChargebeeSubscriptionStatus::potentiallyActiveStatus()
                             ) && $item->data['id'] != $subscriptionChargebeeId
                         )
                     )
@@ -874,14 +979,31 @@ class ChargebeeService
                     ->sortBy('started_at')
                     ->toArray();
 
-                $hasActiveSubscription = !empty($subscriptions);
-                foreach ($subscriptions as $subscription) {
-                    if (!empty($subscription['cancelled_at']) && $subscription['cancelled_at'] < $now) {
-                        $hasActiveSubscription = false;
+                // TODO:: refactor....
+//                $hasActiveSubscription = !empty($subscriptions);
+//                foreach ($subscriptions as $subscription) {
+//                    if (!empty($subscription['cancelled_at']) && $subscription['cancelled_at'] < $now) {
+//                        $hasActiveSubscription = false;
+//                    }
+//                }
+
+                // similar code ChargebeeService::1555
+                if (!empty($subscriptions)){
+                    foreach ($subscriptions as $subscription) {
+                        if (
+                            empty($subscription['cancelled_at'])
+                            ||
+                            (
+                                !empty($subscription['cancelled_at']) && $subscription['cancelled_at'] >= $now
+                            )
+                        ) {
+                            $hasActiveSubscription = true;
+                        }
                     }
                 }
                 // user hasn't active subscription, need to cancel
             }
+            // TODO:: cover subscription status and chargebe item status in database
 
             if (!$hasActiveSubscription) {
                 $user->subscriptions()->where('active', true)->update(['ends_at' => $subscriptionCancelledAt]);
@@ -891,6 +1013,19 @@ class ChargebeeService
         }
     }
 
+    /** TODO:: refactor */
+    public function getUserBySubscriptionData($eventData){
+        $customerEmail = data_get($eventData, 'content.customer.email');
+        if (empty($customerEmail)) {
+            $customerEmail = data_get($eventData, 'content.billing_address.email');
+        }
+        if (empty($customerEmail)) {
+            $customerEmail = data_get($eventData, 'content.subscription.customer_id');
+        }
+
+        $user = !empty($customerEmail) ? User::ofEmail($customerEmail)->first() : null;
+        return $user;
+    }
     /**
      * Uses for sync chargebee subscriptions data from chargebee into local database
      *
@@ -918,7 +1053,9 @@ class ChargebeeService
                 $customerEmail = data_get($eventData, 'content.subscription.customer_id');
             }
 
-            $user = !empty($customerEmail) ? User::ofEmail($customerEmail)->first() : null;
+//            $user = !empty($customerEmail) ? User::ofEmail($customerEmail)->first() : null;
+
+            $user = $this->getUserBySubscriptionData($eventData);
         }
 
         if (!empty($user)) {
@@ -928,7 +1065,7 @@ class ChargebeeService
             //fetch next billing amount calculation
             if ($subscriptionChargebeeId && !empty($subscriptionStatus) && in_array(
                 $subscriptionStatus,
-                ChargeBeeSubscriptionStatusEnum::renewableStatus()
+                ChargebeeSubscriptionStatus::renewableStatus()
             )) {
                 if ($renewalEstimateData = $this->getSubscriptionRenewalEstimate($subscriptionChargebeeId)) {
                     if ($nextBillingTotalCents = data_get($renewalEstimateData, 'invoice_estimate.total')) {
@@ -959,7 +1096,7 @@ class ChargebeeService
             }
 
 
-            $this->checkAndCreateInternalSubscription($user);
+//            $this->checkAndCreateInternalSubscription($user);
 
             //notify admins about user with two active subscriptions
             $this->notifyAdminsAboutTwoActiveSubscriptionsIfRequired($user);
@@ -1086,11 +1223,443 @@ class ChargebeeService
      */
     public static function getChallengeIdByChargebeePlanId($planId = null, $lang = 'general')
     {
-        $challengeId = CourseId::getFirstTimeChallengeId($lang);
+        $courseId = CourseId::getFirstTimeChallengeId($lang);
         if ($selectedChallengeId = self::issetChallengeIdByChargebeePlanId($planId, $lang)) {
-            $challengeId = $selectedChallengeId;
+            $courseId = $selectedChallengeId;
         }
 
-        return $challengeId;
+        return $courseId;
+    }
+
+    // based on https://foodpunk.atlassian.net/wiki/spaces/APP/pages/2613116930/2024-10-11+Automatic+reactivation+of+user+account
+    public function userMetReactivationConditions($order, User $user = null){
+
+        $CONST_DATE = '2019-06-30';
+        $CONST_MINIMUM_RECIPES = 90;
+        $CONST_MINIMUM_BALANCE = 100;
+
+        $metConditions = [
+            'general'=>[
+                'user_exists'=>false,
+            ],
+            'required'=>[
+                'chargebee_subscription_presents'=>false,
+                'chargebee_no_active_no_nonrenewing_subscriptions'=>false,
+                'chargebee_subscription_must_have_status_canceled'=>false,
+                'status_at_least_one_subscription_presents'=>false,
+                'status_must_be_finished'=>false,
+                'status_no_subscription_has_status_active'=>false,
+                'questionnaire_exists'=>false,
+                'recipes_minimum_amount_90'=>false,
+            ],
+            'one_of'=>[
+                'membership_starts_before_date_20190630'=>false,
+                'registration_before_date_20190630'=>false,
+                'recent_questionnaire_created_no_more_2_years_ago'=>false,
+                'has_foodpoints_minimum_100'=>false,
+            ],
+        ];
+
+        if (empty($user)) return $metConditions;
+
+        $metConditions['general']['user_exists'] = true;
+
+        $triggerDate = Carbon::parse($CONST_DATE);
+
+        if ($user->created_at<=$triggerDate){
+            // condition: Additional: The registration date is dated before 2019-06-30.
+            $metConditions['one_of']['registration_before_date_20190630'] = true;
+        }
+
+        if ($user->allRecipes()->count()>=$CONST_MINIMUM_RECIPES){
+            // condition: Recipes: min. 90 recipes are present
+            $metConditions['required']['recipes_minimum_amount_90'] = true;
+        }
+
+        //condition: Additional: The customer has previously purchased foodpoints. In the transaction history a transaction is noted as “Deposit of X FoodPoints Admin” or “Deposit of X FoodPoints based on chargebee invoice” AND Foodpoints balance is > 100 FP
+        if ($user->balance>$CONST_MINIMUM_BALANCE){
+            $transactions = $user->walletTransactions()->get();
+            if ($transactions){
+                foreach($transactions as $transaction){
+                    if (
+                        !empty($transaction->meta['description'])
+                        &&
+                        (
+                            strpos($transaction->meta['description'],'FoodPoints Admin')!==false
+                            ||
+                            strpos($transaction->meta['description'],'FoodPoints based on chargebee invoice')!==false
+                        )
+                    ){
+                        $metConditions['one_of']['has_foodpoints_minimum_100'] = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+
+
+        $latestQuestionnaire = $user->latestQuestionnaire()->first();
+        if (!empty($latestQuestionnaire)){
+            // condition: Questionnaire:exists
+            $metConditions['required']['questionnaire_exists'] = true;
+            if($latestQuestionnaire->created_at > Carbon::now()->subYears(2)){
+                // condition: Additional: The most recent questionnaire was created no more than two years ago
+                $metConditions['one_of']['recent_questionnaire_created_no_more_2_years_ago'] = true;
+            }
+        }
+
+        $userSubscriptions = $user->subscriptions()->get();
+        if (!empty($userSubscriptions)){
+            // condition: Status:At least one subscription is present
+            $metConditions['required']['status_at_least_one_subscription_presents'] = true;
+
+
+            // condition: Status:Status must be “finished”
+            $metConditions['required']['status_no_subscription_has_status_active'] = true;
+            foreach($userSubscriptions as $subscription){
+
+                if ($subscription->created_at<=$triggerDate){
+                    // condition: Additional: The previous membership started before 30.06.2019
+                    $metConditions['one_of']['membership_starts_before_date_20190630'] = true;
+                }
+
+                if ($subscription->active == 1 && empty($subscription->ends_at)){
+                    $metConditions['required']['status_no_subscription_has_status_active'] = false;
+                }
+
+            }
+        }
+
+        // condition: Status:Status must be “finished”
+        $userLatestSubscription = $user->getLatestSubscription();
+        if (empty($userLatestSubscription) || (!empty($userLatestSubscription) && $userLatestSubscription->ends_at<Carbon::now())){
+            $metConditions['required']['status_must_be_finished'] = true;
+        }
+
+
+        $this->configureEnvironment();
+        $chargebeeIds = $this->getChargebeeCustomerIds($user);
+        if (!empty($chargebeeIds) && is_array($chargebeeIds)) {
+            try {
+                $subscriptions = ChargeBee_Subscription::all(
+                    array(
+                        "sortBy[asc]" => "updated_at",
+                        "customerId[in]" => $chargebeeIds,
+                        'limit' => 100,
+                    )
+                );
+                if (!is_null($subscriptions)) {
+                    $this->updateUserExistsSubscriptions($user, $subscriptions);
+                }
+
+            } catch (Throwable $e) {
+                logError($e);
+            }
+        }
+
+
+        $existChargebeeSubscriptions = \DB::table(DatabaseTableEnum::CHARGEBEE_SUBSCRIPTIONS)
+            ->where('assigned_user_id', '=',$user->id)
+            ->where('uuid','!=',$order['id'])
+            ->get();
+
+
+        if (!empty($existChargebeeSubscriptions)){
+            // condition: Chargebee subscription: is present
+            $metConditions['required']['chargebee_subscription_presents'] = true;
+
+            $restrictedStatuses = [ChargebeeSubscriptionStatus::ACTIVE->value,ChargebeeSubscriptionStatus::NON_RENEWING->value];
+
+            // condition: Chargebee subscription:no active or non renewing subscription(s)
+            $metConditions['required']['chargebee_no_active_no_nonrenewing_subscriptions'] = true;
+            foreach ($existChargebeeSubscriptions as $existSubscription) {
+                $data = json_decode($existSubscription->data, true);
+                if (in_array($data['status'],$restrictedStatuses)){
+                    $metConditions['required']['chargebee_no_active_no_nonrenewing_subscriptions'] = false;
+                }
+
+                // condition: Chargebee subscription:Chargebee subscription must have status “cancelled”
+                if ($data['status']==ChargebeeSubscriptionStatus::CANCELLED->value){
+                    $metConditions['required']['chargebee_subscription_must_have_status_canceled'] = true;
+                }
+            }
+        }
+
+        $metConditions['result']['general'] = array_reduce($metConditions['general'], function($result, $value):bool {
+            return (bool)$result*$value;
+
+        },true);
+
+        $metConditions['result']['required'] = array_reduce($metConditions['required'], function($result, $value):bool {
+            return (bool)$result*$value;
+
+        },true);
+
+        $metConditions['result']['one_of'] = array_reduce($metConditions['one_of'], function($result, $value):bool {
+            return (bool)$result||$value;
+
+        },false);
+
+        $canBeReactivated = array_reduce($metConditions['result'], function($result, $value):bool {
+            return (bool)$result*$value;
+
+        },true);
+
+        unset($metConditions['general']);
+        unset($metConditions['result']);
+
+        $metConditions['can_be_reactivated'] = $canBeReactivated;
+
+
+        return $metConditions;
+
+    }
+
+    public function reactivateUser(User $user, $conditionsStr = '', $reactivationDate){
+
+
+        $CONST_FOODPOINTS_MINIMUM = 150;
+
+        //Status: Create a new active subscription in the account under “Status”.
+        $user->status = true;
+        $user->save();
+        $user->createSubscription();
+        //Questionnaire: Force visibility of questionnaire for user is being activated
+        $user->latestQuestionnaire()->update(['is_editable' => 1]);
+        UserQuestionnaireChanged::dispatch($user->id);
+
+        //Balance: the balance should be at least 150 foodpoints. If the balance is less than 150 foodpoints, add the difference. If the account already has more than 150 foodpoints, no additional foodpoints must be added.
+        if ($user->balance<$CONST_FOODPOINTS_MINIMUM){
+            $amount = $CONST_FOODPOINTS_MINIMUM - $user->balance;
+            $user->deposit($amount, ['description' => "Deposit of $amount FoodPoints (Reactivation)"]);
+        }
+
+
+
+        //Weeky plan: Generate weekly plan.
+
+
+//        $recipeIds = $user->allRecipes()->orderBy('recipes.id')->pluck('recipes.id')->toArray();
+//        RecalculateRecipes::dispatchSync($user, $recipeIds);
+        Calculation::_generate2subscription($user);
+
+
+
+        //
+        //If user doesn’t own course ID 2 or 25, add ID 2 for german users, ID 25 for english speaking users. Start date: Day of reactivation.
+        //
+        //for chargebee plans with a course other than ID 2 or 25 the specific course should be added with start date as day of reactivation.
+        //
+        // If minimum start date for this course exists and it is after the current date, start course at minimum start date.
+
+        $addedCourses = [];
+
+        $user->setFirstTimeCourse();
+
+        $planId = '-';
+        $courseId = null;
+        $latestChargebeeSubscription = ChargebeeSubscription::where('assigned_user_id',$user->id)->orderBy('created_at','desc')->first();
+        if (!empty($latestChargebeeSubscription)){
+            $planId = $latestChargebeeSubscription->SubscriptionName;
+            if (!empty($planId)){
+                $trimmedChargebeePlanId = self::prepareChargebeePlanId($planId);
+                $courseId = self::getChallengeIdByChargebeePlanId($trimmedChargebeePlanId, $user->lang);
+                if (!empty($courseId)){
+
+                    if (!$user->courseExists($courseId)){
+                        $user->addCourseIfNotExists($courseId);
+                        $addedCourses[] = $courseId;
+                    }
+                }
+            }
+        }
+
+        if (empty($courseId)){
+            if ($user->lang=='en' && (!$user->courseExists(CourseId::EN_30_DAYS->value))){
+                $user->addCourseIfNotExists(CourseId::EN_30_DAYS->value);
+                $addedCourses[] = CourseId::EN_30_DAYS->value;
+            }
+            elseif (!$user->courseExists(CourseId::DE_30_DAYS->value)){
+                $user->addCourseIfNotExists(CourseId::DE_30_DAYS->value);
+                $addedCourses[] = CourseId::DE_30_DAYS->value;
+            }
+        }
+
+
+        // notification to Admin
+
+        if (!empty($addedCourses)){
+            sort($addedCourses);
+            $tmp = [];
+            foreach($addedCourses as $courseId){
+                $tmp[] = Course::find($courseId)->title.'('.$courseId.')';
+            }
+            $addedCoursesStr = implode(', ',$tmp);
+        }
+        else{
+            $addedCoursesStr = ' - ';
+        }
+
+
+        // TODO:: to think about courses added before
+        $notificationsEmails    = config('chargebee.adminNotificationEmails');
+        $mailObject = new MailMailable('emails.userReactivationAdminSuccess', [
+            'mailBodySubject'=>__('email.userReactivationAdminSuccess.mail_subject'),
+            'user'=>$user,
+            'reactivationDate'=>$reactivationDate,
+            'planId'=>$planId,
+            'addedCoursesStr'=>$addedCoursesStr,
+            'reactivationConditions'=>$conditionsStr,
+        ]);
+
+        $mailObject->from(config('mail.from.address'), config('mail.from.name'))
+        ->to($notificationsEmails)
+        ->subject(__('email.userReactivationAdminSuccess.mail_subject'))
+        ->onQueue('emails');
+
+        Mail::queue($mailObject);
+
+
+        app()->setLocale($user->lang);
+        // notification to User
+        $mailObject = new MailMailable('emails.userReactivationUser', [
+            'mailBodySubject'=>__('email.userReactivationUser.mail_subject'),
+            'user'=>$user,
+        ]);
+        $mailObject->from(config('mail.from.address'), config('mail.from.name'))
+            ->to($user->email)
+            ->subject(__('email.userReactivationUser.mail_subject'))
+            ->onQueue('emails');
+
+        Mail::queue($mailObject);
+
+    }
+
+    public function userHasActiveChargebeeSubscription(User $user){
+
+        $hasActiveSubscription            = false;
+        $subscriptions                    = $user->assignedChargebeeSubscriptions;
+
+        if (!$subscriptions->isEmpty()) {
+            $now = Carbon::now();
+            $subscriptions = $subscriptions
+                ->filter(
+                    fn($item) => (
+                        in_array(
+                            $item->data['status'],
+                            ChargebeeSubscriptionStatus::potentiallyActiveStatus()
+                        )
+                    )
+                )
+                ->map(
+                    function ($item) {
+                        $item->started_at   = null;
+                        $item->cancelled_at = null;
+                        if (!empty($item->data['started_at'])) {
+                            $item->started_at = Carbon::parse($item->data['started_at']);
+                        }
+                        if (!empty($item->data['cancelled_at'])) {
+                            $item->cancelled_at = Carbon::parse($item->data['cancelled_at']);
+                        }
+                        return $item;
+                    }
+                )
+                ->sortBy('started_at');
+
+            if (!empty($subscriptions)){
+                foreach ($subscriptions as $subscription) {
+                    if (
+                        empty($subscription->cancelled_at)
+                        ||
+                        (
+                            !empty($subscription->cancelled_at) && $subscription->cancelled_at >= $now
+                        )
+                    ) {
+                        $hasActiveSubscription = $subscription;
+                    }
+                }
+            }
+            // user hasn't active subscription, need to cancel
+        }
+        return $hasActiveSubscription;
+    }
+
+    // TODO:: refactor ASAP, it's trick for non-creating meal-plans
+    public function subscriptionChangedEvent(User $user){
+
+        $this->refreshSubscriptionData($user);
+        if($chargebeeSubscription = $this->userHasActiveChargebeeSubscription($user)){
+
+            $userCreationPlans      = config('chargebee.create_user_plan');
+            $chargebeePlanId = ChargebeeService::getChargebeePlanIdFromSubscriptionData($chargebeeSubscription->data);
+
+
+            //$chargebeeSubscription
+            $trimmedChargebeePlanId = self::prepareChargebeePlanId($chargebeePlanId);
+
+            if (
+                !empty($chargebeePlanId)
+                &&
+                (
+                        in_array($trimmedChargebeePlanId, $userCreationPlans)
+                        ||
+                        self::issetChallengeIdByChargebeePlanId($trimmedChargebeePlanId, $user->lang) !== false
+                )
+            ){
+                $courseId = self::getChallengeIdByChargebeePlanId($trimmedChargebeePlanId, $user->lang);
+
+                // user has subscription, need to check all conditions
+                $user->maybeCreateSubscription();
+                $user->status = true;
+                $user->save();
+
+                $user->setFirstTimeCourse();
+                $user->addCourseIfNotExists($courseId);
+
+                $latestQuestionnaire = $user->latestQuestionnaire()->first();
+                // if exists questionnaire, otherwise welcome bonus add while creation first questionnaire
+                if (!empty($latestQuestionnaire)){
+                    // checking balance
+                    if ($user->balance==0){
+                        app(UserService::class)->addUserWelcomeBonus($user);
+                    }
+
+                    if (!empty($user->dietdata) && $user->questionnaireApproved === true) {
+
+
+                        $totalUsersRecipesAmount = $user->allRecipes()->count();
+                        if (empty($totalUsersRecipesAmount)){
+
+
+                            SyncUserExcludedIngredientsJob::dispatch($user);
+
+
+                            #Running job for distribute random recipes and generate recipes/
+                            $adminStorageData = AdminStorage::where('key', "meal_plan_generation_$user->id")->first();
+//                            $canRunJob        = is_null($adminStorageData) || $adminStorageData->data === 'on';
+                            AutomationUserCreation::dispatchSync($user);
+                            // Clean up storage if model exists
+                            if (!is_null($adminStorageData)) {
+                                AdminStorage::where('key', "meal_plan_generation_$user->id")->delete();
+                            }
+
+                            $totalUsersRecipesAmount = $user->allRecipes()->count();
+                            $recipesInMealPlanForFutureAmount = $user->recipes()->where('meal_date','>',Carbon::now())->count();
+                            if (!empty($totalUsersRecipesAmount) && empty($recipesInMealPlanForFutureAmount)){
+                                Calculation::_generate2subscription($user);
+                            }
+
+                        }
+
+
+                    }
+
+                }
+
+            }
+
+        }
+
     }
 }

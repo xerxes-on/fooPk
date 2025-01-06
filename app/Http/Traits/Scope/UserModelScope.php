@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Traits\Scope;
 
-use Modules\Chargebee\Enums\Admin\Client\Filters\ClientChargebeeSubscriptionFilterEnum;
 use App\Enums\Admin\Client\Filters\ClientConsultantFilterEnum;
 use App\Enums\Admin\Client\Filters\ClientFormularFilterEnum;
 use App\Enums\Admin\Client\Filters\ClientSubscriptionFilterEnum;
@@ -13,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Facades\DB;
+use Modules\Chargebee\Enums\ClientChargebeeSubscriptionFilter;
 
 trait UserModelScope
 {
@@ -114,11 +114,11 @@ trait UserModelScope
         # find by Chargebee Subscription
         if (array_key_exists('chargebee_subscription', $conditions)) {
             match ((int)$conditions['chargebee_subscription']) {
-                ClientChargebeeSubscriptionFilterEnum::MISSING->value => $query
+                ClientChargebeeSubscriptionFilter::MISSING->value => $query
                     ->whereDoesntHave(
                         'assignedChargebeeSubscriptions'
                     ),
-                ClientChargebeeSubscriptionFilterEnum::EXIST->value => $query
+                ClientChargebeeSubscriptionFilter::EXIST->value => $query
                     ->whereHas('assignedChargebeeSubscriptions', function (Builder $query) {
                         $query
                             ->whereRaw(
@@ -130,7 +130,7 @@ trait UserModelScope
                             )
                             ->whereJsonContains('data->status', 'active');
                     }),
-                ClientChargebeeSubscriptionFilterEnum::MULTIPLE_ACTIVE->value => $query
+                ClientChargebeeSubscriptionFilter::MULTIPLE_ACTIVE->value => $query
                     ->whereHas('assignedChargebeeSubscriptions', function (Builder $query) {
                         $query
                             ->selectSub(
@@ -487,7 +487,7 @@ trait UserModelScope
             ->where(DatabaseTableEnum::RECIPES . '.id', $recipe_id)
             ->where(DatabaseTableEnum::RECIPES_TO_USERS . '.ingestion_id', $ingestionId)
             //TODO:: @NickMost refactor, trick to show only allowed for user ingestions
-            ->whereIn(DatabaseTableEnum::INGESTIONS.'.id', $this->allowedIngestionsId())
+            ->whereIn(DatabaseTableEnum::INGESTIONS.'.id', $this->allowed_ingestion_ids)
             ->whereDate(DatabaseTableEnum::RECIPES_TO_USERS . '.meal_date', $date);
     }
 

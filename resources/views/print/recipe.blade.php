@@ -170,18 +170,7 @@
                 @endif
 
                 <!-- Ingredients -->
-                <div class="recipe-detail_panel">
-                    <div class="recipe-detail_panel_title">{{ trans('common.ingredients') }}</div>
-
-                    <div class="alert alert-danger" role="alert" id="calculation_allert" style="display: none;">
-                        {{ trans('common.calculation_fails') }}
-                    </div>
-
-                    @if( isset($calculatedIngredients) && !empty($calculatedIngredients) )
-                        @include('recipes.feed.inc.ingredients')
-                    @endif
-
-                </div>
+                @include('ingredient::ingredients-section')
             </div>
 
             <div class="col-sm-7">

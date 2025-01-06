@@ -1,5 +1,5 @@
 @php
-    use Modules\Chargebee\Enums\Admin\Client\Filters\ClientChargebeeSubscriptionFilterEnum;
+    use Modules\Chargebee\Enums\ClientChargebeeSubscriptionFilter;
     use App\Enums\Admin\Client\Filters\ClientFormularFilterEnum;
     use App\Enums\Admin\Client\Filters\ClientSubscriptionFilterEnum;
     use App\Enums\Admin\Client\Filters\ClientConsultantFilterEnum;
@@ -12,9 +12,9 @@
         </a>
     @endcan
 
-        @if($hideRecipesRandomizer)
-            <button type="button" id="add-recipes-to-select-users" class="btn btn-info ladda-button"
-                    data-style="expand-right"
+    @if($hideRecipesRandomizer)
+        <button type="button" id="add-recipes-to-select-users" class="btn btn-info ladda-button"
+                data-style="expand-right"
                 onclick="window.FoodPunk.functions.addRecipes2selectUsers()">
             <span class="ladda-label"><i class="fas fa-plus" aria-hidden="true"></i> @lang('common.add_recipe')</span>
         </button>
@@ -32,7 +32,7 @@
         <div class="form-group">
             <label for="v_search">@lang('common.search'):</label>
             <input type="text"
-                   placeholder="Enter Search Keywords (id, First name, Last name, e-mail)"
+                   placeholder="Enter Search Keywords (id, First name, Last name, e-mail)" {{--TODO: translate--}}
                    name="v_search"
                    id="v_search" class="form-control">
         </div>
@@ -61,7 +61,7 @@
                     <label for="filter-chargebee-subscription">@lang('admin.filters.chargebee_subscription.title')</label>
                     <select name="chargebee_subscription" id="filter-chargebee-subscription" class="form-control">
                         <option value="" hidden>@lang('admin.filters.defaults.select')</option>
-                        @foreach(ClientChargebeeSubscriptionFilterEnum::forSelect() as $key =>$value)
+                        @foreach(ClientChargebeeSubscriptionFilter::forSelect() as $key =>$value)
                             <option value="{{$key}}">@lang('admin.filters.defaults.' . strtolower($value))</option>
                         @endforeach
                     </select>

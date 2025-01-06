@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\FlexMeal\Http\Controllers\API;
 
 use App\Http\Controllers\API\APIBase;
@@ -39,6 +41,8 @@ final class FlexMealPreviewApiController extends APIBase
 
     /**
      * Retrieve archive page
+     *
+     * @route  GET /api/v1/flex-meal/all
      */
     public function getArchive(Request $request, FlexMealService $service): JsonResponse
     {

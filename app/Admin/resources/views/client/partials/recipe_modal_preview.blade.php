@@ -31,7 +31,7 @@
                 @endforeach
             </ul>
 
-            <p class="mb-0 font-weight-bold">@lang('common.ingredients'):</p>
+            <p class="mb-0 font-weight-bold">@lang('ingredient:common.ingredients'):</p>
             <ul class="list-unstyled">
                 @forelse($calculatedIngredients as $ingestion => $ingredients)
                     <li><span class="badge badge-primary text-uppercase"><b>{{$ingestion}}</b></span>

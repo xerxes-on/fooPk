@@ -156,4 +156,3 @@
 @else
     <h3>@lang('common.formular_data_empty')</h3>
 @endif
-

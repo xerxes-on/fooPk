@@ -78,5 +78,7 @@ return [
     'cancel'        => 'Cancel',
 
     // Posts
-    'no_posts' => 'No lesson available'
+    'no_posts' => 'No lesson available',
+    'success'=> 'Success',
+    'failed'=> 'Failed',
 ];

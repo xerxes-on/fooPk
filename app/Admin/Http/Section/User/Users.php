@@ -69,6 +69,9 @@ final class Users extends Section implements Initializable
         });
     }
 
+    /**
+     * @throws \Exception
+     */
     public function onDisplay(): FormElements
     {
         $isConsultant          = auth()->user()->hasRole(RoleEnum::CONSULTANT->value);
@@ -77,7 +80,7 @@ final class Users extends Section implements Initializable
         Meta::addJs('client-display.js', mix('js/admin/client/display/index.js'));
         return AdminForm::elements(
             [
-                AdminFormElement::view('admin::client.clients_display_scripts', [
+                AdminFormElement::view('admin::client.partials.global_display_data', [
                     'hideRecipesRandomizer' => $hideRecipesRandomizer,
                 ]),
                 AdminFormElement::custom()->setDisplay(
@@ -118,7 +121,7 @@ final class Users extends Section implements Initializable
      */
     public function onEdit(int $id): FormInterface
     {
-        // TODO: optimization required. Too much duplicated queries
+        // TODO: optimization required. Too much duplicated queries: ~100, and only ~48 unique
         $tabs = new DisplayTabbed();
 
         $this->addInfoTab($id, $tabs);
@@ -135,6 +138,7 @@ final class Users extends Section implements Initializable
             $this->addChargebeeSubscriptionsTab($tabs);
             $this->addCoursesTab($tabs);
         }
+
         return $tabs;
     }
 
@@ -143,19 +147,17 @@ final class Users extends Section implements Initializable
      */
     private function addInfoTab(int $id, NativeTabbed $tabs): void
     {
-        $formClientInfo = AdminForm::panel()
-            ->addStyle('switch.css', mix('css/admin/switch.css'))
-            ->withPackage(['dataTables', 'ladda'])
-            ->addScript('admin.js', mix('js/admin/admin.js'))
-            ->addScript('client-edit.js', mix('js/admin/client/edit/index.js'))
-            ->setAction(route('admin.client.store', ['id' => $id]));
-        $leftColumn = [
-            AdminFormElement::view('admin::client.jobsStatus', [
-                'client'                  => $this->model_value,
-                'subscription'            => $this->model_value->subscription,
+        $serviceColumns = [
+            AdminFormElement::view('admin::client.jobsStatus', ['client' => $this->model_value]),
+            AdminFormElement::view('admin::client.partials.global_edit_data', [
+                'clientID'                => $this->model_value->id,
+                'subscription'            => $this->model_value->subscription, // todo:
                 'canDeleteAllUserRecipes' => auth()->user()->can(PermissionEnum::DELETE_ALL_USER_RECIPES->value),
                 'hideRecipesRandomizer'   => !auth()->user()->hasRole(RoleEnum::CONSULTANT->value) && auth()->user()->hasPermissionTo(PermissionEnum::ADD_RECIPES_TO_CLIENT->value),
             ]),
+        ];
+
+        $leftColumn = [
             AdminFormElement::checkbox('status', trans('common.enable_user'))->setView(view('admin::custom.switch')),
             AdminFormElement::checkbox('mark_tested', 'Set as test user')
                 ->setExactValue($this->model_value->hasRole(RoleEnum::TEST_USER->value))
@@ -187,12 +189,12 @@ final class Users extends Section implements Initializable
 
         // For dev purposes do not show "Recalculations job" view
         if (!config('foodpunk.check_user_recalculations')) {
-            unset($leftColumn[0]);
+            unset($serviceColumns[0]);
         }
 
         // Do not show "Set as test user" for consultants
         if ($this->isConsultant) {
-            unset($leftColumn[2]);
+            unset($leftColumn[1]);
         }
 
         $rightColumn = [
@@ -239,11 +241,20 @@ final class Users extends Section implements Initializable
             );
         }
 
-        $formClientInfo->setItems(
-            AdminFormElement::columns()->addColumn(fn() => $leftColumn)->addColumn(fn() => $rightColumn)
+        $tabs->appendTab(
+            AdminForm::panel()
+                ->addStyle('switch.css', mix('css/admin/switch.css'))
+                ->withPackage(['dataTables', 'ladda'])
+                ->addScript('admin.js', mix('js/admin/admin.js'))
+                ->addScript('client-edit.js', mix('js/admin/client/edit/index.js'))
+                ->setAction(route('admin.client.store', ['id' => $id]))
+                ->setItems(
+                    AdminFormElement::columns()->addColumn(fn() => $serviceColumns, 12)
+                        ->addColumn(fn() => $leftColumn, 6)
+                        ->addColumn(fn() => $rightColumn, 6)
+                ),
+            trans('common.client_information')
         );
-
-        $tabs->appendTab($formClientInfo, trans('common.client_information'));
     }
 
     private function addBalanceTab(NativeTabbed $tabs): void

@@ -14,13 +14,12 @@
             <i class="fas fa-trash"></i>
         </button>
     </div>
-
 </div>
 
 @push('footer-scripts')
     <script>
         jQuery(document).ready(function ($) {
-
+            {{-- TODO: move scripts away --}}
             $('.js-data-ajax-article').select2({
                 placeholder: 'Search for a repository',
                 minimumInputLength: 3,

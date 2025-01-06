@@ -3,6 +3,12 @@
 @import "../components/buttons/purchase";
 
 .shopping-list {
+  &-title-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
   &_panel {
     background: $light-pink;
     padding: 15px 10px;
@@ -240,8 +246,8 @@
 
         &_amount {
           display: inline-block;
-          margin: 0 5px;
-          width: 70px;
+          margin: 0 10px 0 0;
+          min-width: 50px;
           font-weight: bold;
         }
 
@@ -249,6 +255,7 @@
           margin-bottom: 0;
           font-weight: normal;
           flex-grow: 1;
+          display: flex;
 
           .cross-line {
             display: none;
@@ -272,7 +279,7 @@
               padding-left: 28px;
               cursor: pointer;
               line-height: 20px;
-              display: inline-block;
+              //display: flex;
               color: #666;
 
               &:before {

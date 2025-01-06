@@ -78,5 +78,7 @@ return [
     'cancel'        => 'Abbrechen',
 
     // Posts
-    'no_posts' => 'Kein Beitrag vorhanden.'
+    'no_posts' => 'Kein Beitrag vorhanden.',
+    'success'=> 'Success',
+    'failed'=> 'Failed',
 ];

@@ -6,7 +6,7 @@
                 <th style="width:5%">#</th>
                 <th style="width:20%">@lang('common.slug')</th>
                 <th style="width:20%">@lang('common.title')</th>
-                <th style="width:35%">@lang('common.ingredients')</th>
+                <th style="width:35%">@lang('ingredient::common.ingredients')</th>
                 <th style="width:20%;"></th>
             </tr>
             </thead>

@@ -48,7 +48,8 @@ class AutomationUserCreation implements ShouldQueue
         $allRecipesAmount      = $this->user->allRecipes()->count();
         // could be case that user will be affected by monthly recipe distribution before regular creation...WEB-624
         $numberNewRecipes = intval(config("adding-new-recipes.monthly.numberNewRecipes"));
-        if ($allRecipesAmount > $numberNewRecipes || $mealPlanRecipesAmount > 0) {
+//        if ($allRecipesAmount > $numberNewRecipes || $mealPlanRecipesAmount > 0 ) {
+        if ($allRecipesAmount>0 || $mealPlanRecipesAmount > 0) {
             return;
         }
 

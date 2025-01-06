@@ -113,7 +113,7 @@
             <div class="col-xs-12">
                 <ul class="content-links" role="tablist">
                     <li role="presentation" class="content-links_item active font-12">
-                        <a href="#ingredients" role="tab" data-toggle="tab">@lang('common.ingredients')</a>
+                        <a href="#ingredients" role="tab" data-toggle="tab">@lang('ingredient::common.ingredients')</a>
                     </li>
                     <li role="presentation" class="content-links_item font-12">
                         <a href="#recipes" role="tab" data-toggle="tab">@lang('common.recipes')</a>
@@ -166,4 +166,5 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js"></script>
     <script src="{{ mix('vendor/sweetalert/sweetalert.min.js')}} "></script>
     <script src="{{ mix('js/shopping-list.js') }}"></script>
+    <script src="{{ mix('js/ingredientSwitcher.js') }}"></script>
 @endsection

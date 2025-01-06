@@ -17,7 +17,8 @@
                 <span class="ladda-label">@lang('common.deposit')</span>
             </button>
 
-            <button type="button" id="withdraw-balance" class="btn btn-info" onclick="window.FoodPunk.functions.withdraw()">
+            <button type="button" id="withdraw-balance" class="btn btn-info"
+                    onclick="window.FoodPunk.functions.withdraw()">
                 <span class="ladda-label">@lang('common.withdraw')</span>
             </button>
         </div>
@@ -40,7 +41,7 @@
         </thead>
         <tbody>
         @foreach($client->transactions()->latest()->get() as $transaction)
-            @php $class = $transaction->type == 'deposit' ? 'table-success' : 'table-danger'; @endphp
+            @php $class = $transaction->type === $transaction::TYPE_DEPOSIT ? 'table-success' : 'table-danger'; @endphp
 
             <tr class="{{ $class }}">
                 <td>{{ $transaction->id }}</td>
@@ -48,7 +49,7 @@
                 <td>{{ parseDateString($transaction->updated_at,'d.m.Y') }}</td>
                 <td>{{ $transaction->amount }}</td>
                 <td>{{ $transaction->uuid }}</td>
-                <td>{{ key_exists('description', (array)$transaction->meta) ? $transaction->meta['description'] : '' }}</td>
+                <td>{{ array_key_exists('description', (array)$transaction->meta) ? $transaction->meta['description'] : '' }}</td>
             </tr>
         @endforeach
         </tbody>

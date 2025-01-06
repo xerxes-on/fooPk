@@ -34,6 +34,7 @@ trait HasShoppingList
                             $qw->with([
                                 'category' => static fn(HasOne $ew) => $ew->without(['diets']),
                                 'unit'     => static fn(HasOne $ew) => $ew->setEagerLoads([]),
+                                'alternativeUnit',
                                 'translations',
                                 'hint'
                             ]);

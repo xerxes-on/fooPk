@@ -97,14 +97,14 @@ final class FlexMealService
         bool $ingredientsAsCollection = false
     ): Collection|EloquentCollection {
         $mealList        = $user->flexmealLists;
-        $ingredientsUsed = Flexmeal::whereIn('list_id', $mealList->pluck('id'))->with('ingredient')->get();
+        $ingredientsUsed = Flexmeal::whereIn('list_id', $mealList->pluck('id'))->with('ingredient.alternativeUnit')->get();
 
         if ($ingredientsAsCollection) {
             $ingredientsUsed = FlexMealResource::collection($ingredientsUsed);
         }
 
         return $mealList->map(
-            function ($value) use ($ingredientsUsed) {
+            function (FlexmealLists $value) use ($ingredientsUsed) {
                 $values = collect();
 
                 foreach ($ingredientsUsed as $item) {

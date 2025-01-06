@@ -95,7 +95,7 @@ final class PushNotificationOptions
         $havingCondition = match (UserCourseStatus::tryFrom($this->courseStatus)) {
             UserCourseStatus::IN_PROGRESS   => 'active_days < duration and active_days != 0',
             UserCourseStatus::FINISHED      => 'active_days > duration',
-            UserCourseStatus::NOT_STARTED   => 'active_days == 0',
+            UserCourseStatus::NOT_STARTED   => 'active_days = 0',
             UserCourseStatus::NOT_PURCHASED => false,
             default                         => null,
         };

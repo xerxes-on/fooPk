@@ -7,6 +7,7 @@ use App\Enums\Recipe\RecipeTypeEnum;
 use App\Models\CustomRecipe;
 use App\Models\Ingestion;
 use App\Models\Recipe;
+use App\Rules\RecipeReplacementRule;
 use Carbon\Carbon;
 use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -36,7 +37,7 @@ final class RecipeReplacementRequest extends FormRequest
     {
         return [
             'meal_date'     => ['required', 'date'],
-            'ingestion_key' => ['required', 'string'],
+            'ingestion_key' => ['required', 'string', new RecipeReplacementRule($this->user())],
             'new_recipe_id' => ['required', 'integer', 'min:1'],
             'recipe_type'   => ['required', 'integer', 'in:' . implode(',', RecipeTypeEnum::values())],
         ];

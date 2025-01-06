@@ -1,4 +1,4 @@
-import {getFormData} from './filters.js';
+import {getFormData} from './filters';
 
 const selectedUsersStorage = 'selected_users';
 let $tableUsers = null;
@@ -8,7 +8,6 @@ let $tableUsers = null;
  *
  * @function initUserSelection
  * @returns {DataTable} The initialized DataTable instance for user selection.
- *
  */
 export function initUserSelection() {
     localStorage.removeItem(selectedUsersStorage);

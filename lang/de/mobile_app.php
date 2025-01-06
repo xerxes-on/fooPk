@@ -194,7 +194,7 @@ lassen',
     'flex_meal'                          => 'FlexMeal',
     'flex_meal_name'                     => 'FlexMeal Titel',
     'foodpoints'                         => 'Foodpunkte',
-    'foodpoints_description'             => 'Foodpunkte sind deine digitale Währung in der Foodpunk App. Hole dir damit zusätzliche Rezeptinspirationen vom Marktplatz oder schalte dir deinen nächsten Kurs frei. Wöchentlich erhältst du automatisch 20 Foodpunkte.
+    'foodpoints_description'             => 'Foodpunkte sind deine digitale Währung in der Foodpunk App. Hole dir damit zusätzliche Rezeptinspirationen vom Marktplatz oder schalte dir deinen nächsten Kurs frei. Du erhältst monatlich automatisch 100 Foodpunkte.
 
 Außerdem kannst du dir über folgende Wege Foodpunkte verdienen:
 

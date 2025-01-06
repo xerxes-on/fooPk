@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 if (!function_exists('truncate_tables')) {
     function truncate_tables(array $tables): void
     {
@@ -174,7 +176,7 @@ if (!function_exists('convertToNumber')) {
         if (is_int($value) || is_float($value)) {
             return $value;
         }
-        return (str_contains($value, '.') || str_contains($value, ',')) ? floatval($value) : intval($value);
+        return (str_contains($value, '.') || str_contains($value, ',')) ? (float)$value : (int)$value;
     }
 }
 

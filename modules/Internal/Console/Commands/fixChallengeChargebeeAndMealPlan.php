@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Modules\Internal\Console\Commands;
 
-use App\Enums\ChargeBeeSubscriptionStatusEnum;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Modules\Chargebee\Enums\ChargebeeSubscriptionStatus;
 use Modules\Chargebee\Models\ChargebeeSubscription;
 use Modules\Chargebee\Services\ChargebeeService;
 
@@ -115,7 +115,7 @@ class fixChallengeChargebeeAndMealPlan extends Command
                             &&
                             in_array(
                                 $item->data['status'],
-                                ChargeBeeSubscriptionStatusEnum::potentiallyActiveStatus()
+                                ChargebeeSubscriptionStatus::potentiallyActiveStatus()
                             )
                             &&
                             $subscriptionStartedAtDiffToday < 120

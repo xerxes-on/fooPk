@@ -18,6 +18,7 @@ use Modules\Chargebee\Services\EventHandler\SubscriptionReactivatedWithBackdatin
 use Modules\Chargebee\Services\EventHandler\SubscriptionRenewedEventHandler;
 use Modules\Chargebee\Services\EventHandler\SubscriptionResumedEventHandler;
 use Modules\Chargebee\Services\EventHandler\SubscriptionStartedEventHandler;
+use Modules\Chargebee\Services\EventHandler\CustomerChangedEventHandler;
 
 return [
     'handlers' => [
@@ -30,17 +31,17 @@ return [
         // assigning foodpoints to user
         'payment_succeeded' => [
             'handler' => PaymentSucceededEventHandler::class,
-            'delay' => 20,
+            'delay' => 10,
         ],
 
         'subscription_activated' => [
             'handler' => SubscriptionActivatedEventHandler::class,
-            'delay' => 20,
+            'delay' => 10,
         ],
 
         'subscription_activated_with_backdating' => [
             'handler' => SubscriptionActivatedWithBackdatingEventHandlerEventHandler::class,
-            'delay' => 20,
+            'delay' => 10,
         ],
 
         'subscription_canceled_with_backdating' => [
@@ -70,7 +71,7 @@ return [
 
         'subscription_deleted' => [
             'handler' => SubscriptionDeletedEventHandler::class,
-            'delay' => 120,
+            'delay' => 5,
         ],
 
         'subscription_moved_in' => [
@@ -80,11 +81,11 @@ return [
 
         'subscription_reactivated' => [
             'handler' => SubscriptionReactivatedEventHandler::class,
-            'delay' => 120,
+            'delay' => 0,
         ],
         'subscription_reactivated_with_backdating' => [
             'handler' => SubscriptionReactivatedWithBackdatingEventHandler::class,
-            'delay' => 120,
+            'delay' => 0,
         ],
         'subscription_renewed' => [
             'handler' => SubscriptionRenewedEventHandler::class,
@@ -103,10 +104,15 @@ return [
             'handler' => SubscriptionResumedEventHandler::class,
             'delay' => 20,
         ],
+        'customer_changed'=>[
+            'handler' => CustomerChangedEventHandler::class,
+            'delay' => 30,
+
+        ]
     ],
 
-    'create_user_plan' => array_values(json_decode(env('CHARGEBEE_USER_PLANS_NEW', ''), true)),
-    'create_silent_plan' => array_values(json_decode(env('CHARGEBEE_SILENT_PLANS_NEW', ''), true)),
+    'create_user_plan' => array_values(json_decode(env('CHARGEBEE_USER_PLANS_NEW', '[]'), true)??[]),
+    'create_silent_plan' => array_values(json_decode(env('CHARGEBEE_SILENT_PLANS_NEW', '[]'), true)??[]),
     'adminNotificationEmails' => explode(',', env('CHARGEBEE_IMPORT_NOTIFICATION_EMAIL', 'info@foodpunk.de')),
     'challenges_config' => json_decode(env('CHARGEBEE_CHALLENGES_CONFIG_JSON', ''), true),
     'foodpoints' => json_decode(env('CHARGEBEE_FOODPOINTS_CONFIG_JSON', ''), true),

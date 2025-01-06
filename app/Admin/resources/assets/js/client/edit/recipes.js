@@ -1,15 +1,20 @@
-// Main initializer for recipe functionality. Cleans up localStorage, binds DOM events, registers recipe-related functions to window.FoodPunk.functions, and initializes recipe DataTables
-import {selectedPopupRecipesStorage, selectedRecipesStorage} from './recipes/recipesConst.js';
-import {renderCounterToolbarData} from './recipes/renderCounterToolbarData.js';
-import {addRecipes} from './recipes/addRecipes.js';
-import {deleteAllRecipes, deleteRecipe} from './recipes/deleteRecipes.js';
-import {deleteSelectedRecipes, toggleSelect} from './recipes/deleteSelectedRecipes.js';
-import {recalculateUserRecipes} from './recipes/recalculations.js';
-import {addRandomizeRecipes} from './recipes/randomizeRecipes.js';
-import {generateRecipe} from './recipes/generateRecipe.js';
-import {submitAdding} from './recipes/submitAdding.js';
-import {openInfoModal} from './recipes/openInfoModel.js';
-import {initRecipesTables} from './recipes/initRecipesTables.js';
+/**
+ * Main initializer for recipe functionality.
+ *
+ * Cleans up localStorage, binds DOM events, registers recipe-related functions to window.FoodPunk.functions,
+ * and initializes recipe DataTables
+ */
+import {selectedPopupRecipesStorage, selectedRecipesStorage} from './recipes/recipesConst';
+import {renderCounterToolbarData} from './recipes/renderCounterToolbarData';
+import {addRecipes} from './recipes/addRecipes';
+import {deleteAllRecipes, deleteRecipe} from './recipes/deleteRecipes';
+import {deleteSelectedRecipes, toggleSelect} from './recipes/deleteSelectedRecipes';
+import {recalculateUserRecipes} from './recipes/recalculations';
+import {addRandomizeRecipes} from './recipes/randomizeRecipes';
+import {generateRecipe} from './recipes/generateRecipe';
+import {submitAdding} from './recipes/submitAdding';
+import {openInfoModal} from './recipes/openInfoModel';
+import {initRecipesTables} from './recipes/initRecipesTables';
 
 let $SubmitAddRecipes;
 

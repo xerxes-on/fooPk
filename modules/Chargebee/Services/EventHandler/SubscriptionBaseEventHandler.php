@@ -8,6 +8,7 @@ use Modules\Chargebee\Services\ChargebeeService;
 class SubscriptionBaseEventHandler extends BaseEventHandler
 {
 
+    public $user;
     public function __construct($eventData)
     {
 
@@ -21,6 +22,8 @@ class SubscriptionBaseEventHandler extends BaseEventHandler
 
     public function handle()
     {
+        // TODO:: refactor, syncSubscriptionsData set $this->user
         $this->service->syncSubscriptionsData($this->eventData);
+        $this->user = $this->service->getUserBySubscriptionData($this->eventData);
     }
 }

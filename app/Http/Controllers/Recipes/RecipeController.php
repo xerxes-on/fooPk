@@ -41,7 +41,7 @@ class RecipeController extends Controller
             $recipe    = $request->user()->plannedRecipes($id, $date, $ingestion->id)->firstOrFail();
 
             //TODO:: @NickMost refactor, trick to show only allowed for user ingestions
-            $recipe->setRelation('ingestions', $recipe->ingestions->whereIn('id',$request->user()->allowedIngestionsId()));
+            $recipe->setRelation('ingestions', $recipe->ingestions->whereIn('id', $request->user()->allowed_ingestion_ids));
 
         } catch (ModelNotFoundException) {
             abort(ResponseAlias::HTTP_NOT_FOUND);
@@ -85,7 +85,7 @@ class RecipeController extends Controller
             abort(ResponseAlias::HTTP_NOT_FOUND);
         }
         //TODO:: @NickMost refactor, trick to show only allowed for user ingestions
-        $recipe->setRelation('ingestions', $recipe->ingestions->whereIn('id',$request->user()->allowedIngestionsId()));
+        $recipe->setRelation('ingestions', $recipe->ingestions->whereIn('id', $request->user()->allowed_ingestion_ids));
 
         $calculatedIngredients = Calculation::parseRecipeData($recipe, $request->user()->lang);
 
@@ -237,18 +237,17 @@ class RecipeController extends Controller
     {
         $date    = Carbon::now();
         $curYear = $date->year;
-
         if (
             !empty($attributes) &&
-            key_exists('week', $attributes) && !empty($attributes['week']) &&
-            key_exists('year', $attributes) && !empty($attributes['year'])
+            array_key_exists('week', $attributes) && !empty($attributes['week']) &&
+            array_key_exists('year', $attributes) && !empty($attributes['year'])
         ) {
             $date->setISODate($attributes['year'], $attributes['week']);
             $curYear = $attributes['year'];
         }
 
-        $prevWeek = $date->copy()->subWeek()->startOfWeek();
-        $nextWeek = $date->copy()->addWeek()->startOfWeek();
+        $prevWeek = $date->copy()->subWeek()->endOfWeek();
+        $nextWeek = $date->copy()->addWeek()->endOfWeek();
 
         return [
             'prevWeek' => [
@@ -272,9 +271,8 @@ class RecipeController extends Controller
      */
     public function getWeeklyRecipes(array $calendar): array
     {
-        $curWeek = $calendar['curWeek'];
-        $user    = \Auth::user();
-
+        $curWeek                = $calendar['curWeek'];
+        $user                   = auth()->user();
         $currentWeek            = Carbon::now()->weekOfYear;
         $isCurrentWeekRequested = $currentWeek === $calendar['curWeek']->get('current')->weekOfYear;
         $recipesGroup           = Cache::get(CacheKeys::userWeeklyPlan($user->id, $currentWeek));
@@ -284,29 +282,25 @@ class RecipeController extends Controller
             return $recipesGroup;
         }
 
-        //        $challengeId = $user?->subscription?->id;
         $meals = Ingestion::getAll()
             ->map(fn($meal) => ['key' => $meal->key, 'value' => $meal->order])
             ->pluck('value', 'key')
             ->toArray();
-        $mealDateStart = $curWeek->getStartDate()->format('Y-m-d');
-        $mealDateEnd   = $curWeek->getEndDate()->format('Y-m-d');
+        $mealDateStart = $curWeek->getStartDate();
+        $mealDateEnd   = $curWeek->getEndDate();
         $recipes       = $user
             ->recipes()
             ->with(['complexity', 'favorite'])
-            ->whereDate('recipes_to_users.meal_date', '>=', $mealDateStart)
-            ->whereDate('recipes_to_users.meal_date', '<=', $mealDateEnd)
+            ->whereBetween('recipes_to_users.meal_date', [$mealDateStart, $mealDateEnd])
             ->get(); // todo: slow query
         $custom = $user
             ->datedCustomRecipes()
             ->with(['originalRecipe.complexity', 'originalRecipe.favorite'])
-            ->whereDate('recipes_to_users.meal_date', '>=', $mealDateStart)
-            ->whereDate('recipes_to_users.meal_date', '<=', $mealDateEnd)
+            ->whereBetween('recipes_to_users.meal_date', [$mealDateStart, $mealDateEnd])
             ->get();
         $flexmeals = $user
             ->plannedFlexmeals()
-            ->whereDate('recipes_to_users.meal_date', '>=', $mealDateStart)
-            ->whereDate('recipes_to_users.meal_date', '<=', $mealDateEnd)
+            ->whereBetween('recipes_to_users.meal_date', [$mealDateStart, $mealDateEnd])
             ->get();
         $recipesGroup = [];
 
@@ -328,7 +322,7 @@ class RecipeController extends Controller
         foreach ($recipesGroup as $key => $_recipe) {
             usort(
                 $recipesGroup[$key],
-                fn($a, $b) => $meals[$a->pivot->meal_time] - $meals[$b->pivot->meal_time]
+                static fn($a, $b) => $meals[$a->pivot->meal_time] - $meals[$b->pivot->meal_time]
             );
         }
 

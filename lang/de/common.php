@@ -100,7 +100,6 @@ return [
     'recipe_distribution' => 'Rezeptverteilung',
     'portions'            => 'Portionen',
 
-    'ingredients'          => 'Zutaten',
     'ingredients_preview'  => 'Zutaten Vorschau',
     'new_ingredient'       => 'Neue Zutat',
     'import_ingredients'   => 'Zutaten importieren',
@@ -243,7 +242,7 @@ return [
     'category'           => 'Kategorie',
     'unit'               => 'Einheit',
     'name'               => 'Name',
-    'names'               => 'Names (plural form)',
+    'names'              => 'Names (plural form)',
     'replace_ingredient' => 'Zutat ersetzen',
 
     // Ingredient categories
@@ -691,5 +690,4 @@ return [
         'purchase_food_points' => 'Foodpunkte kannst du in unserem Onlineshop unter <a href=":link" target="_blank">Shop</a> erwerben.',
         'extra_info'           => 'Schicke uns einfach einen Screenshot deiner Bewertung oder den Namen der Person, die du geworben hast, per E-Mail an <a href=":link">info@foodpunk.de</a> und erhalte als Dankeschön deine Foodpunkte.',
     ],
-    'cs_count_message' =>'How many CS do you want to add?',
 ];

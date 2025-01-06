@@ -1,4 +1,4 @@
-import {selectedPopupRecipesStorage} from './recipesConst.js';
+import {selectedPopupRecipesStorage} from './recipesConst';
 
 /**
  * Opens a popup to select recipes and initializes a DataTable for managing recipe selection.
@@ -71,8 +71,10 @@ export function addRecipes() {
                 ],
             });
 
-            // Keep reference to the newly created table in our exported variable
-            // so we can reference it outside of this function if needed.
+            /**
+             * Keep reference to the newly created table in our exported variable,
+             * so we can reference it outside of this function if needed.
+             */
             $.extend(true, window, {FoodPunk: {...window.FoodPunk, $tablePopup: tableInstance}});
 
             // Bind events for select/deselect

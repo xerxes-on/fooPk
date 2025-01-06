@@ -1,4 +1,4 @@
-import {$recipesByChallenge} from './recipesConst.js';
+import {$recipesByChallenge} from './recipesConst';
 
 /**
  * Generates a recipe for a specific user after user confirmation.

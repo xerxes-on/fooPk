@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
 
     /*
@@ -175,18 +177,19 @@ return [
         'in_progress'                  => 'Is working...',
         'record_blocked_by_job'        => 'Record is blocked due to background tasks running in the background',
         'record_blocked_by_dependency' => 'Record is blocked due to presence in recipes. Please check the following recipes first: :recipes',
-        'no_user_selected'             =>  'No User selected',
-        'error' => 'Error',
-        'something_went_wrong' => 'Something went wrong',
-        'subscription_id'=>'Enter Chargebee subscription id',
-        'changes_applied'=> 'Changes has been applied',
-        'confirm_details'=>'Confirm details?',
-        'subscription_stopped'=>'Active subscription will be stopped!',
-        'success'=>'Success!',
-        'delete_all_recipes_user'=>'Are you sure to delete all recipes for this user?',
-        'randomize_recipes_settings'=>'Randomize recipes settings',
-        'no_item_selected'=>'No item selected',
-        'no_item'=>'No item',
-        'are_you_sure'=>'Are you sure to delete selected recipes for this user? ',
+        'no_user_selected'             => 'No User selected',
+        'error'                        => 'Error',
+        'something_went_wrong'         => 'Something went wrong',
+        'subscription_id'              => 'Enter Chargebee subscription id',
+        'changes_applied'              => 'Changes has been applied',
+        'confirm_details'              => 'Confirm details?',
+        'subscription_stopped'         => 'Active subscription will be stopped!',
+        'success'                      => 'Success!',
+        'delete_all_recipes_user'      => 'Are you sure to delete all recipes for this user?',
+        'randomize_recipes_settings'   => 'Randomize recipes settings',
+        'no_item_selected'             => 'No item selected',
+        'no_item'                      => 'No item',
+        'are_you_sure'                 => 'Are you sure to delete selected recipes for this user? ',
+        'fp_count_message'             => 'How many FP do you want to add?',
     ],
 ];

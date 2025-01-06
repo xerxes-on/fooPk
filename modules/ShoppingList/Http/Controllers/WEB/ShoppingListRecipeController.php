@@ -8,6 +8,7 @@ use App\Exceptions\NoData;
 use App\Exceptions\PublicException;
 use App\Http\Controllers\Controller;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\JsonResponse;
 use InvalidArgumentException;
 use Modules\ShoppingList\Http\Requests\AddRecipeToShoppingListRequest;
@@ -127,8 +128,11 @@ final class ShoppingListRecipeController extends Controller
                 $request->mealtime,
                 $request->meal_day,
             );
-            $ingredientCollection = $user->shoppingList()->with(['ingredients.category'])->first()?->ingredients;
-            $response['data']     = view(
+            $ingredientCollection = $user->shoppingList()
+                ->with(['ingredients.ingredient' => fn(Relation $relation) => $relation->with(['category', 'hint', 'alternativeUnit'])])
+                ->first()
+                ?->ingredients;
+            $response['data'] = view(
                 'shopping-list::includes.ingredientsList',
                 ['ingredient_categories' => $retrieverService->generateListData($user->lang, $ingredientCollection)]
             )->render();

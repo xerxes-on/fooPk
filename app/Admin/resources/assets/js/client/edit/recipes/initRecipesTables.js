@@ -1,5 +1,5 @@
-import {selectedRecipesStorage} from './recipesConst.js';
-import {renderCounterToolbarData} from './renderCounterToolbarData.js';
+import {selectedRecipesStorage} from './recipesConst';
+import {renderCounterToolbarData} from './renderCounterToolbarData';
 
 /**
  * Initializes DataTables for "Recipes By Challenge" and "Recipes By User" tabs.
@@ -15,9 +15,10 @@ import {renderCounterToolbarData} from './renderCounterToolbarData.js';
  */
 
 export function initRecipesTables() {
-    // Recipes By Challenge tab
+    // Recipes in Weekly plan tab
     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
         const target = $($(e.target).attr('href')).find('#recipesByChallenge');
+
         if (target.length && !$.fn.DataTable.isDataTable(target)) {
             // Initialize challenge-based DataTable
             const tableInstance = $('#recipesByChallenge').DataTable({
@@ -58,9 +59,10 @@ export function initRecipesTables() {
         }
     });
 
-    // Recipes By User tab
+    // User Recipes in Recipes tab
     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
         const target = $($(e.target).attr('href')).find('#recipesByUser');
+
         if (target.length && !$.fn.DataTable.isDataTable(target)) {
             const tableInstance = $('#recipesByUser').DataTable({
                 lengthChange: true,

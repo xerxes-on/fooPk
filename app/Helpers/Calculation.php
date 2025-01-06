@@ -26,6 +26,7 @@ use Modules\Ingredient\Jobs\SyncUserExcludedIngredientsJob;
 use Modules\Ingredient\Models\Ingredient;
 use Modules\Ingredient\Models\IngredientCategory;
 use Modules\Ingredient\Models\IngredientUnit;
+use Modules\Ingredient\Services\IngredientConversionService;
 
 /**
  * Class Calculation
@@ -42,16 +43,16 @@ class Calculation
     //            // 2+ any other tag
     //        ];
     public const RECIPE_DISTRIBUTION_FROM_TAG_TYPE_PREFERABLE = 'PREFERABLE';
-    public const RECIPE_DISTRIBUTION_FROM_TAG_TYPE_STRICT     = 'STRICT';
-    public const GENDER_MALE                                  = 'male';
-    public const GENDER_FEMALE                                = 'female';
+    public const RECIPE_DISTRIBUTION_FROM_TAG_TYPE_STRICT = 'STRICT';
+    public const GENDER_MALE = 'male';
+    public const GENDER_FEMALE = 'female';
 
     //TODO:Should be put in .env
     public static $ingradient_units;
     public static $cache;
     // private static $api_domain = 'https://foodpunk.de';
     // private static $api_domain = 'http://www.laravelportal.com';
-    private static $api_token  = 'gmHaSzNGr7YCLAJv';
+    private static $api_token = 'gmHaSzNGr7YCLAJv';
     private static $api_domain = 'https://meinplan.foodpunk.de';
 
 
@@ -74,32 +75,32 @@ class Calculation
         $client['questionnaire'] = $latestQuestionnaireAnswers ?? null;
 
         $client['predefined_values'] = [
-            'Kcal'        => null,
-            'KH'          => null,
-            'EW'          => null,
-            'F'           => null,
+            'Kcal' => null,
+            'KH' => null,
+            'EW' => null,
+            'F' => null,
             'ew_percents' => 20,
-            'ingestion'   => [
+            'ingestion' => [
                 'breakfast' => [
                     'percents' => 20,
-                    'Kcal'     => null,
-                    'KH'       => null,
-                    'EW'       => null,
-                    'F'        => null,
+                    'Kcal' => null,
+                    'KH' => null,
+                    'EW' => null,
+                    'F' => null,
                 ],
                 'lunch' => [
                     'percents' => 40,
-                    'Kcal'     => null,
-                    'KH'       => null,
-                    'EW'       => null,
-                    'F'        => null,
+                    'Kcal' => null,
+                    'KH' => null,
+                    'EW' => null,
+                    'F' => null,
                 ],
                 'dinner' => [
                     'percents' => 40,
-                    'Kcal'     => null,
-                    'KH'       => null,
-                    'EW'       => null,
-                    'F'        => null,
+                    'Kcal' => null,
+                    'KH' => null,
+                    'EW' => null,
+                    'F' => null,
                 ],
             ],
         ];
@@ -114,24 +115,24 @@ class Calculation
                         $client['predefined_values']['ingestion'] = [
                             'breakfast' => [
                                 'percents' => 20,
-                                'Kcal'     => null,
-                                'KH'       => null,
-                                'EW'       => null,
-                                'F'        => null,
+                                'Kcal' => null,
+                                'KH' => null,
+                                'EW' => null,
+                                'F' => null,
                             ],
                             'lunch' => [
                                 'percents' => 40,
-                                'Kcal'     => null,
-                                'KH'       => null,
-                                'EW'       => null,
-                                'F'        => null,
+                                'Kcal' => null,
+                                'KH' => null,
+                                'EW' => null,
+                                'F' => null,
                             ],
                             'dinner' => [
                                 'percents' => 40,
-                                'Kcal'     => null,
-                                'KH'       => null,
-                                'EW'       => null,
-                                'F'        => null,
+                                'Kcal' => null,
+                                'KH' => null,
+                                'EW' => null,
+                                'F' => null,
                             ],
                         ];
                         break;
@@ -139,24 +140,24 @@ class Calculation
                         $client['predefined_values']['ingestion'] = [
                             'breakfast' => [
                                 'percents' => 40,
-                                'Kcal'     => null,
-                                'KH'       => null,
-                                'EW'       => null,
-                                'F'        => null,
+                                'Kcal' => null,
+                                'KH' => null,
+                                'EW' => null,
+                                'F' => null,
                             ],
                             'lunch' => [
                                 'percents' => 60,
-                                'Kcal'     => null,
-                                'KH'       => null,
-                                'EW'       => null,
-                                'F'        => null,
+                                'Kcal' => null,
+                                'KH' => null,
+                                'EW' => null,
+                                'F' => null,
                             ],
                             'dinner' => [
                                 'percents' => 0,
-                                'Kcal'     => null,
-                                'KH'       => null,
-                                'EW'       => null,
-                                'F'        => null,
+                                'Kcal' => null,
+                                'KH' => null,
+                                'EW' => null,
+                                'F' => null,
                             ],
                         ];
                         break;
@@ -164,24 +165,24 @@ class Calculation
                         $client['predefined_values']['ingestion'] = [
                             'breakfast' => [
                                 'percents' => 40,
-                                'Kcal'     => null,
-                                'KH'       => null,
-                                'EW'       => null,
-                                'F'        => null,
+                                'Kcal' => null,
+                                'KH' => null,
+                                'EW' => null,
+                                'F' => null,
                             ],
                             'lunch' => [
                                 'percents' => 0,
-                                'Kcal'     => null,
-                                'KH'       => null,
-                                'EW'       => null,
-                                'F'        => null,
+                                'Kcal' => null,
+                                'KH' => null,
+                                'EW' => null,
+                                'F' => null,
                             ],
                             'dinner' => [
                                 'percents' => 60,
-                                'Kcal'     => null,
-                                'KH'       => null,
-                                'EW'       => null,
-                                'F'        => null,
+                                'Kcal' => null,
+                                'KH' => null,
+                                'EW' => null,
+                                'F' => null,
                             ],
                         ];
                         break;
@@ -189,24 +190,24 @@ class Calculation
                         $client['predefined_values']['ingestion'] = [
                             'breakfast' => [
                                 'percents' => 0,
-                                'Kcal'     => null,
-                                'KH'       => null,
-                                'EW'       => null,
-                                'F'        => null,
+                                'Kcal' => null,
+                                'KH' => null,
+                                'EW' => null,
+                                'F' => null,
                             ],
                             'lunch' => [
                                 'percents' => 50,
-                                'Kcal'     => null,
-                                'KH'       => null,
-                                'EW'       => null,
-                                'F'        => null,
+                                'Kcal' => null,
+                                'KH' => null,
+                                'EW' => null,
+                                'F' => null,
                             ],
                             'dinner' => [
                                 'percents' => 50,
-                                'Kcal'     => null,
-                                'KH'       => null,
-                                'EW'       => null,
-                                'F'        => null,
+                                'Kcal' => null,
+                                'KH' => null,
+                                'EW' => null,
+                                'F' => null,
                             ],
                         ];
                         break;
@@ -214,7 +215,7 @@ class Calculation
             }
             if (!empty($latestQuestionnaireAnswers[QuestionnaireQuestionSlugsEnum::DIETS])) {
                 $dietsConfig = config('diets');
-                $customKH    = false;
+                $customKH = false;
                 foreach ($dietsConfig['custom_KH'] as $diet => $KH) {
                     if ((!empty($KH)) && (in_array($diet, $latestQuestionnaireAnswers[QuestionnaireQuestionSlugsEnum::DIETS]))) {
                         $customKH = $KH;
@@ -234,16 +235,16 @@ class Calculation
         $predefined_values = $data['predefined_values'];
         // TODO::  @Nick review additional['F'] in formular with Barbara
         $result = array(
-            'KH'          => 50, //Kohlenhydrate  [Carbohydrates]
-            'EW'          => 0, //Eiweis [Protein]
-            'F'           => 0, //Fett [Fat]
-            'Kcal'        => 0,
+            'KH' => 50, //Kohlenhydrate  [Carbohydrates]
+            'EW' => 0, //Eiweis [Protein]
+            'F' => 0, //Fett [Fat]
+            'Kcal' => 0,
             'ew_percents' => 20,  // default ew_percents
             'kh_percents' => 8,  // default kh_percents
-            'f_percents'  => 73,  // default f_percents
+            'f_percents' => 73,  // default f_percents
             // TODO:: review wth Barbara % of fat
-            'additional'        => array(),
-            'notices'           => '',
+            'additional' => array(),
+            'notices' => '',
             'predefined_values' => $predefined_values,
         );
 
@@ -270,7 +271,7 @@ class Calculation
         $data['weight'] = floatval($questionnaireData[QuestionnaireQuestionSlugsEnum::WEIGHT]);
 
         $data['height'] = floatval($questionnaireData[QuestionnaireQuestionSlugsEnum::HEIGHT]);
-        $data['age']    = Carbon::createFromFormat('d.m.Y', $questionnaireData[QuestionnaireQuestionSlugsEnum::BIRTHDATE])->age;
+        $data['age'] = Carbon::createFromFormat('d.m.Y', $questionnaireData[QuestionnaireQuestionSlugsEnum::BIRTHDATE])->age;
 
         // -------------------------------------------------------
         // *** step 1 ***
@@ -327,10 +328,10 @@ class Calculation
                 // updated 20211012 3.7 to 5.0
                 // updated 20211108 5.0 to 6.2
                 $sportsKcals += 6.2 * $data['weight'] * (intval(
-                    $questionnaireData[QuestionnaireQuestionSlugsEnum::SPORTS]["intensive"]['frequency']
-                ) * intval(
-                    $questionnaireData[QuestionnaireQuestionSlugsEnum::SPORTS]["intensive"]['duration']
-                )) / 60;
+                            $questionnaireData[QuestionnaireQuestionSlugsEnum::SPORTS]["intensive"]['frequency']
+                        ) * intval(
+                            $questionnaireData[QuestionnaireQuestionSlugsEnum::SPORTS]["intensive"]['duration']
+                        )) / 60;
             }
 
             if (
@@ -341,10 +342,10 @@ class Calculation
                 isset($questionnaireData[QuestionnaireQuestionSlugsEnum::SPORTS]["medium"]['duration'])
             ) {
                 $sportsKcals += 4.1 * $data['weight'] * (intval(
-                    $questionnaireData[QuestionnaireQuestionSlugsEnum::SPORTS]["medium"]['frequency']
-                ) * intval(
-                    $questionnaireData[QuestionnaireQuestionSlugsEnum::SPORTS]["medium"]['duration']
-                )) / 60;
+                            $questionnaireData[QuestionnaireQuestionSlugsEnum::SPORTS]["medium"]['frequency']
+                        ) * intval(
+                            $questionnaireData[QuestionnaireQuestionSlugsEnum::SPORTS]["medium"]['duration']
+                        )) / 60;
             }
 
             if (
@@ -359,24 +360,24 @@ class Calculation
                 // updated 20211012 5.0 to 3.7
                 // updated 20211108 3.7 to 2.5
                 $sportsKcals += 2.5 * $data['weight'] * (intval(
-                    $questionnaireData[QuestionnaireQuestionSlugsEnum::SPORTS]["easy"]['frequency']
-                ) * intval(
-                    $questionnaireData[QuestionnaireQuestionSlugsEnum::SPORTS]["easy"]['duration']
-                )) / 60;
+                            $questionnaireData[QuestionnaireQuestionSlugsEnum::SPORTS]["easy"]['frequency']
+                        ) * intval(
+                            $questionnaireData[QuestionnaireQuestionSlugsEnum::SPORTS]["easy"]['duration']
+                        )) / 60;
             }
         }
 
 
         $result['additional']['SportEnergy'] = $sportsKcals;
-        $result['Kcal']                      = $result['additional']['DailyEnergy'] = ($result['additional']['SportEnergy'] + 7 * $result['additional']['A']) / 7;
+        $result['Kcal'] = $result['additional']['DailyEnergy'] = ($result['additional']['SportEnergy'] + 7 * $result['additional']['A']) / 7;
 
 
         // -------------------------------------------------------
         // *** step 4 ***
         $disease_rate = array(
-            'diabetes_typ_1'     => 1,
-            'diabetes_typ_2'     => 1,
-            'prediabetes'        => 1,
+            'diabetes_typ_1' => 1,
+            'diabetes_typ_2' => 1,
+            'prediabetes' => 1,
             'insulin_resistance' => 1,
             // updated 20190516
             //        'hashimoto'          => 0.9,
@@ -417,7 +418,7 @@ class Calculation
         // -------------------------------------------------------
         //*** step 5 ***
         $target_rate = array(
-            'lose_weight'    => 0.8, //Abnehmen (Körperfett verlieren)
+            'lose_weight' => 0.8, //Abnehmen (Körperfett verlieren)
             'healthy_weight' => 0.97, //Gewicht halten und definierter werden,  more_defined->healthy_weight
 
             // updated 20190516
@@ -527,7 +528,7 @@ class Calculation
 
 
         $result['kh_percents'] = (($result['KH'] * 4 / $result['Kcal']) * 100);
-        $result['f_percents']  = (($result['F'] * 9 / $result['Kcal']) * 100);
+        $result['f_percents'] = (($result['F'] * 9 / $result['Kcal']) * 100);
 
         if (!empty($predefined_values['ingestion'])) {
             $result['ingestion'] = $predefined_values['ingestion'];
@@ -558,14 +559,14 @@ class Calculation
         }
 
         $result['additional']['calculated_Kcal'] = round($result['additional']['calculated_Kcal']);
-        $result['Kcal']                          = round($result['Kcal']);
-        $result['KH']                            = round($result['KH'], 1);
-        $result['additional']['calculated_KH']   = round($result['additional']['calculated_KH'], 1);
-        $result['EW']                            = round($result['EW'], 1);
-        $result['additional']['calculated_EW']   = round($result['additional']['calculated_EW'], 1);
-        $result['F']                             = round($result['F'], 1);
-        $result['additional']['calculated_F']    = round($result['additional']['calculated_F'], 1);
-        $result['additional']['DailyEnergy']     = round($result['additional']['DailyEnergy']);
+        $result['Kcal'] = round($result['Kcal']);
+        $result['KH'] = round($result['KH'], 1);
+        $result['additional']['calculated_KH'] = round($result['additional']['calculated_KH'], 1);
+        $result['EW'] = round($result['EW'], 1);
+        $result['additional']['calculated_EW'] = round($result['additional']['calculated_EW'], 1);
+        $result['F'] = round($result['F'], 1);
+        $result['additional']['calculated_F'] = round($result['additional']['calculated_F'], 1);
+        $result['additional']['DailyEnergy'] = round($result['additional']['DailyEnergy']);
 
 
         return $result;
@@ -598,7 +599,8 @@ class Calculation
         $variable_ingradients = [],
         $ingestion = null,
         $allowZeroIngredients = true
-    ) {
+    )
+    {
         $nutrients = self::getUserDietData($user_id);
 
         if (!empty($recipe_id)) {
@@ -613,9 +615,9 @@ class Calculation
         $fixed_ingredients_array = [];
         if ((!empty($nutrients['ingestion'][$ingestion])) && (!empty($recipe))) {
             $Kcal = $nutrients['ingestion'][$ingestion]['Kcal'];
-            $KH   = $nutrients['ingestion'][$ingestion]['KH'];
-            $EW   = $nutrients['ingestion'][$ingestion]['EW'];
-            $F    = $nutrients['ingestion'][$ingestion]['F'];
+            $KH = $nutrients['ingestion'][$ingestion]['KH'];
+            $EW = $nutrients['ingestion'][$ingestion]['EW'];
+            $F = $nutrients['ingestion'][$ingestion]['F'];
 
 
             //        if (empty(self::$ingradient_units))
@@ -638,10 +640,10 @@ class Calculation
                 if ((!empty($fixed_ingredients)) && (count($fixed_ingredients))) {
                     foreach ($fixed_ingredients as $ingredient) {
                         if (isset(IngredientCategory::MAIN_CATEGORIES[$ingredient->category->tree_information['main_category']])) {
-                            $category         = IngredientCategory::MAIN_CATEGORIES[$ingredient->category->tree_information['main_category']];
+                            $category = IngredientCategory::MAIN_CATEGORIES[$ingredient->category->tree_information['main_category']];
                             $ingredient->type = $category['short'];
                         }
-                        $ingredient->unit      = $ingradient_units[$ingredient->unit_id];
+                        $ingredient->unit = $ingradient_units[$ingredient->unit_id];
                         $ingredient->unit_data = $ingradient_units[$ingredient->unit_id];
 
                         if (isset($ingredient->pivot->amount)) {
@@ -712,9 +714,9 @@ class Calculation
         // recalculation KCal, EW, KH, F
         $recipe_nutrients = [
             'KCal' => 0,
-            'EW'   => 0,
-            'KH'   => 0,
-            'F'    => 0,
+            'EW' => 0,
+            'KH' => 0,
+            'F' => 0,
         ];
 
         if ((!empty($recipe->ingradients))) {
@@ -783,7 +785,7 @@ class Calculation
 
         $ingredient = Ingredient::find($ingredient_id);
         if (isset(IngredientCategory::MAIN_CATEGORIES[$ingredient->category->tree_information['main_category']])) {
-            $category         = IngredientCategory::MAIN_CATEGORIES[$ingredient->category->tree_information['main_category']];
+            $category = IngredientCategory::MAIN_CATEGORIES[$ingredient->category->tree_information['main_category']];
             $ingredient->type = $category['short'];
         }
 
@@ -794,9 +796,9 @@ class Calculation
         }
 
 
-        $ingredient->unit      = $ingradient_units[$ingredient->unit_id];
+        $ingredient->unit = $ingradient_units[$ingredient->unit_id];
         $ingredient->unit_data = $ingradient_units[$ingredient->unit_id];
-        $ingredient->amount    = $amount;
+        $ingredient->amount = $amount;
 
         return $ingredient;
     }
@@ -809,9 +811,10 @@ class Calculation
         $EW = 0,
         $F = 0,
         $allowZeroIngredients = true
-    ) {
+    )
+    {
         $recipe_calculation_data = [
-            'ingradients'          => $fixed,
+            'ingradients' => $fixed,
             'ingradients_variable' => $variable,
         ];
 
@@ -832,7 +835,7 @@ class Calculation
                     for ($k = 0; $k < $n; $k++) {
                         if ($ipiv[$k] == 0) {
                             if (abs($a[$j][$k]) >= $big) {
-                                $big  = abs($a[$j][$k]);
+                                $big = abs($a[$j][$k]);
                                 $irow = $j;
                                 $icol = $k;
                             }
@@ -847,11 +850,11 @@ class Calculation
             $ipiv[$icol] = $ipiv[$icol] + 1;
             if ($irow != $icol) {
                 for ($l = 0; $l < $n; $l++) {
-                    $dum          = $a[$irow][$l];
+                    $dum = $a[$irow][$l];
                     $a[$irow][$l] = $a[$icol][$l];
                     $a[$icol][$l] = $dum;
                 }
-                $dum      = $b[$irow];
+                $dum = $b[$irow];
                 $b[$irow] = $b[$icol];
                 $b[$icol] = $dum;
             }
@@ -860,7 +863,7 @@ class Calculation
             if ($a[$icol][$icol] == 0) {
                 return false;
             }//"Матрица сингулярна";
-            $pivinv          = 1 / $a[$icol][$icol];
+            $pivinv = 1 / $a[$icol][$icol];
             $a[$icol][$icol] = 1;
             for ($l = 0; $l < $n; $l++) {
                 $a[$icol][$l] = $a[$icol][$l] * $pivinv;
@@ -868,7 +871,7 @@ class Calculation
             $b[$icol] = $b[$icol] * $pivinv;
             for ($ll = 0; $ll < $n; $ll++) {
                 if ($ll != $icol) {
-                    $dum           = $a[$ll][$icol];
+                    $dum = $a[$ll][$icol];
                     $a[$ll][$icol] = 0;
                     for ($l = 0; $l < $n; $l++) {
                         $a[$ll][$l] = $a[$ll][$l] - $a[$icol][$l] * $dum;
@@ -880,7 +883,7 @@ class Calculation
         for ($l = $n - 1; $l >= 0; $l--) {
             if ($indxr[$l] != $indxc[$l]) {
                 for ($k = 1; $k < $n; $k++) {
-                    $dum               = $a[$k][$indxr[$l]];
+                    $dum = $a[$k][$indxr[$l]];
                     $a[$k][$indxr[$l]] = $a[$k][$indxc[$l]];
                     $a[$k][$indxc[$l]] = $dum;
                 }
@@ -894,12 +897,12 @@ class Calculation
 
     public static function _api_calculateNutrientsByKhKcal($KH, $KCal)
     {
-        $result         = [];
-        $ew_percents    = 0.2;
+        $result = [];
+        $ew_percents = 0.2;
         $result['KCal'] = $KCal;
-        $result['KH']   = $KH;
-        $result['EW']   = $KCal * $ew_percents / 4;
-        $result['F']    = ($KCal - ($KH * 4 + $result['EW'] * 4)) / 9;
+        $result['KH'] = $KH;
+        $result['EW'] = $KCal * $ew_percents / 4;
+        $result['F'] = ($KCal - ($KH * 4 + $result['EW'] * 4)) / 9;
         return $result;
     }
 
@@ -910,10 +913,11 @@ class Calculation
         $EW = 0,
         $F = 0,
         $allowZeroIngredients = true
-    ) {
+    )
+    {
         //    var_dump($recipe);
         $recipe['notices'] = '';
-        $recipe['errors']  = false;
+        $recipe['errors'] = false;
 
         $empty_ingradients_variable = false;
 
@@ -948,9 +952,9 @@ class Calculation
         }
 
         $recipe['real_KCal'] = round(floatval($recipe['real_KCal']), 2);
-        $recipe['real_EW']   = round(floatval($recipe['real_EW']), 2);
-        $recipe['real_F']    = round(floatval($recipe['real_F']), 2);
-        $recipe['real_KH']   = round(floatval($recipe['real_KH']), 2);
+        $recipe['real_EW'] = round(floatval($recipe['real_EW']), 2);
+        $recipe['real_F'] = round(floatval($recipe['real_F']), 2);
+        $recipe['real_KH'] = round(floatval($recipe['real_KH']), 2);
 
 
         if (!empty($recipe['KCal'])) {
@@ -983,19 +987,19 @@ class Calculation
 
         $recipe['calculated_KH'] = $recipe['KH'];
         $recipe['calculated_EW'] = $recipe['EW'];
-        $recipe['calculated_F']  = $recipe['F'];
+        $recipe['calculated_F'] = $recipe['F'];
 
 
         $recipe['need_more_nutrients'] = $need_nutrients = [
             'KH' => round($KH - $recipe['KH'], 2),//KH
             'EW' => round($EW - $recipe['EW'], 2),//EW
-            'F'  => round($F - $recipe['F'], 2),//F
+            'F' => round($F - $recipe['F'], 2),//F
         ];
 
         $recipe['need_nutrients'] = [
             'KH' => round($KH, 2),
             'EW' => round($EW, 2),
-            'F'  => round($F, 2),
+            'F' => round($F, 2),
         ];
 
         $recipe_has_more_nutrients = false;
@@ -1060,12 +1064,11 @@ class Calculation
 
                             ///// calculate by type of ingradients
                             $need_calc_by_type = false;
-                            $zero_values       = false;
+                            $zero_values = false;
                             foreach ($calculations as $item) {
                                 if ($item < 0) {
                                     $need_calc_by_type = true;
-                                }
-                                elseif ($item == 0) {
+                                } elseif ($item == 0) {
                                     $zero_values = true;
                                 }
                             }
@@ -1218,13 +1221,13 @@ class Calculation
                 foreach ($recipe['ingradients_variable'] as $k => $ingradient) {
                     if ($ingradient['amount'] < 0) {
                         $recipe['notices'] .= 'need to make changes in recipe manually, amount less 0 (' . var_export(
-                            [
-                                    'id'     => $ingradient['id'],
-                                    'name'   => $ingradient['name'],
+                                [
+                                    'id' => $ingradient['id'],
+                                    'name' => $ingradient['name'],
                                     'amount' => $ingradient['amount']
                                 ],
-                            true
-                        ) . ')' . PHP_EOL;
+                                true
+                            ) . ')' . PHP_EOL;
                         $recipe['errors'] = true;
                     } elseif (
                         !$allowZeroIngredients
@@ -1234,22 +1237,22 @@ class Calculation
                     ) {
                         $recipe['errors'] = true;
                         $recipe['notices'] .= ' recipe has variable ingredient which has less 1g (' . var_export(
-                            [
-                                    'id'     => $ingradient['id'],
-                                    'name'   => $ingradient['name'],
+                                [
+                                    'id' => $ingradient['id'],
+                                    'name' => $ingradient['name'],
                                     'amount' => $ingradient['amount']
                                 ],
-                            true
-                        ) . ') ,';
+                                true
+                            ) . ') ,';
                     } elseif ($ingradient['amount'] == 0) {
                         $recipe['notices'] .= ' recipe has ingredients with amount 0 (' . var_export(
-                            [
-                                    'id'     => $ingradient['id'],
-                                    'name'   => $ingradient['name'],
+                                [
+                                    'id' => $ingradient['id'],
+                                    'name' => $ingradient['name'],
                                     'amount' => $ingradient['amount']
                                 ],
-                            true
-                        ) . ')' . PHP_EOL;
+                                true
+                            ) . ')' . PHP_EOL;
                         $recipe['errors'] = true;
                     }
                 }
@@ -1263,21 +1266,21 @@ class Calculation
                         ) {
                             $recipe['errors'] = true;
                             $recipe['notices'] .= ' recipe has ingredients with amount 0 (' . var_export(
-                                [
-                                        'id'     => $ingradient['id'],
-                                        'name'   => $ingradient['name'],
+                                    [
+                                        'id' => $ingradient['id'],
+                                        'name' => $ingradient['name'],
                                         'amount' => $ingradient['amount']
                                     ],
-                                true
-                            ) . ')' . PHP_EOL;
+                                    true
+                                ) . ')' . PHP_EOL;
                         }
                     }
                 }
 
                 $recipe['calculated_KCal'] = round($recipe['calculated_KCal']);
-                $recipe['calculated_EW']   = round($recipe['calculated_EW'], 1);
-                $recipe['calculated_F']    = round($recipe['calculated_F'], 1);
-                $recipe['calculated_KH']   = round($recipe['calculated_KH'], 1);
+                $recipe['calculated_EW'] = round($recipe['calculated_EW'], 1);
+                $recipe['calculated_F'] = round($recipe['calculated_F'], 1);
+                $recipe['calculated_KH'] = round($recipe['calculated_KH'], 1);
             }
 
             //        } else {
@@ -1315,11 +1318,11 @@ class Calculation
     public static function _api_solveEquation($matrix = [])
     {
         $source_matrix = [];
-        $b             = [];
-        $matrix_count  = count($matrix[0]);
+        $b = [];
+        $matrix_count = count($matrix[0]);
         for ($i = 0; $i < $matrix_count - 1; $i++) {
             $source_matrix[$i] = [];
-            $b[$i]             = $matrix[$i][$matrix_count - 1];
+            $b[$i] = $matrix[$i][$matrix_count - 1];
             for ($j = 0; $j < $matrix_count - 1; $j++) {
                 $source_matrix[$i][$j] = $matrix[$i][$j];
             }
@@ -1351,21 +1354,21 @@ class Calculation
         $result = false;
 
         $post_data = [
-            'recipe'    => $recipe,
+            'recipe' => $recipe,
             'nutrients' => [
                 'KCal' => $Kcal,
-                'KH'   => $KH,
-                'EW'   => $EW,
-                'F'    => $F,
+                'KH' => $KH,
+                'EW' => $EW,
+                'F' => $F,
             ],
         ];
 
 
         $recipe = $post_data['recipe'];
-        $KCal   = intval($post_data['nutrients']['KCal']);
-        $KH     = round(floatval($post_data['nutrients']['KH']), 2);
-        $EW     = round(floatval($post_data['nutrients']['EW']), 2);
-        $F      = round(floatval($post_data['nutrients']['F']), 2);
+        $KCal = intval($post_data['nutrients']['KCal']);
+        $KH = round(floatval($post_data['nutrients']['KH']), 2);
+        $EW = round(floatval($post_data['nutrients']['EW']), 2);
+        $F = round(floatval($post_data['nutrients']['F']), 2);
         if ((!empty($KH)) && (!empty($KCal))) {
             if (empty($EW)) {
                 $calculated_nutrients = self::_api_calculateNutrientsByKhKcal($KH, $KCal);
@@ -1388,11 +1391,11 @@ class Calculation
         }
         $date = array(
             'unixtimestamp' => time(),
-            'string'        => date('Ymd H:i:s'),
+            'string' => date('Ymd H:i:s'),
         );
-        $response['data']['date']      = $date;
-        $recipe['date']                = $date;
-        $response['data']['recipe']    = $recipe;
+        $response['data']['date'] = $date;
+        $recipe['date'] = $date;
+        $response['data']['recipe'] = $recipe;
         $response['data']['nutrients'] = $post_data['nutrients'];
 
         if ((!empty($response['data'])) && (!empty($response['data']['recipe']))) {
@@ -1411,7 +1414,7 @@ class Calculation
     public static function calculateCustomRecipe($custom_recipe_id)
     {
         $result = [
-            'errors'  => true,
+            'errors' => true,
             'notices' => 'invalid data',
         ];
 
@@ -1419,17 +1422,17 @@ class Calculation
             if ($recipe = CustomRecipe::find($custom_recipe_id)) {
                 $nutrients = self::getUserDietData($recipe->user_id);
 
-                $ingestion     = $recipe->ingestion;
+                $ingestion = $recipe->ingestion;
                 $ingestion_key = $ingestion->key;
 
                 if (!empty($nutrients['ingestion'][$ingestion_key])) {
                     $Kcal = $nutrients['ingestion'][$ingestion_key]['Kcal'];
-                    $KH   = $nutrients['ingestion'][$ingestion_key]['KH'];
-                    $EW   = $nutrients['ingestion'][$ingestion_key]['EW'];
-                    $F    = $nutrients['ingestion'][$ingestion_key]['F'];
+                    $KH = $nutrients['ingestion'][$ingestion_key]['KH'];
+                    $EW = $nutrients['ingestion'][$ingestion_key]['EW'];
+                    $F = $nutrients['ingestion'][$ingestion_key]['F'];
                 }
 
-                $recipe_fixed_ingredients    = [];
+                $recipe_fixed_ingredients = [];
                 $recipe_variable_ingredients = [];
                 foreach ($recipe->ingredients as $ingredient) {
                     if ($ingredient->pivot->type == 'fixed') {
@@ -1459,7 +1462,7 @@ class Calculation
                         $result = $calculated_recipe;
                     } else {
                         $result = [
-                            'errors'  => true,
+                            'errors' => true,
                             'notices' => (!empty($calculated_recipe['notices'])) ? $calculated_recipe['notices'] : 'internal problems',
                         ];
                     }
@@ -1505,13 +1508,13 @@ class Calculation
             }
             $ingradient_units = self::$ingradient_units;
 
-            $ingredients          = $recipe->ingredients;
+            $ingredients = $recipe->ingredients;
             $variable_ingredients = $recipe->variableIngredients;
 
             if ((!empty($variable_ingredients)) && (count($variable_ingredients))) {
                 foreach ($variable_ingredients as $ingredient) {
                     if (isset(IngredientCategory::MAIN_CATEGORIES[$ingredient->category->tree_information['main_category']])) {
-                        $category         = IngredientCategory::MAIN_CATEGORIES[$ingredient->category->tree_information['main_category']];
+                        $category = IngredientCategory::MAIN_CATEGORIES[$ingredient->category->tree_information['main_category']];
                         $ingredient->type = $category['short'];
                     }
                     $ingredient->unit_data = $ingradient_units[$ingredient->unit_id];
@@ -1521,7 +1524,7 @@ class Calculation
             if ((!empty($ingredients)) && (count($ingredients))) {
                 foreach ($ingredients as $ingredient) {
                     if (isset(IngredientCategory::MAIN_CATEGORIES[$ingredient->category->tree_information['main_category']])) {
-                        $category         = IngredientCategory::MAIN_CATEGORIES[$ingredient->category->tree_information['main_category']];
+                        $category = IngredientCategory::MAIN_CATEGORIES[$ingredient->category->tree_information['main_category']];
                         $ingredient->type = $category['short'];
                     }
                     $ingredient->unit_data = $ingradient_units[$ingredient->unit_id];
@@ -1535,7 +1538,7 @@ class Calculation
             }
 
             $recipe_calculation_data = [
-                'ingradients'          => (!empty($ingredients)) ? $ingredients->toArray() : [],
+                'ingradients' => (!empty($ingredients)) ? $ingredients->toArray() : [],
                 'ingradients_variable' => (!empty($variable_ingredients)) ? $variable_ingredients->toArray() : [],
             ];
             $calculated_recipe = self::calculateRecipe(
@@ -1549,7 +1552,7 @@ class Calculation
 
         if (is_null($calculated_recipe)) {
             $calculated_recipe = [
-                'errors'  => true,
+                'errors' => true,
                 'notices' => 'User diet data is empty!'
             ];
         }
@@ -1572,7 +1575,6 @@ class Calculation
     //    }
 
 
-
     /**
      * parse Recipe Data
      *
@@ -1585,32 +1587,33 @@ class Calculation
         $_parseData = [];
         if ((isset($_recipe->calc_recipe_data) && ($_recipeData = json_decode($_recipe->calc_recipe_data))) &&
             (!empty($_recipeData) && property_exists($_recipeData, 'ingredients'))) {
-            $ingredientsIds  = array_map(static fn($ingredient) => $ingredient->id, $_recipeData->ingredients);
-            $usedIngredients = Ingredient::ofIds($ingredientsIds)->with(['category', 'hint'])->get(); // Units loading eagerly
+            $ingredientsIds = array_map(static fn($ingredient) => $ingredient->id, $_recipeData->ingredients);
+            $usedIngredients = Ingredient::ofIds($ingredientsIds)->with(['category', 'hint', 'alternativeUnit'])->get(); // Units load eagerly
             foreach ($_recipeData->ingredients as $item) {
                 $ingredient = $usedIngredients->find($item->id);
                 if ($ingredient === null) {
                     continue;
                 }
-                $hint        = $ingredient->hint?->translations->where('locale', $userLocale)->first();
+                $hint = $ingredient->hint?->translations->where('locale', $userLocale)->first();
                 $hintContent = [];
                 if ($hint !== null) {
                     $hintContent = [
-                        'title'     => $ingredient->name,
-                        'content'   => $hint->content,
-                        'link_url'  => $hint->link_url,
+                        'title' => $ingredient->name,
+                        'content' => $hint->content,
+                        'link_url' => $hint->link_url,
                         'link_text' => $hint->link_text,
                     ];
                 }
                 $prepareData = [
-                    'ingredient_id'     => $ingredient->id,
-                    'ingredient_type'   => $item->type,
-                    'main_category'     => $ingredient->category->tree_information['main_category'],
+                    'ingredient_id' => $ingredient->id,
+                    'ingredient_type' => $item->type,
+                    'main_category' => $ingredient->category->tree_information['main_category'],
                     'ingredient_amount' => (int)$item->amount,
-                    'ingredient_text'   => $ingredient->unit->short_name . ' ' . $ingredient->name,
-                    'ingredient_name'   => $ingredient->name,
-                    'ingredient_unit'   => $ingredient->unit->short_name,
-                    'hint'              => $hintContent,
+                    'ingredient_text' => $ingredient->unit->visibility ? "{$ingredient->unit->short_name} $ingredient->name" : $ingredient->name,
+                    'ingredient_name' => $ingredient->name,
+                    'ingredient_unit' => $ingredient->unit->visibility ? $ingredient->unit->short_name : '',
+                    'hint' => $hintContent,
+                    IngredientConversionService::KEY => app(IngredientConversionService::class)->generateData($ingredient, (int)$item->amount)
                 ];
 
                 if ($prepareData['main_category'] == IngredientCategoryEnum::SEASON->value) {
@@ -1648,7 +1651,8 @@ class Calculation
         $seasons = [],
         $setSeasonsAutomatically = false,
         &$options = []
-    ) {
+    )
+    {
 
         // resync excluded ingredients
         SyncUserExcludedIngredientsJob::dispatchSync($_user);
@@ -1666,7 +1670,7 @@ class Calculation
 
 
         if ($_user->isQuestionnaireExist()) {
-            $latestQuestionnaireAnswers  = $_user->latestQuestionnaireFullAnswers;
+            $latestQuestionnaireAnswers = $_user->latestQuestionnaireFullAnswers;
             $options['distributionType'] = 'ingestions';
 
 
@@ -1677,7 +1681,7 @@ class Calculation
                         $options['breakfastSnack'] = $options['lunchDinner'] = intdiv($amountRecipes, 2);
                         break;
                     case MealPerDayQuestionOptionsEnum::LUNCH_DINNER->value:
-                        $options['lunchDinner']    = $amountRecipes;
+                        $options['lunchDinner'] = $amountRecipes;
                         $options['breakfastSnack'] = 0;
                         break;
                     case MealPerDayQuestionOptionsEnum::STANDARD->value:
@@ -1702,8 +1706,8 @@ class Calculation
             }
 
             $hasBreakfast = !(empty($_user->dietdata['ingestion']['breakfast']['percents']));
-            $hasLunch     = !(empty($_user->dietdata['ingestion']['lunch']['percents']));
-            $hasDinner    = !(empty($_user->dietdata['ingestion']['dinner']['percents']));
+            $hasLunch = !(empty($_user->dietdata['ingestion']['lunch']['percents']));
+            $hasDinner = !(empty($_user->dietdata['ingestion']['dinner']['percents']));
 
             /*
                 Automation adds 90 randomize recipes, sometimes only 5 breakfast and 85 lunch/dinner.
@@ -1716,20 +1720,20 @@ class Calculation
 
             if (!$hasLunch && !$hasDinner) {
                 $options['breakfastSnack'] = $amountRecipes;
-                $options['lunchDinner']    = 0;
+                $options['lunchDinner'] = 0;
             } elseif (!$hasBreakfast) {
                 $options['breakfastSnack'] = 0;
-                $options['lunchDinner']    = $amountRecipes;
+                $options['lunchDinner'] = $amountRecipes;
             }
 
             if (!empty($latestQuestionnaireAnswers[QuestionnaireQuestionSlugsEnum::RECIPE_PREFERENCES])) {
                 $configRecipesTagsBasedOnAnswers = config('questionnaire.recipes_tag_based_on_answers.recipe_preferences');
-                $routineValue                    = $latestQuestionnaireAnswers[QuestionnaireQuestionSlugsEnum::RECIPE_PREFERENCES];
+                $routineValue = $latestQuestionnaireAnswers[QuestionnaireQuestionSlugsEnum::RECIPE_PREFERENCES];
                 if (
                     !empty($configRecipesTagsBasedOnAnswers[$routineValue])
                 ) {
                     // TODO:: refactor that to tags @NickMost
-                    $recipeTagId                          = intval($configRecipesTagsBasedOnAnswers[$routineValue]);
+                    $recipeTagId = intval($configRecipesTagsBasedOnAnswers[$routineValue]);
                     $options['recipe_tags_prioritized'][] = [$recipeTagId];
                 }
             }
@@ -1785,7 +1789,8 @@ class Calculation
         $diff = [],
         $excluded_recipes_ids_by_user_exclusion = [],
         $recipesTags = []
-    ): array {
+    ): array
+    {
 
         // TODO: @NickMost review, probably need additional conditions
         if (is_array($recipesTags)) {
@@ -1833,7 +1838,8 @@ class Calculation
         $seasons = [],
         $setSeasonsAutomatically = false,
         &$options = []
-    ) {
+    )
+    {
         if (is_null($setSeasonsAutomatically)) {
             $setSeasonsAutomatically = false;
         }
@@ -1848,7 +1854,7 @@ class Calculation
         }
 
         $excluded_recipes_ids_by_seasons = [];
-        $recipesIdsWithoutSeasons        = [];
+        $recipesIdsWithoutSeasons = [];
 
         // TODO:: @NickMost review seasons
         // TODO: amend here for new approach @NickMost
@@ -1868,7 +1874,7 @@ class Calculation
         }
 
         // getting recipes which were attached by last month
-        $monthAgoDate     = \Carbon\Carbon::now()->subMonths(1);
+        $monthAgoDate = \Carbon\Carbon::now()->subMonths(1);
         $lastMonthRecipes = $_user->recipes()
             ->where('meal_date', '>', $monthAgoDate)
             ->orderBy('recipe_id')
@@ -1970,22 +1976,22 @@ class Calculation
                 $options['ingestions_scope'][] = [
                     // dissabled snack recipes distribution
 //                    'ingestion_ids'     => [1, 4],
-                    'ingestion_ids'     => [1],
-                    'ingestion_key'     => 'breakfastSnack',
-                    'count_requested'   => intval($options['breakfastSnack']),
+                    'ingestion_ids' => [1],
+                    'ingestion_key' => 'breakfastSnack',
+                    'count_requested' => intval($options['breakfastSnack']),
                     'count_distributed' => 0,
-                    'recipes'           => [],
+                    'recipes' => [],
                 ];
                 $amountRecipes += intval($options['breakfastSnack']);
             }
 
             if (!empty($options['lunchDinner'])) {
                 $options['ingestions_scope'][] = [
-                    'ingestion_ids'     => [2, 3],
-                    'ingestion_key'     => 'lunchDinner',
-                    'count_requested'   => intval($options['lunchDinner']),
+                    'ingestion_ids' => [2, 3],
+                    'ingestion_key' => 'lunchDinner',
+                    'count_requested' => intval($options['lunchDinner']),
                     'count_distributed' => 0,
-                    'recipes'           => [],
+                    'recipes' => [],
                 ];
                 $amountRecipes += intval($options['lunchDinner']);
             }
@@ -2032,7 +2038,7 @@ class Calculation
 
                     // TODO:: refactor it, remove duplications
                     $options['distribution_mode'] = 'level0_normal';
-                    $count                        = self::internalDistributeAndCalculateRecipesForUser(
+                    $count = self::internalDistributeAndCalculateRecipesForUser(
                         $diff,
                         $_user,
                         $amountRecipes,
@@ -2044,7 +2050,7 @@ class Calculation
                 }
             } else {
                 $options['distribution_mode'] = 'level0_normal';
-                $count                        = self::internalDistributeAndCalculateRecipesForUser(
+                $count = self::internalDistributeAndCalculateRecipesForUser(
                     $diff,
                     $_user,
                     $amountRecipes,
@@ -2069,7 +2075,7 @@ class Calculation
 
                     // TODO:: refactor it, remove duplications
                     $options['distribution_mode'] = 'level0_normal';
-                    $count                        = self::internalDistributeAndCalculateRecipesForUser(
+                    $count = self::internalDistributeAndCalculateRecipesForUser(
                         $diff,
                         $_user,
                         $amountRecipes,
@@ -2089,7 +2095,7 @@ class Calculation
 
                 // recipes distribution first step without category
                 $options['distribution_mode'] = 'level1_normal';
-                $count                        = self::internalDistributeAndCalculateRecipesForUser(
+                $count = self::internalDistributeAndCalculateRecipesForUser(
                     $diff,
                     $_user,
                     $amountRecipes,
@@ -2112,7 +2118,7 @@ class Calculation
 
                 if (!empty($diffRecipeWithAnySeasons)) {
                     $options['distribution_mode'] = 'level2_recipes_without_any_seasons';
-                    $count                        = self::internalDistributeAndCalculateRecipesForUser(
+                    $count = self::internalDistributeAndCalculateRecipesForUser(
                         $diffRecipeWithAnySeasons,
                         $_user,
                         $amountRecipes,
@@ -2143,7 +2149,7 @@ class Calculation
                     ->whereNotIn('id', $excluded_recipes_ids_by_user_exclusion)
                     ->pluck('id')->toArray();
                 $options['distribution_mode'] = 'level3_all_recipes';
-                $count                        = self::internalDistributeAndCalculateRecipesForUser(
+                $count = self::internalDistributeAndCalculateRecipesForUser(
                     $allRecipeIds,
                     $_user,
                     $amountRecipes,
@@ -2189,15 +2195,16 @@ class Calculation
         $amountRecipes,
         $count = 0,
         &$options = []
-    ) {
+    )
+    {
         if (empty($count)) {
             $count = 0;
         }
         while ($count < $amountRecipes && count($recipesIds) > 0) {
             do {
-                $randKey  = array_rand($recipesIds);
+                $randKey = array_rand($recipesIds);
                 $recipeId = $recipesIds[$randKey];
-                $result   = self::_calcRecipe2user($user, [$recipeId], true, $options);
+                $result = self::_calcRecipe2user($user, [$recipeId], true, $options);
                 if (!empty($result['options'])) {
                     $options = $result['options'];
                 }
@@ -2235,7 +2242,7 @@ class Calculation
         $_errors = [
             'success' => true,
             'message' => null,
-            'IDs'     => null,
+            'IDs' => null,
             'options' => $options,
         ];
 
@@ -2255,9 +2262,9 @@ class Calculation
 
         if (array_values($originallyRequestedRecipes) != array_values($_recipeIds)) {
             $_errors['message'] = 'Recipes were restricted by user\'s exclusions (' . implode(
-                ', ',
-                array_diff($originallyRequestedRecipes, $_recipeIds)
-            ) . ')';
+                    ', ',
+                    array_diff($originallyRequestedRecipes, $_recipeIds)
+                ) . ')';
         }
 
         $recipesForDelete = [];
@@ -2317,13 +2324,13 @@ class Calculation
             if (count($relatedRecipeCalc) !== 0 && $isFirstAdd) {
                 $_errors['success'] = false;
                 $_errors['message'] .= '<br>Recipe <b>#' . $itemId . '</b> not added! Exist valid related recipes <b>(' . implode(
-                    '; ',
-                    $relatedRecipeCalc
-                ) . ')</b>';
+                        '; ',
+                        $relatedRecipeCalc
+                    ) . ')</b>';
                 continue;
             }
 
-            $validResult   = false;
+            $validResult = false;
             $recipeIsValid = false;
             do {
                 # get related recipe Id
@@ -2367,10 +2374,10 @@ class Calculation
                     foreach ($calcRecipes as $calcRecipe) {
                         $recipeData = $calcRecipe->recipe_data;
 
-                        $recipeData['errors']  = true;
+                        $recipeData['errors'] = true;
                         $recipeData['notices'] = [$validRecipeData['notices']];
 
-                        $calcRecipe->invalid     = true;
+                        $calcRecipe->invalid = true;
                         $calcRecipe->recipe_data = $recipeData;
                         $calcRecipe->save();
 
@@ -2429,10 +2436,10 @@ class Calculation
                     foreach ($calcRecipes as $calcRecipe) {
                         $recipeData = $calcRecipe->recipe_data;
 
-                        $recipeData['errors']  = true;
+                        $recipeData['errors'] = true;
                         $recipeData['notices'] = [$validResult['message']];
 
-                        $calcRecipe->invalid     = true;
+                        $calcRecipe->invalid = true;
                         $calcRecipe->recipe_data = $recipeData;
                         $calcRecipe->save();
 
@@ -2461,7 +2468,7 @@ class Calculation
             $calcError = true;
 
             if ($recipeIsValid && isset($validResult) && !$validResult['errors'] && (!empty($validResult['ingestions']))) {
-                $allIngestions         = Ingestion::get();
+                $allIngestions = Ingestion::get();
                 $allInactiveIngestions = $allIngestions->filter(
                     function ($item) {
                         if (!$item->active) {
@@ -2501,7 +2508,7 @@ class Calculation
                                 )->first();
 
                             if ($recipeCalc) {
-                                $recipeCalc->invalid     = $recipeData['errors'];
+                                $recipeCalc->invalid = $recipeData['errors'];
                                 $recipeCalc->recipe_data = $recipeData;
                                 $recipeCalc->save();
 
@@ -2511,12 +2518,12 @@ class Calculation
                             //recipe is valid, we can add it
                             $recipeCalc = UserRecipeCalculated::updateOrCreate(
                                 [
-                                    'user_id'      => $_user->getKey(),
-                                    'recipe_id'    => $recipeId,
+                                    'user_id' => $_user->getKey(),
+                                    'recipe_id' => $recipeId,
                                     'ingestion_id' => $ingestion->id,
                                 ],
                                 [
-                                    'invalid'     => $recipeData['errors'],
+                                    'invalid' => $recipeData['errors'],
                                     'recipe_data' => $recipeData
                                 ]
                             );
@@ -2551,7 +2558,7 @@ class Calculation
                             ->where('ingestion_id', $ingestionId)
                             ->update(
                                 [
-                                    'invalid'     => $recipeData['errors'],
+                                    'invalid' => $recipeData['errors'],
                                     'recipe_data' => json_encode($recipeData)
                                 ]
                             );
@@ -2593,9 +2600,9 @@ class Calculation
                     foreach ($validResult['ingestions'] as $ingestionId => $ingestionError) {
                         foreach ($options['ingestions_scope'] as $ingestionScopes) {
                             if (in_array(
-                                $ingestionId,
-                                $ingestionScopes['ingestion_ids']
-                            ) && $ingestionScopes['count_distributed'] < $ingestionScopes['count_requested']) {
+                                    $ingestionId,
+                                    $ingestionScopes['ingestion_ids']
+                                ) && $ingestionScopes['count_distributed'] < $ingestionScopes['count_requested']) {
                                 $allowedByIngestionsRestictions = true;
                             }
                         }
@@ -2625,7 +2632,7 @@ class Calculation
                     // need to check if user has related recipe before
                     // label "new" fix
                     $existRelatedRecipes = 0;
-                    $recipeForAdding     = Recipe::query()->find($recipeId);
+                    $recipeForAdding = Recipe::query()->find($recipeId);
                     if (!empty($recipeForAdding->related_recipes)) {
                         $existRelatedRecipes = $_user->allRecipes()->whereIn(
                             'recipe_id',
@@ -2662,7 +2669,7 @@ class Calculation
                     } else {
                         $_errors['message'] .= '<br>Recipe <b>#' . $recipeId . '</b> added successfully!';
                     }
-                    $_errors['IDs']     = is_null($_errors['IDs']) ? $recipeId : $_errors['IDs'] . ',' . $recipeId;
+                    $_errors['IDs'] = is_null($_errors['IDs']) ? $recipeId : $_errors['IDs'] . ',' . $recipeId;
                     $_errors['success'] = true;
                 }
 
@@ -2684,7 +2691,7 @@ class Calculation
                             ]
                         )->update(
                             [
-                                'recipe_id'        => $recipeId,
+                                'recipe_id' => $recipeId,
                                 'custom_recipe_id' => null,
                             ]
                         );
@@ -2723,8 +2730,8 @@ class Calculation
                                 $options['ingestions_scope'][$index]['count_distributed']++;
 
                                 $options['ingestions_scope'][$index]['recipes'][] = [
-                                    'ingestion_id'      => $ingestionId,
-                                    'recipe_id'         => $recipeId,
+                                    'ingestion_id' => $ingestionId,
+                                    'recipe_id' => $recipeId,
                                     'distribution_mode' => $options['distribution_mode'],
                                 ];
                                 $ingestionFound = true;
@@ -2742,7 +2749,7 @@ class Calculation
                 $validRecipeData = static::checkUserValidRecipe($itemId, $_user);
 
 
-                $allIngestions         = Ingestion::get();
+                $allIngestions = Ingestion::get();
                 $allInactiveIngestions = $allIngestions->filter(
                     function ($item) {
                         if (!$item->active) {
@@ -2781,7 +2788,7 @@ class Calculation
                                 $ingestion->id
                             )->first();
                         if ($recipeDbRecord) {
-                            $recipeDbRecord->invalid     = $recipeData['errors'];
+                            $recipeDbRecord->invalid = $recipeData['errors'];
                             $recipeDbRecord->recipe_data = $recipeData;
                             $recipeDbRecord->save();
                         }
@@ -2789,12 +2796,12 @@ class Calculation
                         //recipe is valid, we can add it
                         UserRecipeCalculated::updateOrCreate(
                             [
-                                'user_id'      => $_user->getKey(),
-                                'recipe_id'    => $itemId,
+                                'user_id' => $_user->getKey(),
+                                'recipe_id' => $itemId,
                                 'ingestion_id' => $ingestion->id,
                             ],
                             [
-                                'invalid'     => $recipeData['errors'],
+                                'invalid' => $recipeData['errors'],
                                 'recipe_data' => $recipeData
                             ]
                         )->touch();
@@ -2862,12 +2869,12 @@ class Calculation
     {
         $result = [
             'recipe_id' => $source_recipe_id,
-            'valid'     => true,
-            'notices'   => '',
+            'valid' => true,
+            'notices' => '',
         ];
 
         $currentUser = is_null($user) ? \Auth::user() : $user;
-        $user_id     = $currentUser->getKey();
+        $user_id = $currentUser->getKey();
 
         $excluded_recipes_ids = \Cache::get(CacheKeys::userExcludedRecipesIds($user_id));
         if (is_null($excluded_recipes_ids)) {
@@ -2992,7 +2999,7 @@ class Calculation
             ->whereIn('recipe_id', $recipeIds)
             ->where('meal_date', '>=', $startDate)
             ->where(function ($query) {
-                $query->where('custom_recipe_id',null)
+                $query->where('custom_recipe_id', null)
                     ->orWhereNull('custom_recipe_id');
             })
             ->get();
@@ -3101,10 +3108,10 @@ class Calculation
             // current recipe validation, is current recipe valid for replace
             do {
                 $recipeValidForReplace = false;
-                $validResult           = false;
+                $validResult = false;
 
                 if (!empty($recipeDate[$recipe->ingestion_id])) {
-                    $arrayKeys         = array_keys($recipeDate[$recipe->ingestion_id]);
+                    $arrayKeys = array_keys($recipeDate[$recipe->ingestion_id]);
                     $randomRecipeIndex = reset($arrayKeys);
 
                     $randomRecipeId = $recipeDate[$recipe->ingestion_id][$randomRecipeIndex];
@@ -3139,7 +3146,7 @@ class Calculation
                 )
                     ->update(
                         [
-                            'recipe_id'        => $randomRecipeId,
+                            'recipe_id' => $randomRecipeId,
                             'custom_recipe_id' => null
                         ]
                     );
@@ -3177,7 +3184,7 @@ class Calculation
                     ->where('recipe_id', $recipe->recipe_id)
                     ->where('meal_date', '>=', $startDate)
                     ->where(function ($query) {
-                        $query->where('custom_recipe_id',null)
+                        $query->where('custom_recipe_id', null)
                             ->orWhereNull('custom_recipe_id');
                     })
                     ->orderBy('meal_date')
@@ -3213,8 +3220,8 @@ class Calculation
         # set default result
         $result = [
             'ingestions' => [],
-            'errors'     => true,
-            'message'    => null
+            'errors' => true,
+            'message' => null
         ];
 
         foreach ($recipe->ingestions as $ingestion) {
@@ -3232,7 +3239,7 @@ class Calculation
             if (!empty($validByKCalKHData) && key_exists('errors', $validByKCalKHData) && $validByKCalKHData['errors']) {
                 $result['message'] .= '<br>Recipe <b>#' . $recipe->id . ' (' . $ingestion->title . ')</b> — Range ERROR! => ' . $validByKCalKHData['notices'];
             } else {
-                $result['errors']                     = false;
+                $result['errors'] = false;
                 $result['ingestions'][$ingestion->id] = false;
             }
         }
@@ -3254,9 +3261,9 @@ class Calculation
     public static function validRecipeKcalKH($recipe, $ingestion, $diet_data = null)
     {
         $result = [
-            'valid'   => true,
+            'valid' => true,
             'notices' => '',
-            'errors'  => false,
+            'errors' => false,
         ];
 
         // check user dietData
@@ -3276,7 +3283,7 @@ class Calculation
                 $KH = floatval($nutriens['KH']);
                 if ((!empty($recipe->min_kh)) && ($KH < $recipe->min_kh)) {
                     $result['errors'] = true;
-                    $result['valid']  = false;
+                    $result['valid'] = false;
                     $result['notices'] .= 'invalid by KH, min recipe KH = ' . $recipe->min_kh . ' need KH = ' . $KH . '; ';
                 }
 
@@ -3284,7 +3291,7 @@ class Calculation
                 // recipe with KH 5-10, must be valid for 5.0 - 10.999999
                 if ((!empty($recipe->max_kh)) && ($KH >= ($recipe->max_kh + 1))) {
                     $result['errors'] = true;
-                    $result['valid']  = false;
+                    $result['valid'] = false;
                     $result['notices'] .= 'invalid by KH, max recipe KH = ' . $recipe->max_kh . ' need KH = ' . $KH . '; ';
                 }
             }
@@ -3294,13 +3301,13 @@ class Calculation
                 $KCal = floatval($nutriens['Kcal']);
                 if ((!empty($recipe->min_kcal)) && ($KCal < $recipe->min_kcal)) {
                     $result['errors'] = true;
-                    $result['valid']  = false;
+                    $result['valid'] = false;
                     $result['notices'] .= 'invalid by KCal, min recipe KCal = ' . $recipe->min_kcal . ' need KCal = ' . $KCal . '; ';
                 }
 
                 if ((!empty($recipe->max_kcal)) && ($KCal > $recipe->max_kcal)) {
                     $result['errors'] = true;
-                    $result['valid']  = false;
+                    $result['valid'] = false;
                     $result['notices'] .= 'invalid by KCal, max recipe KCal = ' . $recipe->max_kcal . ' need KCal = ' . $KCal . '; ';
                 }
             }
@@ -3329,10 +3336,10 @@ class Calculation
             foreach ($_ingredientsType as $key => $type) {
                 if (key_exists($key, $_recipeData)) {
                     foreach ($_recipeData[$key] as $item) {
-                        $ingredient                  = Ingredient::findOrFail($item['id'])->load('unit');
+                        $ingredient = Ingredient::findOrFail($item['id'])->load('unit');
                         $resultData['ingredients'][] = [
-                            'id'     => $ingredient->id,
-                            'type'   => $type,
+                            'id' => $ingredient->id,
+                            'type' => $type,
                             'amount' => intval($item['amount'])
                         ];
                     }
@@ -3361,31 +3368,31 @@ class Calculation
 
             foreach ($_ingredientsType as $key => $type) {
                 foreach ($_recipeData->{$key} as $item) {
-                    $ingredient                  = $item->load('unit');
+                    $ingredient = $item->load('unit');
                     $resultData['ingredients'][] = [
-                        'id'     => $ingredient->id,
-                        'type'   => $type,
+                        'id' => $ingredient->id,
+                        'type' => $type,
                         'amount' => $item->pivot->amount,
                     ];
                 }
             }
         }
 
-        $resultData['errors']  = false;
+        $resultData['errors'] = false;
         $resultData['notices'] = [];
 
         if (!empty($validRecipeData) && key_exists('valid', $validRecipeData) && !$validRecipeData['valid']) {
-            $resultData['errors']    = true;
+            $resultData['errors'] = true;
             $resultData['notices'][] = $validRecipeData['notices'];
         }
 
         if (!empty($validByKCalKHData) && key_exists('valid', $validByKCalKHData) && !$validByKCalKHData['valid']) {
-            $resultData['errors']    = true;
+            $resultData['errors'] = true;
             $resultData['notices'][] = $validByKCalKHData['notices'];
         }
 
         if (!empty($_recipeData) && key_exists('errors', $_recipeData) && $_recipeData['errors']) {
-            $resultData['errors']    = true;
+            $resultData['errors'] = true;
             $resultData['notices'][] = $_recipeData['notices'];
         }
 
@@ -3584,12 +3591,12 @@ class Calculation
                 $randomRecipeId = $recipeDate[$ingestion->id][array_rand($recipeDate[$ingestion->id])];
 
                 $preparedData[] = [
-                    'user_id'            => $_user->id,
-                    'recipe_id'          => $randomRecipeId,
-                    'custom_recipe_id'   => null,
+                    'user_id' => $_user->id,
+                    'recipe_id' => $randomRecipeId,
+                    'custom_recipe_id' => null,
                     'original_recipe_id' => $randomRecipeId,
-                    'meal_date'    => $startDate->format('Y-m-d 00:00:00'),
-                    'meal_time'    => $ingestion->key,
+                    'meal_date' => $startDate->format('Y-m-d 00:00:00'),
+                    'meal_time' => $ingestion->key,
                     'ingestion_id' => $ingestion->id,
                 ];
             }
@@ -3617,12 +3624,12 @@ class Calculation
         }
         $recipeCalc = UserRecipeCalculated::updateOrCreate(
             [
-                'user_id'      => $_user->getKey(),
-                'recipe_id'    => $_recipe->id,
+                'user_id' => $_user->getKey(),
+                'recipe_id' => $_recipe->id,
                 'ingestion_id' => $ingestion->id,
             ],
             [
-                'invalid'     => $invalid,
+                'invalid' => $invalid,
                 'recipe_data' => $recipeData
             ]
         );
@@ -3644,10 +3651,10 @@ class Calculation
         // issue when recipes
         $ingestionIds = $_recipe->ingestions()->whereActive(true)->pluck('ingestions.id')->toArray();
         foreach ($ingestionIds as $ingestionId) {
-            $ingestion         = $allIngestions->find($ingestionId);
+            $ingestion = $allIngestions->find($ingestionId);
             $validByKCalKHData = static::validRecipeKcalKH($_recipe, $ingestion, $_user->dietdata);
-            $recipeData        = static::calcRecipe($_recipe, $ingestion, $_user->dietdata);
-            $recipeData        = static::calcRecipeOptimization(
+            $recipeData = static::calcRecipe($_recipe, $ingestion, $_user->dietdata);
+            $recipeData = static::calcRecipeOptimization(
                 $_recipe,
                 $recipeData,
                 $validRecipeData,
@@ -3672,18 +3679,19 @@ class Calculation
     public static function calcSuitableRecipe2users(
         User  $_user,
         array $_recipeIds,
-        $preliminaryCalcData = null,
-        $relatedJobType = null,
-        $relatedJobHash = null,
-        $couldBeInterrupted = true
-    ): array {
+              $preliminaryCalcData = null,
+              $relatedJobType = null,
+              $relatedJobHash = null,
+              $couldBeInterrupted = true
+    ): array
+    {
 
         DB::disableQueryLog();
         # result array
         $result = array();
 
         $allInactiveIngestions = Ingestion::whereActive(false)->pluck('id')->toArray();
-        $allIngestions         = Ingestion::get();
+        $allIngestions = Ingestion::get();
 
         // fix WEB-130
         $existRecipeIds = $_user
@@ -3697,7 +3705,7 @@ class Calculation
         // fix WEB-130
 
 
-        $recipes                     = Recipe::isActive()->with(['ingredients', 'variableIngredients', 'ingestions'])->whereIntegerInRaw('id', $_recipeIds)->get();
+        $recipes = Recipe::isActive()->with(['ingredients', 'variableIngredients', 'ingestions'])->whereIntegerInRaw('id', $_recipeIds)->get();
         $lastRecipeCalculatedRecords = UserRecipeCalculated::where('user_id', $_user->getKey())
             ->whereIn('recipe_id', $_recipeIds)
             ->orderBy('updated_at', 'DESC')
@@ -3713,7 +3721,7 @@ class Calculation
             $expectedPreliminaryDate = Carbon::parse($preliminaryCalcData['updated_at'])->subDays(1)->startOfDay();
         }
         $questionnaireUpdated_at = 0;
-        $isQuestionnaireExist    = $_user->isQuestionnaireExist();
+        $isQuestionnaireExist = $_user->isQuestionnaireExist();
         if ($isQuestionnaireExist) {
             $questionnaireUpdated_at = $_user->questionnaire()->first()->updated_at;
         }
@@ -3791,10 +3799,10 @@ class Calculation
                 foreach ($calcRecipes as $calcRecipe) {
                     $recipeData = $calcRecipe->recipe_data;
 
-                    $recipeData['errors']  = true;
+                    $recipeData['errors'] = true;
                     $recipeData['notices'] = [$validRecipeData['notices']];
 
-                    $calcRecipe->invalid     = true;
+                    $calcRecipe->invalid = true;
                     $calcRecipe->recipe_data = $recipeData;
                     $calcRecipe->save();
 
@@ -3840,10 +3848,10 @@ class Calculation
                 foreach ($calcRecipes as $calcRecipe) {
                     $recipeData = $calcRecipe->recipe_data;
 
-                    $recipeData['errors']  = true;
+                    $recipeData['errors'] = true;
                     $recipeData['notices'] = [$validResult['message']];
 
-                    $calcRecipe->invalid     = true;
+                    $calcRecipe->invalid = true;
                     $calcRecipe->recipe_data = $recipeData;
                     $calcRecipe->save();
 

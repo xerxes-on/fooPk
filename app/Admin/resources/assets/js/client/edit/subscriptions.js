@@ -1,4 +1,5 @@
 export function initSubscriptions() {
+    // Chargebee subscription
     $('#chargebee-subscription-add').on('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -10,51 +11,43 @@ export function initSubscriptions() {
                 //
             },
         }).then(function (result) {
-            if (result.value) {
-
-                let subscriptionId = $('#chargebee-subscription-id').val();
-
-                Swal.fire({
-                    title: window.FoodPunk.i18n.wait,
-                    text: window.FoodPunk.i18n.inProgress,
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    allowEnterKey: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    },
-                });
-
-                $.ajax({
-                    type: 'POST',
-                    url: window.FoodPunk.route.assignChargebeeSubscription,
-                    dataType: 'json',
-                    data: {
-                        _token: $('meta[name=csrf-token]').attr('content'),
-                        chargebee_subscription_id: subscriptionId,
-                        client_id: window.FoodPunk.pageInfo.clientId,
-                    },
-                    success: function (result) {
-                        location.reload();
-                    },
-                    error: function (data) {
-                        let response = JSON.parse(data.responseText),
-                            errorString = '<ul style="text-align: left;">';
-                        $.each(response.errors, function (key, value) {
-                            errorString += '<li>' + value + '</li>';
-                        });
-                        errorString += '</ul>';
-
-                        Swal.fire({
-                            icon: 'error',
-                            title: response.message,
-                            html: errorString,
-                        });
-                    },
-                });
+            if (!result.value) {
+                return;
             }
+            let subscriptionId = $('#chargebee-subscription-id').val();
+
+            Swal.fire({
+                title: window.FoodPunk.i18n.wait,
+                text: window.FoodPunk.i18n.inProgress,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                allowEnterKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+            });
+
+            $.ajax({
+                type: 'POST',
+                url: window.FoodPunk.route.assignChargebeeSubscription,
+                dataType: 'json',
+                data: {
+                    _token: $('meta[name=csrf-token]').attr('content'),
+                    chargebee_subscription_id: subscriptionId,
+                    client_id: window.FoodPunk.pageInfo.clientId,
+                },
+                success: function (result) {
+                    location.reload();
+                },
+                error: function (data) {
+                    errorHandler(data);
+                },
+            });
+
         });
     });
+
+    // Status
     $('.user-subscription-edit').on('click', function (e) {
         let subscriptionId = $(this).attr('data-subscription'),
             url = window.FoodPunk.route.subscriptionEdit,
@@ -103,24 +96,13 @@ export function initSubscriptions() {
                         location.reload();
                     },
                     error: function (data) {
-                        let response = JSON.parse(data.responseText),
-                            errorString = '<ul style="text-align: left;">';
-                        $.each(response.errors, function (key, value) {
-                            errorString += '<li>' + value + '</li>';
-                        });
-                        errorString += '</ul>';
-
-                        Swal.fire({
-                            icon: 'error',
-                            title: response.message,
-                            html: errorString,
-                        });
+                        errorHandler(data);
                     },
                 });
             }
         });
-
     });
+
     $('.user-subscription-stop').on('click', function (e) {
         let subscriptionId = $(this).attr('data-subscription'),
             url = window.FoodPunk.route.subscriptionStop;
@@ -140,48 +122,38 @@ export function initSubscriptions() {
             confirmButtonText: window.FoodPunk.i18n.defaultsExist,
             cancelButtonText: window.FoodPunk.i18n.defaultsMissing,
         }).then((result) => {
-
-            if (result.value) {
-                Swal.fire({
-                    title: window.FoodPunk.i18n.wait,
-                    text: window.FoodPunk.i18n.inProgress,
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    allowEnterKey: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    },
-                });
-
-                $.ajax({
-                    type: 'PUT',
-                    url: url,
-                    dataType: 'json',
-                    data: {
-                        _token: $('meta[name=csrf-token]').attr('content'),
-                    },
-                    success: function (result) {
-                        location.reload();
-                    },
-                    error: function (data) {
-                        let response = JSON.parse(data.responseText),
-                            errorString = '<ul style="text-align: left;">';
-                        $.each(response.errors, function (key, value) {
-                            errorString += '<li>' + value + '</li>';
-                        });
-                        errorString += '</ul>';
-
-                        Swal.fire({
-                            icon: 'error',
-                            title: response.message,
-                            html: errorString,
-                        });
-                    },
-                });
+            if (!result.value) {
+                return;
             }
+            Swal.fire({
+                title: window.FoodPunk.i18n.wait,
+                text: window.FoodPunk.i18n.inProgress,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                allowEnterKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+            });
+
+            $.ajax({
+                type: 'PUT',
+                url: url,
+                dataType: 'json',
+                data: {
+                    _token: $('meta[name=csrf-token]').attr('content'),
+                },
+                success: function (result) {
+                    location.reload();
+                },
+                error: function (data) {
+                    errorHandler(data);
+                },
+            });
         });
 
     });
+
     $('.user-subscription-delete').on('click', function (e) {
         let subscriptionId = $(this).attr('data-subscription'),
             url = window.FoodPunk.route.subscriptionDelete
@@ -201,85 +173,91 @@ export function initSubscriptions() {
             confirmButtonText: window.FoodPunk.i18n.defaultsExist,
             cancelButtonText: window.FoodPunk.i18n.defaultsMissing,
         }).then((result) => {
-
-            if (result.value) {
-                Swal.fire({
-                    title: window.FoodPunk.i18n.wait,
-                    text: window.FoodPunk.i18n.inProgress,
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    allowEnterKey: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    },
-                });
-
-                $.ajax({
-                    type: 'DELETE',
-                    url: url,
-                    dataType: 'json',
-                    data: {
-                        _token: $('meta[name=csrf-token]').attr('content'),
-                    },
-                    success: function (result) {
-                        location.reload();
-                    },
-                    error: function (data) {
-                        let response = JSON.parse(data.responseText),
-                            errorString = '<ul style="text-align: left;">';
-                        $.each(response.errors, function (key, value) {
-                            errorString += '<li>' + value + '</li>';
-                        });
-                        errorString += '</ul>';
-
-                        Swal.fire({
-                            icon: 'error',
-                            title: response.message,
-                            html: errorString,
-                        });
-                    },
-                });
+            if (!result.value) {
+                return;
             }
+            Swal.fire({
+                title: window.FoodPunk.i18n.wait,
+                text: window.FoodPunk.i18n.inProgress,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                allowEnterKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+            });
+
+            $.ajax({
+                type: 'DELETE',
+                url: url,
+                dataType: 'json',
+                data: {
+                    _token: $('meta[name=csrf-token]').attr('content'),
+                },
+                success: function (result) {
+                    location.reload();
+                },
+                error: function (data) {
+                    errorHandler(data);
+                },
+            });
         });
     });
+
     $('#subscription-create').on('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
         let activeChallenge = window.FoodPunk.pageInfo.activeChallenge
 
-        if (activeChallenge > 0) {
+        if (activeChallenge <= 0) {
+            $(this).closest('form').submit();
+            return;
+        }
+
+        Swal.fire({
+            title: window.FoodPunk.i18n.confirmation,
+            text: window.FoodPunk.i18n.subscriptionStopped,
+            icon: 'warning',
+            showCancelButton: true,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            allowEnterKey: false,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: window.FoodPunk.i18n.defaultsExist,
+            cancelButtonText: window.FoodPunk.i18n.defaultsMissing,
+        }).then((result) => {
+            if (!result.value) {
+                return;
+            }
             Swal.fire({
-                title: window.FoodPunk.i18n.confirmation,
-                text: window.FoodPunk.i18n.subscriptionStopped,
-                icon: 'warning',
-                showCancelButton: true,
+                title: window.FoodPunk.i18n.wait,
+                text: window.FoodPunk.i18n.inProgress,
                 allowOutsideClick: false,
                 allowEscapeKey: false,
                 allowEnterKey: false,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: window.FoodPunk.i18n.defaultsExist,
-                cancelButtonText: window.FoodPunk.i18n.defaultsMissing,
-            }).then((result) => {
-
-                if (result.value) {
-                    Swal.fire({
-                        title: window.FoodPunk.i18n.wait,
-                        text: window.FoodPunk.i18n.inProgress,
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        allowEnterKey: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        },
-                    });
-
-                    $(this).closest('form').submit();
-                }
+                didOpen: () => {
+                    Swal.showLoading();
+                },
             });
-        } else {
+
             $(this).closest('form').submit();
-        }
+        });
 
     });
+
+    function errorHandler(data) {
+        let response = JSON.parse(data.responseText),
+            errorString = '<ul style="text-align: left;">';
+        $.each(response.errors, function (key, value) {
+            errorString += '<li>' + value + '</li>';
+        });
+        errorString += '</ul>';
+
+        Swal.fire({
+            icon: 'error',
+            title: response.message,
+            html: errorString,
+        });
+    }
 }

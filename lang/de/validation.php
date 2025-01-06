@@ -193,6 +193,9 @@ return [
             'translations' => 'Fehlende Übersetzung',
             'link'         => 'Fehlender Link'
         ],
+        'ingestion' => [
+            'not_allowed' => 'You cannot replace recipes for this mealtime'
+        ]
     ],
 
 ];

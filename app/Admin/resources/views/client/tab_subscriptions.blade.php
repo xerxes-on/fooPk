@@ -81,7 +81,7 @@
                                 @can(\App\Enums\Admin\Permission\PermissionEnum::DELETE_SUBSCRIPTION->value, '\App\Models\Admin')
                                     <button type="button" class="button-round user-subscription-delete"
                                             data-subscription="{{ $subscription->id }}"
-                                            title="Delete subscription">
+                                            title="Delete subscription"> {{--TODO: translate--}}
                                         <i class="fa fa-trash fa-lg" aria-hidden="true"></i>
                                     </button>
                                 @endcan

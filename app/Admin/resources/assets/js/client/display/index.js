@@ -1,9 +1,9 @@
 // Main initializer for user and recipe selection. Sets up the user DataTable, filters, and recipe-related actions like selection and randomization
 import $ from 'jquery';
-import {initUserSelection} from './userSelection.js';
-import {initFilters} from './filters.js';
-import {addRecipes2selectUsers, submitAdding} from './recipeSelection.js';
-import {addRandomizeRecipes2selectUsers} from './randomizeRecipes.js';
+import {initUserSelection} from './userSelection';
+import {initFilters} from './filters';
+import {addRecipes2selectUsers, submitAdding} from './recipeSelection';
+import {addRandomizeRecipes2selectUsers} from './randomizeRecipes';
 
 window.$SubmitAddRecipes = null;
 if (window.FoodPunk?.pageInfo?.hideRecipesRandomizer) {

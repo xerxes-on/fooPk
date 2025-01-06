@@ -1,21 +1,21 @@
-<div class="form-inline">
+{{--<div class="form-inline">
 
     <div class="form-group mb-2">
-        {{--		<a href="{{ route('admin.clients.formular.edit', ['id' => $client->id]) }}" class="btn btn-primary">--}}
-        {{--			@if($formularExist)--}}
-        {{--				@lang('common.edit')--}}
-        {{--			@else--}}
-        {{--				@lang('common.create')--}}
-        {{--			@endif--}}
-        {{--		</a>--}}
+        --}}{{--		<a href="{{ route('admin.clients.formular.edit', ['id' => $client->id]) }}" class="btn btn-primary">--}}{{--
+        --}}{{--			@if($formularExist)--}}{{--
+        --}}{{--				@lang('common.edit')--}}{{--
+        --}}{{--			@else--}}{{--
+        --}}{{--				@lang('common.create')--}}{{--
+        --}}{{--			@endif--}}{{--
+        --}}{{--		</a>--}}{{--
     </div>
     @if($formularExist)
         <div class="form-group mx-sm-3 mb-2" style="margin-left: 10px">
             <input readonly
                    disabled
                    type="checkbox"
-                   name="approve_formular" {{ $client->formular->approved ? 'checked' : '' }}>
-            <label for="approve_formular">@lang('common.approve_formular')</label>
+                   id="old_approve_formular" {{ $client->formular->approved ? 'checked' : '' }}>
+            <label for="old_approve_formular">@lang('common.approve_formular')</label>
         </div>
     @endif
 
@@ -25,24 +25,24 @@
                    disabled
                    type="checkbox"
                    class="form-check-input"
-                   name="toggle_formular" {{$client->formular->forced_visibility ? 'checked' : '' }}>
-            <label for="toggle_formular" class="form-check-label">@lang('common.force_visibility_for_user')</label>
+                   id="old_toggle_formular" {{$client->formular->forced_visibility ? 'checked' : '' }}>
+            <label for="old_toggle_formular" class="form-check-label">@lang('common.force_visibility_for_user')</label>
         </div>
     @endif
-</div>
+</div>--}}
 
 @if($formularExist && !empty($formular))
     <table class="table">
         <thead>
         <tr>
-            <th>#</th>
+            <th style="width: 3%">#</th>
             <th style="width: 48%">@lang('common.question')</th>
             <th @if($formularCount >= 2) style="width: 25%" @endif>
                 {{ trans('common.answer') .' (#'. $client->formular->id .' - '. \Carbon\Carbon::parse($client->formular->created_at)->format('d.m.Y') .')' }}
             </th>
-            <th class="compare-answer-title @if($formularCount < 2) hidden @endif" style="width: 25%">
-                @lang('common.compare_answer')
-            </th>
+            {{--            <th class="compare-answer-title @if($formularCount < 2) hidden @endif" style="width: 25%">--}}
+            {{--                @lang('common.compare_answer')--}}
+            {{--            </th>--}}
         </tr>
         </thead>
 

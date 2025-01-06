@@ -8,7 +8,7 @@ enum IngredientCategoryEnum: int
 {
     use EnumToArray;
 
-    case SPICES = 1;
+    case SPICES = 1; // TODO: spices is duplicated, 80 is duplicated
 
     case SEASON = 79;
 }

@@ -26,7 +26,8 @@
             <span class="fa fa-info-circle" aria-hidden="true"></span>
             <span class="ladda-label">@lang('common.delete_selected')</span>
         </button>
-        <button type="button" id="delete-all-user-recipes" class="btn btn-danger" onclick="window.FoodPunk.functions.deleteAllRecipes()">
+        <button type="button" id="delete-all-user-recipes" class="btn btn-danger"
+                onclick="window.FoodPunk.functions.deleteAllRecipes()">
             <span class="ladda-label">@lang('common.delete_all_recipe')</span>
         </button>
     @endif
@@ -155,4 +156,3 @@
         </div>
     </div>
 </div>
-

@@ -31,7 +31,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  */
 final class UserSubscription extends Model
 {
-    public const DEFAULT_USER_CHALLENGE_ID = 1;
 
     protected $table = 'user_subscriptions';
 

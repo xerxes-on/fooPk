@@ -13,7 +13,7 @@
  */
 export async function addRandomizeRecipes() {
     const initFormData = await inputRecipeAmount();
-    if (!initFormData) return false;
+    if (!initFormData) return;
 
     let {
         amount,
@@ -25,7 +25,7 @@ export async function addRandomizeRecipes() {
         distribution_mode
     } = initFormData;
 
-    if (!amount || amount === '0') return false;
+    if (!amount || amount === '0') return;
 
     $.ajax({
         type: 'POST',
@@ -62,13 +62,13 @@ export async function addRandomizeRecipes() {
                     title: window.FoodPunk.i18n.saved,
                     html: data.message,
                 });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    html: data.message,
-                });
+                return;
             }
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                html: data.message,
+            });
         },
         error: function (jqXHR) {
             Swal.hideLoading();

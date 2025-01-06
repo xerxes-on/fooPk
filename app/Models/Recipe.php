@@ -82,6 +82,7 @@ use Illuminate\Support\Facades\Auth;
  * @property-read EloquentCollection<int, \Modules\Ingredient\Models\Ingredient> $variableIngredients
  * @property-read int|null $variable_ingredients_count
  * @method static \Database\Factories\RecipeFactory factory($count = null, $state = [])
+ * @method static Builder|Recipe inActiveStatus()
  * @method static Builder|Recipe isActive()
  * @method static Builder|Recipe isDraft()
  * @method static Builder|Recipe isOutdated()
@@ -296,6 +297,10 @@ final class Recipe extends TranslatableStaplerModel
 
         if (in_array($key, $this->translatedAttributes)) {
             return $this->getAttributeTranslatable($key); //process by Translatable
+        }
+
+        if ($key === 'inventory') {
+            return $this->inventories()->pluck('inventory_id');
         }
 
         return parent::getAttribute($key);

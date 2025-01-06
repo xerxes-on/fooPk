@@ -386,7 +386,7 @@ final class DataTableAdminController extends Controller
      */
     public function allRecipes(Request $request): JsonResponse
     {
-        return DataTables::of(Recipe::isActive()
+        return DataTables::of(Recipe::inActiveStatus()
             ->with(
                 [
                     'ingestions',

@@ -41,7 +41,7 @@ trait HasCourse
     }
 
     /**
-     * get AboChallenge Data
+     * get Course Data
      */
     public function getCourseData(): ?array
     {
@@ -87,10 +87,10 @@ trait HasCourse
         $existsQuickGuideChallenge = $this->courseExists($challengeId);
 
         if (!$existsQuickGuideChallenge) {
-            $aboChallenge = Course::findOrFail($challengeId);
+            $course = Course::findOrFail($challengeId);
 
             $now     = Carbon::now();
-            $startAt = $now->subDays($aboChallenge->duration);
+            $startAt = $now->subDays($course->duration);
             $this->addCourse($challengeId, $startAt);
         }
     }
@@ -111,7 +111,7 @@ trait HasCourse
      */
     public function addCourse(int $challengeId = 0, $startAt = null): void
     {
-        $aboChallenge = Course::findOrFail($challengeId);
+        $course = Course::findOrFail($challengeId);
 
         if (is_null($startAt)) {
             $startAt = Carbon::now()->startOfDay();
@@ -138,15 +138,15 @@ trait HasCourse
             }
         }
 
-        if (!empty($aboChallenge->minimum_start_at) && $startAt < $aboChallenge->minimum_start_at) {
-            $startAt = Carbon::parse($aboChallenge->minimum_start_at)->startOfDay();
+        if (!empty($course->minimum_start_at) && $startAt < $course->minimum_start_at) {
+            $startAt = Carbon::parse($course->minimum_start_at)->startOfDay();
         }
 
-        $endsAt = $startAt->copy()->addDays($aboChallenge->duration)->startOfDay();
+        $endsAt = $startAt->copy()->addDays($course->duration)->startOfDay();
 
         $this->courses()
             ->attach(
-                $aboChallenge,
+                $course,
                 [
                     'start_at' => $startAt,
                     'ends_at'  => $endsAt

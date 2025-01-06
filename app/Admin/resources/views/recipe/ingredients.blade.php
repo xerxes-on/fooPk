@@ -1,5 +1,5 @@
 <div class="mb-3">
-    <h4>@lang('common.ingredients')</h4>
+    <h4>@lang('ingredient::common.ingredients')</h4>
     <table class="table-primary table table-striped">
         <thead>
         <tr>

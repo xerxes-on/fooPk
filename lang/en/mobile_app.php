@@ -191,7 +191,7 @@ return [
     'flex_meal'                                => 'FlexMeal',
     'flex_meal_name'                           => 'FlexMeal name',
     'foodpoints'                               => 'Foodpoints',
-    'foodpoints_description'                   => 'Foodpoints are your digital currency in the Foodpunk app. Use them to get additional recipes from the marketplace in the app or unlock your next course. You automatically receive 20 Foodpoints every week.
+    'foodpoints_description'                   => 'Foodpoints are your digital currency in the Foodpunk app. Use them to get additional recipes from the marketplace in the app or unlock your next course. You automatically receive 100 Foodpoints every month.
 
 You can also earn Foodpoints in the following ways: 
 

@@ -1,25 +1,25 @@
 import $ from 'jquery';
 
-import {setupValidations} from './validations.js';
-import {initCalculationStatusCheck} from './jobStatus.js';
-import {initChallenges} from './challenges.js';
-import {initSubscriptions} from './subscriptions.js';
-import {initRecipes} from './recipes.js';
+import {initCalculationStatusCheck} from './jobStatus';
 import {initDeposit} from "./deposit";
-import initFormular from "./formular";
+import initQuestionnaire from "./questionnaire";
+import {initNutrientsCalculations} from './nutrientsCalculation';
+import {initRecipes} from './recipes';
+import {initSubscriptions} from './subscriptions';
+import {initCourses} from './courses';
 
 if (window.FoodPunk.pageInfo.hideRecipesRandomizer) {
     window.$SubmitAddRecipes = Ladda.create(document.querySelector('#submit-add-recipes'));
 }
 
 $(document).ready(function () {
-    setupValidations();
-    initCalculationStatusCheck();
-    initChallenges();
-    initSubscriptions();
-    initRecipes();
-    initDeposit();
-    initFormular();
-
     window.FoodPunk.functions = window.FoodPunk.functions || {};
+
+    initCalculationStatusCheck();
+    initDeposit();
+    initQuestionnaire();
+    initNutrientsCalculations();
+    initRecipes();
+    initSubscriptions();
+    initCourses();
 });

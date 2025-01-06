@@ -2,7 +2,7 @@ export function initDeposit() {
     window.FoodPunk.functions.deposit = function () {
         Swal.fire({
             title: window.FoodPunk.i18n.deposit,
-            text: window.FoodPunk.i18n.csCountMessage,
+            text: window.FoodPunk.i18n.fpCountMessage,
             input: 'number',
             icon: 'question',
         }).then(function (result) {
@@ -30,7 +30,7 @@ export function initDeposit() {
                         userId: window.FoodPunk.pageInfo.clientId,
                         amount: amount,
                     },
-                    success: function (result) {
+                    success: function () {
                         location.reload();
                     },
                 });
@@ -44,35 +44,36 @@ export function initDeposit() {
             input: 'number',
             icon: 'question',
         }).then(function (result) {
-            if (result.value) {
-
-                let amount = result.value;
-
-                Swal.fire({
-                    title: window.FoodPunk.i18n.wait,
-                    text: window.FoodPunk.i18n.inProgress,
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    allowEnterKey: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    },
-                });
-
-                $.ajax({
-                    type: 'POST',
-                    url: window.FoodPunk.route.clientWithdraw,
-                    dataType: 'json',
-                    data: {
-                        _token: $('meta[name=csrf-token]').attr('content'),
-                        userId: window.FoodPunk.pageInfo.clientId,
-                        amount: amount,
-                    },
-                    success: function (result) {
-                        location.reload();
-                    },
-                });
+            if (!result.value) {
+                return
             }
+
+            let amount = result.value;
+
+            Swal.fire({
+                title: window.FoodPunk.i18n.wait,
+                text: window.FoodPunk.i18n.inProgress,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                allowEnterKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+            });
+
+            $.ajax({
+                type: 'POST',
+                url: window.FoodPunk.route.clientWithdraw,
+                dataType: 'json',
+                data: {
+                    _token: $('meta[name=csrf-token]').attr('content'),
+                    userId: window.FoodPunk.pageInfo.clientId,
+                    amount: amount,
+                },
+                success: function (result) {
+                    location.reload();
+                },
+            });
         });
     }
 }

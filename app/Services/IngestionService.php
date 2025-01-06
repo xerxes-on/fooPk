@@ -52,4 +52,14 @@ final class IngestionService
 
         return $ingestions;
     }
+
+    /**
+     * Get filtered ingestions from cached data.
+     *
+     * @return Collection<array-key,Ingestion>
+     */
+    public function getFilteredIngestions(array $filterData): Collection
+    {
+        return $this->getAll()->filter(static fn(Ingestion $ingestion) => in_array($ingestion->key, $filterData, true));
+    }
 }

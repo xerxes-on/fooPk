@@ -224,18 +224,7 @@
                 @endif
 
                 <!-- Ingredients -->
-                <div class="recipe-detail_panel">
-                    <div class="recipe-detail_panel_title">@lang('common.ingredients')</div>
-
-                    <div class="alert alert-danger" role="alert" id="calculation_alert" style="display: none;">
-                        {{-- TODO: should error be explained in here? --}}
-                        @lang('common.calculation_fails')
-                    </div>
-
-                    @if( !empty($calculatedIngredients) )
-                        @include('recipes.feed.inc.ingredients')
-                    @endif
-                </div>
+                @include('ingredient::ingredients-section')
             </div>
 
             <div class="col-sm-7" style="display: inline-block;">
@@ -273,12 +262,26 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/i18n/{{auth()->user()->lang ?? 'de'}}.min.js"
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="{{ asset('js/ingredientSwitcher.js') }}"></script>
     <script>
-
         $('#portions').on('change', function () {
             const portions = parseInt($(this).val());
-
+            const converterActivated = $('#js-ingredient-switcher').prop('checked');
             $('.ingredient-amount-anchor').each(function () {
+                $(this).parent('.ingredient-text').attr('data-portion-modifier', portions);
+                if (converterActivated && $(this).parent('.ingredient-text').attr('data-is-convertable') === '1') {
+                    let map = JSON.parse($(this).attr('data-fraction-map'));
+                    let amount = (parseFloat($(this).attr('data-piece')) * portions).toFixed(1);
+                    let pieceFraction = amount - Math.floor(amount);
+                    pieceFraction = pieceFraction.toString().replace(',', '.');
+                    map = map[pieceFraction] || '';
+
+                    let text = amount - pieceFraction;
+                    text = text > 0 ? text + map : map;
+
+                    $(this).text(text);
+                    return;
+                }
                 $(this).text(parseFloat($(this).attr('data-amount')) * portions + ' ' + $(this).attr('data-unit'));
             });
         });
@@ -417,7 +420,6 @@
         $(document).on('select2:open', () => {
             document.querySelector('.select2-search__field').focus();
         });
-
         @endif
     </script>
 @append

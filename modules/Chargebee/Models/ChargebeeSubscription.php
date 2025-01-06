@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Chargebee\Models;
 
 use App\Models\User;
@@ -8,6 +10,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use Modules\Chargebee\Enums\ChargebeeSubscriptionType;
+
 
 /**
  * Modules\Chargebee\Models\ChargebeeSubscription
@@ -17,10 +21,13 @@ use Illuminate\Support\Carbon;
  * @property int|null $assigned_user_id
  * @property array $data
  * @property array|null $payment_method
- * @property string $uuid
+ * @property string|null $uuid
+ * @property string|null $status
+ * @property string|null $processed Flag to indicate that item processed and corrected after 20231229
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read User|null $assignedClient
+ * @property-read string|null $subscription_name
  * @property-read User $owner
  * @method static Builder|ChargebeeSubscription newModelQuery()
  * @method static Builder|ChargebeeSubscription newQuery()
@@ -30,6 +37,8 @@ use Illuminate\Support\Carbon;
  * @method static Builder|ChargebeeSubscription whereData($value)
  * @method static Builder|ChargebeeSubscription whereId($value)
  * @method static Builder|ChargebeeSubscription wherePaymentMethod($value)
+ * @method static Builder|ChargebeeSubscription whereProcessed($value)
+ * @method static Builder|ChargebeeSubscription whereStatus($value)
  * @method static Builder|ChargebeeSubscription whereUpdatedAt($value)
  * @method static Builder|ChargebeeSubscription whereUserId($value)
  * @method static Builder|ChargebeeSubscription whereUuid($value)
@@ -37,17 +46,6 @@ use Illuminate\Support\Carbon;
  */
 final class ChargebeeSubscription extends Model
 {
-
-    public const PROCESSED = true;
-    public const NOT_PROCESSED = false;
-
-    public const STATUS_FUTURE = 'future';
-    public const STATUS_IN_TRIAL = 'in_trial';
-    public const STATUS_ACTIVE = 'active';
-    public const STATUS_NON_RENEWING = 'non_renewing';
-    public const STATUS_PAUSED = 'paused';
-    public const STATUS_CANCELED = 'canceled';
-    public const STATUS_TRANSFERRED = 'transferred';
     /**
      * Key used to save next billing amount to the chargebee subscription data
      *
@@ -64,7 +62,7 @@ final class ChargebeeSubscription extends Model
     ];
 
     protected $casts = [
-        'data' => 'array',
+        'data'           => 'array',
         'payment_method' => 'array',
     ];
 
@@ -82,5 +80,27 @@ final class ChargebeeSubscription extends Model
     public function assignedClient(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_user_id');
+    }
+
+    public function getSubscriptionNameAttribute(): ?string
+    {
+        $data = data_get($this->data, 'plan_id');
+        if (is_string($data) && !empty($data)) {
+            return $data;
+        }
+
+        $data = data_get($this->data, 'subscription_items'); // should be a type of array or null
+        if (empty($data)) {
+            return null;
+        }
+
+        $data = is_array($data) ? $data : (array)$data;
+        $data = array_filter($data, static fn(array $item) => data_get($item, 'item_type') === ChargebeeSubscriptionType::PLAN->value);
+
+        if (empty($data[0]['item_price_id'])) {
+            return null;
+        }
+
+        return (string)$data[0]['item_price_id'];
     }
 }

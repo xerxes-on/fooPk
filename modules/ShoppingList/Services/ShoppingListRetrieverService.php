@@ -8,6 +8,7 @@ use App\Models\{User};
 use Illuminate\Support\Collection;
 use Modules\Ingredient\Models\IngredientCategory;
 use Modules\Ingredient\Models\IngredientUnit;
+use Modules\Ingredient\Services\IngredientConversionService;
 use Modules\ShoppingList\Models\ShoppingList;
 use Modules\ShoppingList\Models\ShoppingListIngredient;
 
@@ -112,13 +113,14 @@ final class ShoppingListRetrieverService
             $unit->loadMissing('translations');
 
             $ingredientCategories[$slug]['ingredients'][] = [
-                'id'            => $ingredient->id,
-                'ingredient_id' => $ingredient->ingredient_id,
-                'name'          => $ingredient->ingredient->name,
-                'amount'        => $amount,
-                'unit'          => $unit->short_name,
-                'completed'     => $ingredient->completed,
-                'hint'          => $this->getIngredientHintContent($ingredient, $locale)
+                'id'                             => $ingredient->id,
+                'ingredient_id'                  => $ingredient->ingredient_id,
+                'name'                           => $ingredient->ingredient->name,
+                'amount'                         => $amount,
+                'unit'                           => $unit->visibility ? $unit->short_name : '',
+                'completed'                      => $ingredient->completed,
+                'hint'                           => $this->getIngredientHintContent($ingredient, $locale),
+                IngredientConversionService::KEY => app(IngredientConversionService::class)->generateData($ingredient->ingredient, $amount)
             ];
         });
 

@@ -364,8 +364,8 @@ return [
         'update_confirmation' => 'Möchtest du deinen Fragebogen wirklich bearbeiten?',
         'withdraw_error'      => 'Foodpunkte können nicht abgezogen werden. Bitte versuche es später erneut.',
         'not_saved_error'     => 'Daten konnten nicht gespeichert werden. Bitte versuche es später erneut.',
-        'withdraw'=> 'Zurückziehen',
-        'withdraw_number' =>'Wie viele CS möchten Sie abheben?',
+        'withdraw'            => 'Withdraw',
+        'withdraw_number'     => 'How many FP do you want to withdraw?',
     ],
 
     // Button texts

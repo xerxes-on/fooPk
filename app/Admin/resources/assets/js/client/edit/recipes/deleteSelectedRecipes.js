@@ -1,5 +1,5 @@
-import {$tableRecipes, selectedRecipesStorage} from './recipesConst.js';
-import {renderCounterToolbarData} from './renderCounterToolbarData.js';
+import {$tableRecipes, selectedRecipesStorage} from './recipesConst';
+import {renderCounterToolbarData} from './renderCounterToolbarData';
 
 /**
  * Toggles the selection of recipes and updates the selected recipes in localStorage.
@@ -57,7 +57,6 @@ export function toggleSelect(element) {
     });
     localStorage.setItem(selectedRecipesStorage, JSON.stringify(alreadySelected));
 }
-
 
 /**
  * Deletes the selected recipes after user confirmation.
@@ -143,5 +142,3 @@ export function deleteSelectedRecipes() {
         });
     });
 }
-
-

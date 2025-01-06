@@ -19,7 +19,8 @@ use App\Http\Resources\{Complexity,
     Recipe\RecipeTagResource,
     Recipe\RecipeToBuyResource,
     Recipe\UsersRecipeResource,
-    Season};
+    Season
+};
 use App\Models\{Diet, Ingestion as IngestionModel, Recipe as RecipeModel, RecipeComplexity, RecipePrice, RecipeTag};
 use App\Repositories\{Recipes as RecipeRepo, SeasonsRepository};
 use App\Services\{RecipeService};
@@ -62,8 +63,9 @@ final class RecipesApiController extends APIBase
         $recipe->custom_categories = $this->recipesRepo->getRecipeCustomCategories($recipe, $user);
         return $this->sendResponse(
             [
-                'recipe'      => new UsersRecipeResource($recipe),
-                'ingredients' => Calculation::parseRecipeData($recipe, $user->lang),
+                'user_available_ingestions' => IngestionResource::collection($user->allowed_ingestions),
+                'recipe'                    => new UsersRecipeResource($recipe),
+                'ingredients'               => Calculation::parseRecipeData($recipe, $user->lang),
             ],
             trans('common.success')
         );
@@ -156,8 +158,8 @@ final class RecipesApiController extends APIBase
      * TODO: The method is highly unoptimized. Refactor recommended
      * TODO: takes too much time to perform
      * TODO: >320 duplicated requests and > 12mb memory
-     * TODO: The method has a Cyclomatic Complexity of 21. Simplify the code
-     * TODO: The method has an NPath complexity of 6336. Simplify the code!
+     * TODO: The method has a Cyclomatic Complexity of 22. Simplify the code
+     * TODO: The method has an NPath complexity of 16896. Simplify the code!
      *
      * @route POST /api/v1/replace-ingredient
      */

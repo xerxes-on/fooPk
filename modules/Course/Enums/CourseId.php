@@ -26,6 +26,8 @@ enum CourseId: int
     case TBR2024_EN       = 28;
     case SPORT            = 29;
     case SEELENHUNGER     = 33;
+    case DE_30_DAYS       = 2;
+    case EN_30_DAYS       = 25;
 
     public static function getFirstTimeChallengeId(?string $lang = null): int
     {

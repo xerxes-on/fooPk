@@ -58,7 +58,7 @@ final class FlexMealPreviewController extends Controller
     {
         /**
          * @note table recipes_to_users is huge. Search over it is very slow.
-         * In case we need to filter it more buy date or else, adds some time seconds to duration.
+         * In case we need to filter it more by date or else, adds some time seconds to duration.
          * This is why after obtaining collection we filter it by date and ingestion using php
          */
         $recipe = $request
@@ -70,7 +70,7 @@ final class FlexMealPreviewController extends Controller
                 '=',
                 'recipes_to_users.flexmeal_id'
             )
-            ->with('ingredients.ingredient.hint')
+            ->with(['ingredients.ingredient.hint', 'ingredients.ingredient.alternativeUnit'])
             ->select(
                 'flexmeal_lists.*',
                 'recipes_to_users.meal_date AS meal_date',

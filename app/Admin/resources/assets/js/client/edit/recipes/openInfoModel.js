@@ -32,19 +32,20 @@ export function openInfoModal(element, recipeId) {
                 });
                 return;
             }
+
             const modal = $('#recipeDetailsModal');
             modal.modal('show');
             modal.find('.modal-title').html(data.title);
             modal.find('.modal-body').html(data.data);
         },
         error: function (jqXHR) {
+            console.error(jqXHR);
             $(element).find('span.fa.fa-spinner.fa-spin').remove();
             Swal.fire({
                 icon: 'error',
                 title: 'Oops...',
                 html: jqXHR.responseJSON.message,
             });
-            console.error(jqXHR);
         },
     });
 }

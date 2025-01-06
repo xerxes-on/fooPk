@@ -102,7 +102,7 @@
         </div>
 
         <div class="col-sm-4 my-3">
-            <label for="ingredients" class="text-white">@lang('common.ingredients')</label>
+            <label for="ingredients" class="text-white">@lang('ingredient::common.ingredients')</label>
             <input name='ingredients'
                    id="ingredients"
                    class='form-control changeable-element-recipe'

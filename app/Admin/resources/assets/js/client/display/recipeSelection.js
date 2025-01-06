@@ -200,20 +200,22 @@ export function submitAdding() {
                     html: data.message,
                 });
             }
+
             if (window.FoodPunk.pageInfo.hideRecipesRandomizer && window.$SubmitAddRecipes) {
                 window.$SubmitAddRecipes.stop();
             }
+
             localStorage.removeItem(selectedPopupRecipesStorage);
             localStorage.removeItem(usersStorage);
         },
         error: function (jqXHR) {
+            console.error(jqXHR);
             Swal.hideLoading();
             Swal.fire({
                 icon: 'error',
                 title: 'Oops...',
                 html: jqXHR.responseJSON?.message || 'Request Failed',
             });
-            console.error(jqXHR);
             if (window.FoodPunk.pageInfo.hideRecipesRandomizer && window.$SubmitAddRecipes) {
                 window.$SubmitAddRecipes.stop();
             }

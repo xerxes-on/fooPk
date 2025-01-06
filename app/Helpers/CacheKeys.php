@@ -48,6 +48,11 @@ final class CacheKeys
         return "all_active_ingestions";
     }
 
+    public static function userAllowedIngestions(int $userId): string
+    {
+        return "user-$userId-allowed-ingestions";
+    }
+
     /*-----------------------CHARGEBEE------------------------------*/
 
     /**

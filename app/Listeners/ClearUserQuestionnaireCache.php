@@ -23,6 +23,7 @@ final class ClearUserQuestionnaireCache extends EventBase
         Cache::forget(CacheKeys::userQuestionnaireExists($this->userId));
         Cache::forget(CacheKeys::userCanEditQuestionnaire($this->userId));
         Cache::forget(CacheKeys::userExcludedRecipesIds($this->userId));
+        Cache::forget(CacheKeys::userAllowedIngestions($this->userId));
         QuestionnaireUserSession::flushData($this->userId);
     }
 }

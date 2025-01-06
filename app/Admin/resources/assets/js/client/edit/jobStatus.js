@@ -1,4 +1,9 @@
 export function initCalculationStatusCheck() {
+
+    if ($('#js-check-refresh').length === 0) {
+        return;
+    }
+
     let time = 30;
     setInterval(() => {
         $('#js-check-refresh').html(--time);
@@ -17,9 +22,7 @@ export function initCalculationStatusCheck() {
             url: window.FoodPunk.route.checkCalculationStatus,
             dataType: 'json',
             beforeSend: function () {
-                $('#calculation-status').html(
-                    '<span class="fa fa-spinner fa-spin" aria-hidden="true"></span>'
-                );
+                $('#calculation-status').html('<span class="fa fa-spinner fa-spin" aria-hidden="true"></span>');
             },
             success: function (data) {
                 if (data.success) {
