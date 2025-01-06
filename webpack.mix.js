@@ -164,6 +164,8 @@ mix.js(`${paths.modules.admin.js}/admin.js`,
     .js(`${paths.modules.ingredient.js}/admin/sections/ingredient-categories.js`, `${paths.dest.js}/admin/ingredients`)
     .js(`${paths.modules.admin.js}/recipes/recipes.js`, `${paths.dest.js}/admin/recipes`)
     .js(`${paths.modules.admin.js}/recipes/recipe-tags.js`, `${paths.dest.js}/admin/recipes`)
+	.js(`${paths.modules.admin.js}/client/edit/index.js`, `${paths.dest.js}/admin/client/edit`)
+	.js(`${paths.modules.admin.js}/client/display/index.js`, `${paths.dest.js}/admin/client/display`)
     .sass(`${paths.modules.admin.sass}/switch.scss`,
 				`${paths.dest.css}/admin`).sass(`${paths.modules.admin.sass}/progressBar.scss`,
     `${paths.dest.css}/admin`).sass(`${paths.modules.ingredient.sass}/ingredientCategories.scss`,

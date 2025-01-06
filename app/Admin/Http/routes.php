@@ -23,7 +23,7 @@ Route::get('', static fn() => AdminSection::view('Define your dashboard here.', 
 
 Route::namespace('\App\Admin\Http\Controllers')->group(
     function () {
-        Route::get('datatable/async/{adminDisplayName?}', [DataTableAdminController::class, 'async']);
+        Route::get('datatable/async/{adminDisplayName?}', [DataTableAdminController::class, 'async'])->name('admin.datatable.async');
 
         Route::post('artisan/optimize/clear', [ArtisanCommandsAdminController::class, 'actionOptimizeClear'])
             ->name('admin.artisan.optimize.clear');

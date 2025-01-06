@@ -13,11 +13,11 @@
     </div>
     @can(\App\Enums\Admin\Permission\PermissionEnum::MANAGE_CLIENT_BALANCE->value, '\App\Models\Admin')
         <div class="col-md-12">
-            <button type="button" id="add-deposit" class="btn btn-info" onclick="deposit()">
+            <button type="button" id="add-deposit" class="btn btn-info" onclick="window.FoodPunk.functions.deposit()">
                 <span class="ladda-label">@lang('common.deposit')</span>
             </button>
 
-            <button type="button" id="withdraw-balance" class="btn btn-info" onclick="withdraw()">
+            <button type="button" id="withdraw-balance" class="btn btn-info" onclick="window.FoodPunk.functions.withdraw()">
                 <span class="ladda-label">@lang('common.withdraw')</span>
             </button>
         </div>
@@ -56,86 +56,3 @@
 @else
     <div>@lang('common.transaction_empty')</div>
 @endif
-
-@push('footer-scripts')
-    {{-- TODO: better move to scripts --}}
-    <script>
-        function deposit() {
-            Swal.fire({
-                title: 'Deposit',
-                text: 'How many CS do you want to add?',
-                input: 'number',
-                icon: 'question',
-            }).then(function (result) {
-                if (result.value) {
-
-                    let amount = result.value;
-
-                    Swal.fire({
-                        title: 'Please Wait..!',
-                        text: 'Is working..',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        allowEnterKey: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        },
-                    });
-
-                    $.ajax({
-                        type: 'POST',
-                        url: "{{ route('admin.client.deposit') }}",
-                        dataType: 'json',
-                        data: {
-                            _token: $('meta[name=csrf-token]').attr('content'),
-                            userId: '{{ $client->id }}',
-                            amount: amount,
-                        },
-                        success: function (result) {
-                            location.reload();
-                        },
-                    });
-                }
-            });
-        }
-
-        function withdraw() {
-            Swal.fire({
-                title: 'Withdraw',
-                text: 'How many CS do you want to withdraw?',
-                input: 'number',
-                icon: 'question',
-            }).then(function (result) {
-                if (result.value) {
-
-                    let amount = result.value;
-
-                    Swal.fire({
-                        title: 'Please Wait..!',
-                        text: 'Is working..',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        allowEnterKey: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        },
-                    });
-
-                    $.ajax({
-                        type: 'POST',
-                        url: "{{ route('admin.client.withdraw') }}",
-                        dataType: 'json',
-                        data: {
-                            _token: $('meta[name=csrf-token]').attr('content'),
-                            userId: '{{ $client->id }}',
-                            amount: amount,
-                        },
-                        success: function (result) {
-                            location.reload();
-                        },
-                    });
-                }
-            });
-        }
-    </script>
-@endpush
