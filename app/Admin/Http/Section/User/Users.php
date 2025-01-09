@@ -55,6 +55,7 @@ final class Users extends Section implements Initializable
     protected $icon = 'fas fa-user';
 
     private bool $isConsultant = false;
+    protected $model_value;
 
     public function getTitle(): string
     {
@@ -106,10 +107,12 @@ final class Users extends Section implements Initializable
     {
         $item->load(
             [
+//                TODO: here query is duplicated, but it's not clear why
                 'assignedChargebeeSubscriptions' => fn($query) => $query->with(['assignedClient', 'owner']),
                 'chargebeeSubscriptions'         => fn($query) => $query->with(['assignedClient', 'owner']),
                 'clientNotes'                    => fn($query) => $query->with(['author'])->orderBy('created_at', 'desc'),
                 'activeSubscriptions',
+                'marketingQuestionnaire'
             ]
         );
         $this->model_value  = $item;
@@ -299,7 +302,7 @@ final class Users extends Section implements Initializable
             );
 
             // Build marketing questions
-            $marketingData = $this->model_value->marketingQuestionnaire()->get();
+            $marketingData = $this->model_value->marketingQuestionnaire;
             $marketingData = $marketingData
                 ->filter(fn(Questionnaire $marketingData) => $marketingData->answers->isNotEmpty())
                 ->first();
@@ -316,7 +319,7 @@ final class Users extends Section implements Initializable
                 })
                 ?->toArray();
             $questionnaireCount  = $this->model_value->questionnaire()->count();
-            $clientQuestionnaire = $this->model_value->questionnaire()->get();
+            $clientQuestionnaire = $this->model_value->questionnaire()->with('creator')->get();
         }
 
         $tabFormular = AdminFormElement::view(

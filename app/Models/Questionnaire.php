@@ -110,10 +110,10 @@ final class Questionnaire extends Model
     /**
      * Interact with the user's first name.
      */
-    public function getCreatorAttribute(): ?Admin
-    {
-        // todo: infinite loop detected when using $this->getAttribute('creator'). fix later
-        return $this->creator_id ? Admin::find($this->creator_id) : null;
-        // $this->getAttribute('creator') ?? null ;#? $this->getAttribute('creator') : null;
-    }
+//    public function getCreatorAttribute(): ?Admin
+//    {
+//        // todo: infinite loop detected when using $this->getAttribute('creator'). fix later
+//        return $this->creator_id ? Admin::find($this->creator_id) : null;
+//        // $this->getAttribute('creator') ?? null ;#? $this->getAttribute('creator') : null;
+//    }
 }

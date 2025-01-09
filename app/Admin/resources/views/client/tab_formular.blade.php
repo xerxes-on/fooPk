@@ -80,13 +80,13 @@
 
         <tbody>
         @php $index = 1; @endphp
-        @foreach($client->formulars()->get() as $formular)
+        @foreach($client->formulars()->with('creator')->get() as $formular)
             <tr @if($formular->id == $client->formular->id) style="background-color: aliceblue;" @endif>
                 <td>{{ $index++ }}</td>
                 <td>{{ 'Formular (#'. $formular->id .')' }}</td>
                 <td>{{ parseDateString($formular->created_at,'d.m.Y') }}</td>
                 <td>
-                    @php $creator = $formular->getCreator(); @endphp
+                    @php $creator = $formular->creator; @endphp
                     <span>{{ $creator === null ? trans('common.user') : $creator->name .' ('. $creator->email .')' }}</span>
                 </td>
                 <td>
