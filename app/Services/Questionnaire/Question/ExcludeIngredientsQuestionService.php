@@ -75,43 +75,29 @@ final class ExcludeIngredientsQuestionService extends BaseValidationRequireQuest
 
     public function getAnswer(): string|array|null
     {
-        // Pull the base answer from questionAnswer:
+        // gather user excluded ingredients from all sources
         $baseAnswer = $this->questionAnswer[$this->questionModel->slug] ?? $this->questionAnswer;
+        $userExcludedIngredients = $this->user?->excludedIngredients()->pluck('ingredients.id')->toArray();
 
-        $userExcludedIngredients = $this->user
-            ? $this->user->excludedIngredients->pluck('id')->toArray()
-            : [];
-
-        // Ensure both are arrays, remove duplicates, and sort numerically
+        // ensure and transform all to array and remove duplicates
         $baseAnswer = $baseAnswer ?? [];
-        $baseAnswer = array_unique(
-            array_merge((array) $baseAnswer, $userExcludedIngredients),
-            SORT_NUMERIC
-        );
+        $userExcludedIngredients = $userExcludedIngredients ?? [];
+        $baseAnswer = array_unique(array_merge((array) $baseAnswer, (array) $userExcludedIngredients), SORT_NUMERIC);
         sort($baseAnswer, SORT_NUMERIC);
 
         if (empty($baseAnswer)) {
             return null;
         }
 
-        // Load ingredient data (with translations) for the final "display" answer.
-        $data = Ingredient::withOnly('translations')
-            ->whereIn('id', $baseAnswer)
-            ->get();
-
-        // Build array of { key => ingredient id, value => localized name }:
+        $data = Ingredient::withOnly('translations')->whereIn('id', $baseAnswer)->get();
         $formattedAnswer = [];
         foreach ($data as $item) {
             $formattedAnswer[] = [
                 'key'   => $item->id,
-                'value' => $item->translations
-                        ->where('locale', $this->locale)
-                        ->first()
-                        ?->name ?? $item->name
+                'value' => $item->translations->where('locale', $this->locale)->first()?->name ?? $item->name
             ];
         }
 
         return $formattedAnswer;
     }
-
 }

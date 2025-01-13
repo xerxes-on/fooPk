@@ -7,7 +7,6 @@ namespace App\Services;
 use App\Helpers\CacheKeys;
 use App\Models\Diet;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Cache;
 
 /**
  * Service providing data for Diets.
@@ -23,13 +22,15 @@ final class DietService
      */
     public function getAll(): Collection
     {
-        // Use Cache::remember to avoid duplication:
-        return Cache::remember(
-            CacheKeys::diets(),
-            config('cache.lifetime_10m'),
-            function () {
-                return Diet::with('translations')->get();
-            }
-        );
+        $diets = \Cache::get(CacheKeys::diets());
+
+        if (!empty($diets)) {
+            return $diets;
+        }
+        $diets = Diet::get();
+
+        \Cache::put(CacheKeys::diets(), $diets, config('cache.lifetime_10m'));
+
+        return $diets;
     }
 }
