@@ -106,8 +106,8 @@ final class Users extends Section implements Initializable
     {
         $item->load(
             [
-//                'assignedChargebeeSubscriptions' => fn($query) => $query->with(['assignedClient', 'owner']),
-//                'chargebeeSubscriptions'         => fn($query) => $query->with(['assignedClient', 'owner']),
+                'assignedChargebeeSubscriptions' => fn($query) => $query->with(['assignedClient', 'owner']),
+                'chargebeeSubscriptions' => fn($query) => $query->with(['assignedClient', 'owner']),
                 'formulars' => fn($query) => $query->with(['creator', 'answers.question']),
                 'activeSubscriptions',
                 'marketingQuestionnaire',
