@@ -80,7 +80,7 @@
 
         <tbody>
         @php $index = 1; @endphp
-        @foreach($client->formulars()->with('creator')->get() as $formular)
+        @foreach($client->formulars as $formular)
             <tr @if($formular->id == $client->formular->id) style="background-color: aliceblue;" @endif>
                 <td>{{ $index++ }}</td>
                 <td>{{ 'Formular (#'. $formular->id .')' }}</td>

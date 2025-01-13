@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -36,6 +37,12 @@ final class ClientNote extends Model
      */
     protected $fillable = ['author_id', 'client_id', 'text'];
 
+    protected static function booted(): void
+    {
+        ClientNote::addGlobalScope('orderByCreatedAtDesc', function (Builder $builder) {
+            $builder->orderByDesc('created_at');
+        });
+    }
     /**
      * Relation for author
      */

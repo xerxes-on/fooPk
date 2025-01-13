@@ -55,7 +55,6 @@ final class Users extends Section implements Initializable
     protected $icon = 'fas fa-user';
 
     private bool $isConsultant = false;
-    protected $model_value;
 
     public function getTitle(): string
     {
@@ -107,12 +106,11 @@ final class Users extends Section implements Initializable
     {
         $item->load(
             [
-//                TODO: here query is duplicated, but it's not clear why
-                'assignedChargebeeSubscriptions' => fn($query) => $query->with(['assignedClient', 'owner']),
-                'chargebeeSubscriptions'         => fn($query) => $query->with(['assignedClient', 'owner']),
-                'clientNotes'                    => fn($query) => $query->with(['author'])->orderBy('created_at', 'desc'),
+//                'assignedChargebeeSubscriptions' => fn($query) => $query->with(['assignedClient', 'owner']),
+//                'chargebeeSubscriptions'         => fn($query) => $query->with(['assignedClient', 'owner']),
+                'formulars' => fn($query) => $query->with(['creator', 'answers.question']),
                 'activeSubscriptions',
-                'marketingQuestionnaire'
+                'marketingQuestionnaire',
             ]
         );
         $this->model_value  = $item;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Traits\Questionnaire\Model;
 
 use App\Enums\Questionnaire\Options\MealPerDayQuestionOptionsEnum;
@@ -283,18 +285,19 @@ trait HasQuestionnaire
      */
     public function getLatestQuestionnaireFullAnswersAttribute(): ?array
     {
-        return $this
-            ->latestQuestionnaire()
-            ->with('answers.question')
-            ->first()
-            ?->answers
-            ->mapWithKeys(
-                function (QuestionnaireAnswer $item) {
-                    // TODO: probably need to pass source type in initialisation
-                    $service = new $item->question->service($item, $this->lang, user: $this);
-                    return [$item->question->slug => $service->getAnswer()];
-                }
-            )
+        $latest = $this->relationLoaded('latestQuestionnaireRelation')
+            ? $this->getRelation('latestQuestionnaireRelation')
+            : $this->latestQuestionnaireRelation()->first();
+
+        if (!$latest) {
+            return null;
+        }
+
+        return $latest->answers
+            ->mapWithKeys(function (QuestionnaireAnswer $item) {
+                $service = new $item->question->service($item, $this->lang, user: $this);
+                return [$item->question->slug => $service->getAnswer()];
+            })
             ->toArray();
     }
 
