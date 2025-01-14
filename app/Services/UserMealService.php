@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Http\Resources\Meal\PlannedDailyMealPreviewResource;
@@ -17,12 +19,10 @@ final class UserMealService
         $meals = $user
             ->meals()
             ->with(['recipe' => ['complexity'], 'ingestion'])
-//			->where('challenge_id', $user->subscription->id)
-            ->whereDate('meal_date', '>=', $date->startOfWeek())
-            ->whereDate('meal_date', '<=', $date->endOfWeek())
+            ->whereBetween('meal_date', [$date->copy()->startOfWeek(), $date->copy()->endOfWeek()])
             ->get();
-        $previousWeek = $date->copy()->subWeek()->startOfWeek();
-        $nextWeek     = $date->copy()->addWeek()->startOfWeek();
+        $previousWeek = $date->copy()->subWeek()->endOfWeek();
+        $nextWeek     = $date->copy()->addWeek()->endOfWeek();
         return [
             'meals'    => PlannedWeeklyMealPreviewResource::collection($meals),
             'previous' => [
@@ -44,7 +44,6 @@ final class UserMealService
         $meals = $user
             ->meals()
             ->with(['recipe' => ['complexity'], 'ingestion'])
-//			->where('challenge_id', $user->subscription->id)
             ->whereDate('meal_date', $date)
             ->get();
 

@@ -1901,6 +1901,7 @@ class Calculation
             $allowAnyLangRecipes = false;
         }
 
+
         # get exist recipe and calculations
         $existRecipeIds = $_user->allRecipes()
 //                                ->leftJoin('user_recipe_calculated', 'recipes.id', '=', 'user_recipe_calculated.recipe_id')
@@ -3500,7 +3501,7 @@ class Calculation
                 ->pluck('recipe_id')
                 ->toArray();*/
 
-            $recipeIds = $_user->allRecipes()
+            $recipeIds = $_user->allRecipes()->isActive()
                 ->leftJoin('user_recipe_calculated', 'recipes.id', '=', 'user_recipe_calculated.recipe_id')
                 ->leftJoin('ingestions', 'user_recipe_calculated.ingestion_id', '=', 'ingestions.id')
                 ->select(

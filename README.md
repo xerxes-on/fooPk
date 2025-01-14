@@ -124,3 +124,4 @@ numprocs=1
 redirect_stderr=true
 stdout_logfile=/srv/foodpunk_laravel_v2/storage/logs/artisan/worker-default.log
 ```
+

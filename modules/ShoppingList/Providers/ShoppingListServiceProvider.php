@@ -17,6 +17,7 @@ final class ShoppingListServiceProvider extends ServiceProvider
     {
         $this->app->register(RouteServiceProvider::class);
         $this->loadTranslationsFrom(__DIR__ . '/../lang', 'shopping-list');
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
         $this->mergeConfigFrom(__DIR__ . '/../config/shopping-list.php', 'shopping-list');
         \View::addNamespace('shopping-list', __DIR__ . '/../resources/views');
         Blade::component('shopping-list-recipe', ShoppingListRecipeComponent::class);

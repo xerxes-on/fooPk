@@ -188,6 +188,7 @@ return [
         'delete_all_recipes_user'      => 'Are you sure to delete all recipes for this user?',
         'randomize_recipes_settings'   => 'Randomize recipes settings',
         'no_item_selected'             => 'No item selected',
+        'deleted'                      => 'Deleted',
         'no_item'                      => 'No item',
         'are_you_sure'                 => 'Are you sure to delete selected recipes for this user? ',
         'fp_count_message'             => 'How many FP do you want to add?',

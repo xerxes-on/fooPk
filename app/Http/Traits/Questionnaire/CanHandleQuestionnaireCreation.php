@@ -37,10 +37,38 @@ trait CanHandleQuestionnaireCreation
         Cache::forget(CacheKeys::userQuestionnaireExists($user->id));
         $user->refresh();
 
-        app(UserService::class)->addUserWelcomeBonus($user);
+        if ($user->balance==0){
+            app(UserService::class)->addUserWelcomeBonus($user);
+        }
 
         $user->calc_auto = true;
         $user->save();
+
+
+        // TODO:: refactor to user's service method
+        if($chargebeeSubscription = app(ChargebeeService::class)->userHasActiveChargebeeSubscription($user)){
+
+            $userCreationPlans      = config('chargebee.create_user_plan');
+            $chargebeePlanId = ChargebeeService::getChargebeePlanIdFromSubscriptionData($chargebeeSubscription->data);
+
+            //$chargebeeSubscription
+            $trimmedChargebeePlanId = app(ChargebeeService::class)::prepareChargebeePlanId($chargebeePlanId);
+
+            if (
+                !empty($chargebeePlanId)
+                &&
+                (
+                    in_array($trimmedChargebeePlanId, $userCreationPlans)
+                    ||
+                    app(ChargebeeService::class)::issetChallengeIdByChargebeePlanId($trimmedChargebeePlanId, $user->lang) !== false
+                )
+            ) {
+                $user->maybeCreateSubscription();
+            }
+        }
+
+        // check subscription....
+
 
         // Early exit if user has no subscription
         // TODO:: review @NickMost, if it's related to challenges PRIO - 1 ???

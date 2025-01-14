@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Enums\Recipe\RecipeStatusEnum;
 use App\Events\AdminActionsTaken;
 use App\Models\{Ingestion, User, UserRecipe};
 use Carbon\Carbon;
@@ -90,6 +91,7 @@ final class RecipeDistribution extends Command
 
                 $recipeIds = $_user
                     ->allRecipes()
+                    ->isActive()
                     ->leftJoin('user_recipe_calculated', 'recipes.id', '=', 'user_recipe_calculated.recipe_id')
                     ->leftJoin('ingestions', 'user_recipe_calculated.ingestion_id', '=', 'ingestions.id')
                     ->select(
@@ -104,6 +106,7 @@ final class RecipeDistribution extends Command
                     ->where('user_recipe_calculated.ingestion_id', $ingestion->id)
                     ->where('user_recipe_calculated.invalid', '=', 0)
                     ->whereNotIn('recipes.id', $excluded_recipes_ids_by_user_exclusion)
+                    ->where('recipes.status', RecipeStatusEnum::ACTIVE->value)
                     ->groupBy('recipes.id')
                     ->pluck('recipes.id')
                     ->toArray();

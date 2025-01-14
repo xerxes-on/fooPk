@@ -8,6 +8,8 @@ use App\Enums\MealtimeEnum;
 use App\Enums\Recipe\RecipeTypeEnum;
 use App\Exceptions\PublicException;
 use App\Models\{CustomRecipe, Recipe, User};
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Collection;
 use Modules\FlexMeal\Models\FlexmealLists;
@@ -15,12 +17,13 @@ use Modules\Ingredient\Enums\IngredientCategoryEnum;
 use Modules\Ingredient\Enums\IngredientTypeEnum;
 use Modules\Ingredient\Models\Ingredient;
 use Modules\ShoppingList\Events\ShoppingListProcessed;
+use Modules\ShoppingList\Models\ShoppingListIngredient;
 use Modules\ShoppingList\Traits\CanCombineIngredientsInShoppingList;
 
 /**
  * Service that can generate users shopping list by provided time period.
  *
- * @package App\Services\PurchaseList
+ * @package Modules\ShoppingList\Services
  */
 final class ShoppingListGeneratorService
 {
@@ -39,6 +42,14 @@ final class ShoppingListGeneratorService
      */
     public function generate(User $user, string $dateStart, string $dateEnd): void
     {
+        $customIngredients = $user->shoppingList()
+            ->with(
+                'ingredients',
+                fn(HasMany $e) => $e->whereNotNull('custom_title')
+            )
+            ->first()
+            ?->ingredients;
+
         $user->shoppingList()->delete();
         $this->ingredients = collect();
 
@@ -49,8 +60,11 @@ final class ShoppingListGeneratorService
 
         $list = $user->shoppingList()->create();
 
-        // Save recipes & ingredients
+        // Prepare ingredients
         $this->prepareIngredientsForStoring($list->id);
+        $this->addCustomIngredients($list->id, $customIngredients);
+
+        // Save recipes & ingredients
         $list->recipes()->attach($this->recipes->toArray());
         $list->ingredients()->createManyQuietly($this->ingredients->toArray());
 
@@ -221,5 +235,27 @@ final class ShoppingListGeneratorService
                 }
             )
             ->filter(fn(array $item) => !empty($item));
+    }
+
+    private function addCustomIngredients(int $listId, ?EloquentCollection $ingredients): void
+    {
+        if ($ingredients === null || $ingredients->isEmpty()) {
+            return;
+        }
+
+        $ingredients->each(
+            function (ShoppingListIngredient $ingredient) use ($listId) {
+                $this->ingredients->push(
+                    [
+                        'list_id'       => $listId,
+                        'ingredient_id' => null,
+                        'category_id'   => null,
+                        'custom_title'  => $ingredient->custom_title,
+                        'amount'        => $ingredient->amount,
+                        'completed'     => $ingredient->completed,
+                    ]
+                );
+            }
+        );
     }
 }

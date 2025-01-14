@@ -1,4 +1,4 @@
-import {$tableRecipes, selectedRecipesStorage} from './recipesConst';
+import {selectedRecipesStorage} from './recipesConst';
 import {renderCounterToolbarData} from './renderCounterToolbarData';
 
 /**
@@ -117,7 +117,7 @@ export function deleteSelectedRecipes() {
                 recipes: data.selected,
             },
             success: function (result) {
-                $tableRecipes.ajax.reload();
+                window.FoodPunk.$tableRecipes.ajax.reload();
                 renderCounterToolbarData();
                 Swal.hideLoading();
                 Swal.fire({

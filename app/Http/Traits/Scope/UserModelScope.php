@@ -185,21 +185,21 @@ trait UserModelScope
             }
         }
 
-        # find by abo_challenge
-        if (array_key_exists('abo_challenge', $conditions)) {
-            $whereValue = $conditions['abo_challenge'];
+        # find by courses
+        if (array_key_exists('courses', $conditions)) {
+            $whereValue = $conditions['courses'];
             $query->when(
                 $whereValue,
                 function ($subQuery, $whereValue) {
                     $subQuery->whereHas(
-                        'aboChallenges',
+                        'courses',
                         function ($q) use ($whereValue) {
                             $q->where('course_id', $whereValue);
                         }
                     );
                 },
                 function ($subQuery) {
-                    $subQuery->doesntHave('aboChallenges');
+                    $subQuery->doesntHave('courses');
                 }
             );
         }

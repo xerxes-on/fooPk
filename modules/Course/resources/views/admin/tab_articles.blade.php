@@ -25,7 +25,7 @@
 
 <h3 class="text-center">@lang('admin.articles.table_title')</h3>
 
-<table id="table-abo_challenge" class="table table-striped table-bordered w-100">
+<table id="table-courses" class="table table-striped table-bordered w-100">
     <thead>
     <tr>
         <th>@lang('course::common.days')</th>
@@ -40,7 +40,7 @@
     <script>
         jQuery(document).ready(function ($) {
 
-            $('#table-abo_challenge').DataTable({
+            $('#table-courses').DataTable({
                 lengthChange: false,
                 processing: true,
                 serverSide: true,

@@ -238,6 +238,7 @@ return [
     'max_price' => 'Max price',
 
     // Ingredients
+    'ingredients'        => 'Ingredients',
     'attributes'         => 'Attributes',
     'category'           => 'Category',
     'unit'               => 'Unit',

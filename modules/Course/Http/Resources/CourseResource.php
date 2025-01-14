@@ -33,6 +33,7 @@ final class CourseResource extends JsonResource
         if (isset($this->resource->pivot)) {
             $return['start_at'] = $this->resource->pivot->start_at;
             $return['ends_at']  = $this->resource->pivot->ends_at;
+
         }
         // Ensure minimum start date is at least today
         $return['minimum_start_at'] = $return['minimum_start_at']->startOfDay();

@@ -159,6 +159,7 @@ mix.js(`${paths.modules.admin.js}/admin.js`,
     .js(`${paths.modules.ingredient.js}/admin/ingredientCategorySelect.js`, `${paths.dest.js}/admin`)
     .js(`${paths.modules.ingredient.js}/admin/ingredients.js`, `${paths.dest.js}/admin`)
     .js(`${paths.modules.admin.js}/common.js`, `${paths.dest.js}/admin`)
+	.js(`${paths.modules.ingredient.js}/ingredientSwitcher.js`, `${paths.dest.js}`)
     .js(`${paths.modules.ingredient.js}/admin/sections/ingredients.js`, `${paths.dest.js}/admin/ingredients`)
     .js(`${paths.modules.ingredient.js}/admin/sections/ingredient-tags.js`, `${paths.dest.js}/admin/ingredients`)
     .js(`${paths.modules.ingredient.js}/admin/sections/ingredient-categories.js`, `${paths.dest.js}/admin/ingredients`)

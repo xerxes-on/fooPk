@@ -1,4 +1,3 @@
-import {$tableRecipes} from './recipesConst';
 import {renderCounterToolbarData} from './renderCounterToolbarData';
 
 /**
@@ -54,7 +53,7 @@ export function deleteRecipe(elem) {
             },
             dataType: 'json',
             success: function (result) {
-                $tableRecipes.ajax.reload();
+                window.FoodPunk.$tableRecipes.ajax.reload();
                 renderCounterToolbarData();
                 Swal.hideLoading();
 
@@ -134,7 +133,7 @@ export function deleteAllRecipes() {
             },
             dataType: 'json',
             success: function (result) {
-                $tableRecipes.ajax.reload();
+                window.FoodPunk.$tableRecipes.ajax.reload();
                 $('#counterToolbar').html('');
                 Swal.hideLoading();
                 Swal.fire({

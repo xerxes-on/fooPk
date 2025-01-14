@@ -238,6 +238,7 @@ return [
     'category_already_attached' => 'Die Kategorie ":name" wurde diesem Rezept bereits zugeordnet.',
 
     // Ingredients
+    'ingredients'        => 'Zutaten',
     'attributes'         => 'Attribute',
     'category'           => 'Kategorie',
     'unit'               => 'Einheit',

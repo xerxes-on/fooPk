@@ -203,9 +203,16 @@ class ChargebeeService
     {
         // check if last 4 item is '-', try to remove it
         $strlen = strlen($planId);
+        $planId = strtolower($planId);
+
+
+        $existsPlanIds = self::getChargebeePossiblePlanIdsFromChallengesConfig();
+        if (in_array($planId, $existsPlanIds)) {
+            return $planId;
+        }
 
         if ($strlen > 4 && $planId[$strlen - 4] == '-') {
-            $currency = strtolower(substr($planId, $strlen - 3, 3));
+            $currency = substr($planId, $strlen - 3, 3);
             if (in_array($currency, CurrenciesEnum::values())) {
                 $planId = substr($planId, 0, $strlen - 4);
             }
@@ -227,6 +234,31 @@ class ChargebeeService
             }
         }
         return $result;
+    }
+
+    public static function getChargebeePossiblePlanIdsFromChallengesConfig()
+    {
+        $config = self::getChargebeeChallengesConfig();
+
+        $planIds = [];
+
+        if (isset($config['langs']) && is_array($config['langs'])){
+            foreach($config['langs'] as $lang=>$data){
+                $planIds = array_merge($planIds,array_keys($data));
+            }
+
+            $langs = array_keys($config['langs']);
+            foreach($langs as $lang){
+                if (isset($config['langs'][$lang])) unset($config['langs'][$lang]);
+            }
+            if (isset($config['langs'])) unset($config['langs']);
+        }
+
+        $planIds = array_merge($planIds,array_keys($config));
+        sort($planIds);
+        $planIds = array_values(array_unique($planIds));
+
+        return $planIds;
     }
 
     /**
@@ -259,6 +291,7 @@ class ChargebeeService
     {
         if (is_string($planId)) {
             $trimmedPlanId = strtolower(trim($planId));
+            $trimmedPlanId = html_entity_decode($trimmedPlanId);
             return self::removeCurrencyFromChargebeePlanId($trimmedPlanId);
         }
 
@@ -1595,6 +1628,7 @@ class ChargebeeService
             $chargebeePlanId = ChargebeeService::getChargebeePlanIdFromSubscriptionData($chargebeeSubscription->data);
 
 
+            // TODO:: refactor to user's service method
             //$chargebeeSubscription
             $trimmedChargebeePlanId = self::prepareChargebeePlanId($chargebeePlanId);
 

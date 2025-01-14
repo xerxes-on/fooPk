@@ -32,7 +32,6 @@ use Modules\FlexMeal\Models\FlexmealLists;
  * @property-read \App\Models\RecipeComplexity|null $complexity
  * @property-read \App\Models\RecipePrice|null $price
  * @method bool favorited()
- * @method bool purchased()
  * @method \Illuminate\Database\Eloquent\Relations\HasMany steps()
  *
  * @note if ($resource instanceof \App\Models\CustomRecipe)

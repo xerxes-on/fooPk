@@ -221,18 +221,23 @@ final class Recipes
     ): ?LengthAwarePaginator {
         $perPage = $perPage < 20 ? 20 : (min($perPage, 40));
 
+        $existRecipeIds = $user->allRecipes()->setEagerLoads([])->pluck('recipes.id')->toArray();
+
+        // TODO:: probably move related into cache
+        // get related recipes for excluding from marketplace
+        $relatedRecipes  = DB::table('recipes')
+            ->select('id', 'related_recipes')
+            ->whereIn('id', $existRecipeIds)
+            ->get(['id', 'related_recipes'])
+            ->map(fn(\stdClass $collection) => array_map(
+                'intval',
+                [$collection->id, ...(json_decode($collection->related_recipes, true) ?? [])]
+            ))
+            ->flatten()
+            ->toArray();
         if (array_key_exists('favorite', $filters) && $filters['favorite']) {
             $favoriteRecipes = $user->favorites()->pluck('recipe_id')->toArray();
-            $relatedRecipes  = DB::table('recipes')
-                ->select('id', 'related_recipes')
-                ->whereIn('id', $favoriteRecipes)
-                ->get(['id', 'related_recipes'])
-                ->map(fn(\stdClass $collection) => array_map(
-                    'intval',
-                    [$collection->id, ...(json_decode($collection->related_recipes, true) ?? [])]
-                ))
-                ->flatten()
-                ->toArray();
+
             $filters['favorite'] = array_unique(array_merge($favoriteRecipes, $relatedRecipes));
             sort($filters['favorite']);
         }
@@ -240,12 +245,10 @@ final class Recipes
         if (is_null($validRecipeIds = $user->preliminaryCalc()->first()?->valid)) {
             return null;
         }
-        // TODO: need to user_recipe_calculated_preliminaries in order to perform diff as a subquery
-        // for showing to user firstly new recipes
-        rsort($validRecipeIds);
-        $existRecipeIds = $user->allRecipes()->setEagerLoads([])->pluck('recipes.id')->toArray();
+
+        $existRecipeIds = array_unique(array_merge($relatedRecipes, $existRecipeIds));
         $diffRelated    = array_values(array_unique(array_diff($validRecipeIds, $existRecipeIds)));
-        $recipes        = Models\Recipe::whereIntegerInRaw('recipes.id', $diffRelated)
+        $recipes        = Models\Recipe::isActive()->whereIntegerInRaw('recipes.id', $diffRelated)
             ->with([
                 'ingestions'          => static fn(Relation $query) => $query->select(['ingestions.id', 'ingestions.key']),
                 'diets'               => static fn(Relation $query) => $query->select('diets.id'),

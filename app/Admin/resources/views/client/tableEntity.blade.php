@@ -86,8 +86,8 @@
                 </div>
             @endif
             <div class="form-group col-lg-3">
-                <label for="filter-abo_challenge">@lang('admin.filters.challenge.title')</label>
-                <select name="abo_challenge" id="filter-abo_challenge" class="form-control">
+                <label for="filter-courses">@lang('admin.filters.challenge.title')</label>
+                <select name="courses" id="filter-courses" class="form-control">
                     <option value="" hidden>@lang('admin.filters.defaults.select')</option>
                     <option value="0">@lang('common.no')</option>
                     @foreach($aboChallenges as $value => $aboChallenge)

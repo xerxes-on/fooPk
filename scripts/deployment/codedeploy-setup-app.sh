@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -eux -o pipefail
 
 # ---
 # Copy .env file for frontend servers (ASG):
@@ -102,6 +102,7 @@ then
 
     # ---
     # Check NodeJS version
+    echo "NodeJS check version >>>>"
     CURRENT_NODEJS_VERSION="$(node --version)"
     REQUIRED_NODEJS_VERSION="v18.2.0"
     if [ "$(printf '%s\n' "$CURRENT_NODEJS_VERSION" "$REQUIRED_NODEJS_VERSION" | sort -V | head -n1)" = "$REQUIRED_NODEJS_VERSION" ]; then
@@ -113,6 +114,7 @@ then
 
     # ---
     # NPM install
+    echo "NPM install >>>>"
     npm install
 
     # Building assets minified
@@ -120,33 +122,49 @@ then
 
     # ---
     # Install composer
+    echo "Install 'composer' >>>>"
     sudo -Hu www-data composer install
 
     # ---
     # Composer post update
+    echo "COMPOSER RUN-SCRIPT Begin >>>>"
     sudo -Hu www-data composer run-script post-update-cmd
+    # Print the result errorcode
+    echo $?
+    echo "<<<< COMPOSER RUN-SCRIPT END"
     #
 
     # ---
     # Configure
+    echo -e "Artisan >>>>\n\t'config:cache' >>"
     sudo -Hu www-data php artisan config:cache
-    yes | php artisan sleepingowl:install
+    # echo -e "\t'sleepingowl:install' >>"
+    # yes | php artisan sleepingowl:install
+    echo -e "\t'cache:clear' >>"
     sudo -Hu www-data php artisan cache:clear
+    echo -e "\t'config:cache' >>"
     sudo -Hu www-data php artisan config:cache
+    echo -e "\t'view:cache' >>"
     sudo -Hu www-data php artisan view:cache
+    echo -e "\t'optimize:clear' >>"
     sudo -Hu www-data php artisan optimize:clear
 
-    #run migrations only on static server
+    # Run migrations only on static server
     if [ "$DEPLOYMENT_GROUP_NAME" == "prod-foodpunk-static" ];
     then
-          sudo -Hu www-data php /srv/foodpunk_laravel_v2/artisan migrate --force
+        echo -e "Artisan >>>>\n\t'migrate' >>"
+        sudo -Hu www-data php /srv/foodpunk_laravel_v2/artisan migrate --force
     fi
 
     # ---
     # Restart services
+    echo -e "Restart services >>>>\n\tphp-fpm >>"
     sudo systemctl restart php8.2-fpm.service
+    echo -e "\tnginx >>"
     sudo systemctl restart nginx.service
+    echo -e "Change owner >>>>\n\t'/srv' >>"
     sudo chown -R www-data:www-data /srv/
+    echo -e "Change mode >>>>\n\t'/srv' >>"
     sudo chmod 775 -R /srv/
     touch /tmp/deployment-done
 fi
@@ -155,24 +173,28 @@ fi
 # Static server specific settings
 if [ "$DEPLOYMENT_GROUP_NAME" == "prod-foodpunk-static" ];
 then
+    echo -e "Artisan [${DEPLOYMENT_GROUP_NAME}] >>>>\n\t'queue:restart' >>"
     sudo -Hu www-data php artisan queue:restart
-    sudo supervisorctl reread
-    sudo supervisorctl reload
-    # sleep 5
-    # sudo supervisorctl restart all
+    echo -e "Supervisor [${DEPLOYMENT_GROUP_NAME}] >>>>\n\t'update->restart' >>"
+    # sudo supervisorctl status
+    sudo supervisorctl update all
+    sudo supervisorctl restart all
+    # sudo supervisorctl status
 fi
-# mayeb we need swagger on static too?
+# maybe we need swagger on static too?
 if [ "$DEPLOYMENT_GROUP_NAME" == "prod-foodpunk" ];
 then
-     mkdir -p /srv/foodpunk_laravel_v2/storage/api-docs/
-     sudo chown -R www-data:www-data /srv/foodpunk_laravel_v2/storage/api-docs/
-     sudo chmod 775 /srv/foodpunk_laravel_v2/storage/api-docs/ -R
-     sudo -Hu www-data php artisan vendor:publish --provider "L5Swagger\L5SwaggerServiceProvider"
-     sudo -Hu www-data php artisan l5-swagger:generate --all
-     # temporary copy because  l5-swagger:generate not geneate proper data TODO:: Pavel please create correct notes
-     cp -f /mnt/efs/shared_folders/storage/api-docs/api-docs.json /srv/foodpunk_laravel_v2/storage/api-docs/api-docs.json
-     sudo -Hu www-data php artisan optimize:clear
-
+    mkdir -p /srv/foodpunk_laravel_v2/storage/api-docs/
+    sudo chown -R www-data:www-data /srv/foodpunk_laravel_v2/storage/api-docs/
+    sudo chmod 775 /srv/foodpunk_laravel_v2/storage/api-docs/ -R
+    echo -e "Artisan [${DEPLOYMENT_GROUP_NAME}] >>>>\n\t'vendor:publish' >>"
+    sudo -Hu www-data php artisan vendor:publish --provider "L5Swagger\L5SwaggerServiceProvider"
+    echo -e "\t'l5-swagger:generate' >>"
+    sudo -Hu www-data php artisan l5-swagger:generate --all
+    # temporary copy because l5-swagger:generate not geneate proper data TODO:: Pavel please create correct notes
+    cp -f /mnt/efs/shared_folders/storage/api-docs/api-docs.json /srv/foodpunk_laravel_v2/storage/api-docs/api-docs.json
+    echo -e "Artisan [${DEPLOYMENT_GROUP_NAME}] >>>>\n\t'optimize:clear' >>"
+    sudo -Hu www-data php artisan optimize:clear
 fi
 
 #
@@ -219,6 +241,7 @@ then
     sudo chmod -R 775 /srv/foodpunk_laravel_v2/
     # ---
     # Check NodeJS version
+    echo "NodeJS check version >>>>"
     CURRENT_NODEJS_VERSION="$(node --version)"
     REQUIRED_NODEJS_VERSION="v18.2.0"
     if [ "$(printf '%s\n' "$CURRENT_NODEJS_VERSION" "$REQUIRED_NODEJS_VERSION" | sort -V | head -n1)" = "$REQUIRED_NODEJS_VERSION" ]; then
@@ -229,26 +252,38 @@ then
     fi
     # ---
     # NPM install
+    echo "NPM install >>>>"
     npm install
+    
     # Building assets minified
     npm run production
     # ---
     # Install composer
+    echo "Install 'composer' >>>>"
     sudo -Hu www-data composer install
+    
     # ---
     # Composer post update
+    echo "COMPOSER RUN-SCRIPT Begin >>>>"
     sudo -Hu www-data composer run-script post-update-cmd
-    #
+    echo $?
+    echo "<<<< COMPOSER RUN-SCRIPT END"
+    # ---
     sudo -Hu www-data php artisan migrate
     sudo -Hu www-data php artisan cache:clear
     sudo -Hu www-data php artisan config:cache
     sudo -Hu www-data php artisan view:cache
     sudo -Hu www-data php artisan optimize:clear
+    # ---
+    echo "Restarting NGINX ..."
     sudo systemctl restart nginx.service
     sudo chown -R www-data:www-data /srv/foodpunk_laravel_v2/
     sudo chmod 775 -R /srv/foodpunk_laravel_v2/
-
+    # ---
+    echo "artisan queue RESTART ..."
     sudo -Hu www-data php artisan queue:restart
-    sudo supervisorctl reread
-    sudo supervisorctl reload
+    # sudo supervisorctl status
+    sudo supervisorctl update all
+    sudo supervisorctl restart all
+    # sudo supervisorctl status
 fi
