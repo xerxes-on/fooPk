@@ -86,13 +86,15 @@ final class ShoppingListRetrieverService
                 ];
             }
 
-            // Handle custom ingredients
+            // check custom ingredients
             if (is_null($ingredient->ingredient_id)) {
-                $ingredientCategories[$slug]['ingredients'][] = $this->prepareCustomIngredient($ingredient);
+                $ingredientCategories[$slug]['ingredients'][] = [
+                    'id' => $ingredient->id,
+                    'custom_title' => $ingredient->custom_title,
+                    'completed' => $ingredient->completed,
+                ];
                 return;
             }
-
-            // Handle regular ingredients
             $ingredientCategories[$slug]['ingredients'][] = $this->prepareRegularIngredient(
                 $ingredient,
                 $locale,
@@ -128,15 +130,6 @@ final class ShoppingListRetrieverService
         return [
             'id' => $ingredient->category_id,
             'name' => $ingredient->category->name,
-        ];
-    }
-
-    private function prepareCustomIngredient(ShoppingListIngredient $ingredient): array
-    {
-        return [
-            'id' => $ingredient->id,
-            'custom_title' => $ingredient->custom_title,
-            'completed' => $ingredient->completed,
         ];
     }
 
