@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Modules\Ingredient\Models;
 
-use App\Enums\Recipe\RecipeStatusEnum;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Builder;
@@ -96,5 +95,10 @@ final class IngredientUnit extends Model implements TranslatableContract
     public function scopeIsSecondary(Builder $query): Builder
     {
         return $query->where('type', IngredientUnitType::SECONDARY->value);
+    }
+
+    public function nextUnit(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(IngredientUnit::class, 'next_unit_id');
     }
 }

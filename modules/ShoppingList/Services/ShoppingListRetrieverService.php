@@ -7,7 +7,6 @@ namespace Modules\ShoppingList\Services;
 use App\Models\{User};
 use Illuminate\Support\Collection;
 use Modules\Ingredient\Models\IngredientCategory;
-use Modules\Ingredient\Models\IngredientUnit;
 use Modules\Ingredient\Services\IngredientConversionService;
 use Modules\ShoppingList\Models\ShoppingList;
 use Modules\ShoppingList\Models\ShoppingListIngredient;
@@ -29,7 +28,16 @@ final class ShoppingListRetrieverService
         /**
          * Get active list or create new
          */
-        $list = $user->shoppingListWithIngredientsAndCategory()->firstOrCreate();
+        $list = $user->shoppingListWithIngredientsAndCategory()->with(
+            [
+                'ingredients.ingredient.unit.translations',
+                'ingredients.ingredient.unit.nextUnit.translations',
+                'ingredients.ingredient.category',
+                'ingredients.ingredient.hint.translations',
+                'ingredients.ingredient.alternativeUnit',
+                'ingredients.category',
+            ]
+        )->firstOrCreate();
 
         $response = [
             'list'                  => $list,
@@ -55,78 +63,106 @@ final class ShoppingListRetrieverService
         $categoryCollection   = $this->getIngredientsCategory($ingredients);
         $ingredientCategories = [];
 
-        $ingredients->each(function (ShoppingListIngredient $ingredient) use ($locale, $categoryCollection, &$ingredientCategories) {
+        $conversionService = app(IngredientConversionService::class);
+        $ingredients->each(function (ShoppingListIngredient $ingredient) use (
+            $locale,
+            $categoryCollection,
+            &
+            $ingredientCategories,
+            $conversionService
+        ) {
             $slug         = $this->baseSlug;
-            $categoryName = trans('common.other');
-            $categoryId   = null;
-
-            // Preparing category name and id
-            if (!is_null($ingredient->category_id)) {
-                // Mid_category most time gets null, need to condition this matter
-                $category = is_null($ingredient?->ingredient?->category?->tree_information['mid_category']) ?
-                    null :
-                    $categoryCollection
-                        ->where('id', $ingredient->ingredient->category->tree_information['mid_category'])
-                        ->first();
-
-                if (!is_null($ingredient->category_id) && !is_null($category)) {
-                    $categoryName = $category->name;
-                    $categoryId   = $category->id;
-                    $slug .= $category->id;
-                } elseif (is_null($category)) {
-                    $categoryName = $ingredient->category->name;
-                    $categoryId   = $ingredient->category_id;
-                    $slug .= $ingredient->category_id;
-                }
-            }
+            $categoryData = $this->determineCategory($ingredient, $categoryCollection);
+            $slug .= $categoryData['id'] ?? '';
 
             // Merge ingredients of the same category
             if (!isset($ingredientCategories[$slug])) {
                 $ingredientCategories[$slug] = [
                     'category' => [
-                        'id'   => $categoryId,
-                        'name' => $categoryName,
+                        'id' => $categoryData['id'],
+                        'name' => $categoryData['name'],
                     ],
                     'ingredients' => [],
                 ];
             }
 
-            // check custom ingredients
+            // Handle custom ingredients
             if (is_null($ingredient->ingredient_id)) {
-                $ingredientCategories[$slug]['ingredients'][] = [
-                    'id'           => $ingredient->id,
-                    'custom_title' => $ingredient->custom_title,
-                    'completed'    => $ingredient->completed,
-                ];
+                $ingredientCategories[$slug]['ingredients'][] = $this->prepareCustomIngredient($ingredient);
                 return;
             }
 
-            // get default ingredient values
-            $amount = $ingredient->amount;
-            $unit   = $ingredient->ingredient->unit;
-
-            // check conversion (1000 g. => 1 kg.)
-            if (!is_null($unit->next_unit_id) && $amount >= $unit->max_value) {
-                $amount /= $unit->max_value;
-                $unit = IngredientUnit::with('translations')->find($unit->next_unit_id);
-            }
-            $unit->loadMissing('translations');
-
-            $ingredientCategories[$slug]['ingredients'][] = [
-                'id'                             => $ingredient->id,
-                'ingredient_id'                  => $ingredient->ingredient_id,
-                'name'                           => $ingredient->ingredient->name,
-                'amount'                         => $amount,
-                'unit'                           => $unit->visibility ? $unit->short_name : '',
-                'completed'                      => $ingredient->completed,
-                'hint'                           => $this->getIngredientHintContent($ingredient, $locale),
-                IngredientConversionService::KEY => app(IngredientConversionService::class)->generateData($ingredient->ingredient, $amount)
-            ];
+            // Handle regular ingredients
+            $ingredientCategories[$slug]['ingredients'][] = $this->prepareRegularIngredient(
+                $ingredient,
+                $locale,
+                $conversionService
+            );
         });
 
         $this->sortIngredientCategories($ingredientCategories);
 
         return $ingredientCategories;
+    }
+
+    private function determineCategory(ShoppingListIngredient $ingredient, Collection $categoryCollection): array
+    {
+        if (is_null($ingredient->category_id)) {
+            return [
+                'id' => null,
+                'name' => trans('common.other'),
+            ];
+        }
+
+        $midCategory = $ingredient?->ingredient?->category?->tree_information['mid_category'];
+        if (!is_null($midCategory)) {
+            $category = $categoryCollection->where('id', $midCategory)->first();
+            if (!is_null($category)) {
+                return [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                ];
+            }
+        }
+
+        return [
+            'id' => $ingredient->category_id,
+            'name' => $ingredient->category->name,
+        ];
+    }
+
+    private function prepareCustomIngredient(ShoppingListIngredient $ingredient): array
+    {
+        return [
+            'id' => $ingredient->id,
+            'custom_title' => $ingredient->custom_title,
+            'completed' => $ingredient->completed,
+        ];
+    }
+
+    private function prepareRegularIngredient(
+        ShoppingListIngredient $ingredient,
+        string $locale,
+        IngredientConversionService $conversionService
+    ): array {
+        $amount = $ingredient->amount;
+        $unit = $ingredient->ingredient->unit;
+
+        if (!is_null($unit->next_unit_id) && $amount >= $unit->max_value) {
+            $amount /= $unit->max_value;
+            $unit = $unit->nextUnit;
+        }
+
+        return [
+            'id' => $ingredient->id,
+            'ingredient_id' => $ingredient->ingredient_id,
+            'name' => $ingredient->ingredient->name,
+            'amount' => $amount,
+            'unit' => $unit->visibility ? $unit->short_name : '',
+            'completed' => $ingredient->completed,
+            'hint' => $this->getIngredientHintContent($ingredient, $locale),
+            IngredientConversionService::KEY => $conversionService->generateData($ingredient->ingredient, $amount)
+        ];
     }
 
     private function getIngredientsCategory(Collection $ingredients): Collection
@@ -179,9 +215,9 @@ final class ShoppingListRetrieverService
          */
         return collect(
             [
-                $list->recipes()->get(),
-                $list->customRecipes()->with('ingestion')->get(),
-                $list->flexmeals($userId)->with('ingestion')->get()
+                $list->recipes()->with('ingestions')->get(),
+                $list->customRecipes()->with(['ingestion', 'originalRecipe.image', 'pivot'])->get(),
+                $list->flexmeals($userId)->with(['ingestion', 'image', 'pivot'])->get()
             ]
         )
             ->flatten()
