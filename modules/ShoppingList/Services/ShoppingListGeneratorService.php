@@ -219,13 +219,11 @@ final class ShoppingListGeneratorService
                     // We must check if ingredient in Collection really exist in DB and not removed.
                     $ingredientModel = $ingredientsWithCategory->get($ingredient->id);
                     if (!$ingredientModel) {
-                        // Ingredient not found or removed; skip
                         return [];
                     }
 
                     // Access category relationship
                     $categoryModel = $ingredientModel->category;
-                    // If tree_information[mid_category] is set, use it; otherwise fall back to category->id
                     $categoryId = $categoryModel?->tree_information['mid_category'] ?? $categoryModel?->id;
 
                     return [
