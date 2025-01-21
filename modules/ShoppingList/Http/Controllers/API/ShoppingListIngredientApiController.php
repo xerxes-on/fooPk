@@ -11,6 +11,7 @@ use Modules\ShoppingList\Http\Requests\CustomIngredientRequest;
 use Modules\ShoppingList\Http\Requests\DeleteIngredientRequest;
 use Modules\ShoppingList\Http\Resources\ShoppingListCustomIngredientResource;
 use Modules\ShoppingList\Models\ShoppingListIngredient;
+use Modules\ShoppingList\Models\ShoppingListRecipe;
 use Modules\ShoppingList\Services\ShoppingListIngredientsService;
 
 /**
@@ -40,9 +41,41 @@ class ShoppingListIngredientApiController extends APIBase
      */
     public function destroy(DeleteIngredientRequest $request): JsonResponse
     {
-        return ShoppingListIngredient::whereId($request->ingredient_id)->delete() ?
-            $this->sendResponse(true, trans('common.success')) :
-            $this->sendError(message: trans('common.error'));
+        $shoppingListIngredient = ShoppingListIngredient::find($request->ingredient_id);
+
+        if (!$shoppingListIngredient) {
+            return $this->sendError(message: trans('common.error'));
+        }
+
+        $shoppingList = auth()->user()->shoppinglist;
+        $deletedRecipes = [];
+
+        if ($shoppingListIngredient->delete()) {
+            foreach ($shoppingList->recipes as $recipe) {
+                $remainingIngredients = $shoppingList->ingredients()
+                    ->whereIn('shopping_lists_ingredients.id', function ($query) use ($recipe) {
+                        $query->select('id')
+                            ->from('shopping_lists_ingredients')
+                            ->whereIn('ingredient_id', $recipe->ingredients->pluck('id'));
+                    })
+                    ->count();
+
+                if ($remainingIngredients === 0) {
+                    $pivotId = $recipe->pivot->id;
+                    ShoppingListRecipe::where('recipe_id', $recipe->id)
+                        ->where('list_id', $shoppingList->id)
+                        ->delete();
+                    $deletedRecipes[] = $pivotId;
+                }
+            }
+
+            return $this->sendResponse(
+                data: ['deletedRecipes' => $deletedRecipes],
+                message: trans('common.success')
+            );
+        }
+
+        return $this->sendError(message: trans('common.error'));
     }
 
     /**
