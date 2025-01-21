@@ -10,6 +10,7 @@ use Modules\ShoppingList\Http\Requests\ChangeIngredientStatusRequest;
 use Modules\ShoppingList\Http\Requests\CustomIngredientRequest;
 use Modules\ShoppingList\Http\Requests\DeleteIngredientRequest;
 use Modules\ShoppingList\Models\ShoppingListIngredient;
+use Modules\ShoppingList\Models\ShoppingListRecipe;
 use Modules\ShoppingList\Services\ShoppingListIngredientsService;
 
 /**
@@ -47,16 +48,40 @@ final class ShoppingListIngredientController extends Controller
             'success' => false,
             'message' => trans('shopping-list::messages.error.item_removal')
         ];
-        if (ShoppingListIngredient::whereId($request->ingredient_id)->delete()) {
+
+        $shoppingListIngredient = ShoppingListIngredient::whereId($request->ingredient_id);
+
+        if (empty($shoppingListIngredient)) {
+            return response()->json($response, 404);
+        }
+
+        $shoppingList = auth()->user()->shoppinglist;
+        $deletedRecipes = [];
+
+        if ($shoppingListIngredient->delete()) {
+            foreach ($shoppingList->recipes as $recipe) {
+                $remainingIngredients = $shoppingList->ingredients()
+                    ->whereIn('shopping_lists_ingredients.id', function ($query) use ($recipe) {
+                        $query->select('id')
+                            ->from('shopping_lists_ingredients')
+                            ->whereIn('ingredient_id', $recipe->ingredients->pluck('id'));
+                    })
+                    ->count();
+
+                if ($remainingIngredients === 0) {
+                    $pivotId = $recipe->pivot->id;
+                    ShoppingListRecipe::where('recipe_id', $recipe->id)
+                        ->where('list_id', $shoppingList->id)
+                        ->delete();
+
+                    $deletedRecipes[] = $pivotId;
+                }
+            }
             $response = [
                 'success' => true,
-                'message' => trans('shopping-list::messages.success.item_removed')
+                'message' => trans('shopping-list::messages.success.item_removed'),
+                'deletedRecipes' => $deletedRecipes
             ];
-            /**
-             * todo: need to think a solution to remove recipe when all its ingredients are removed.
-             * @note ingredients are mainly combined with each other, so it is not a big problem.
-             * we need to be sure that the recipes ingredients were all deleted
-             */
         }
 
         return response()->json($response);
