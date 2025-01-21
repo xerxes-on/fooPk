@@ -283,14 +283,14 @@ trait HasQuestionnaire
     /**
      * Users latest questionnaire full answers.
      */
-    public function getLatestQuestionnaireFullAnswersAttribute(): array
+    public function getLatestQuestionnaireFullAnswersAttribute(): ?array
     {
         $latest = $this->relationLoaded('latestQuestionnaireRelation')
             ? $this->getRelation('latestQuestionnaireRelation')
             : $this->latestQuestionnaireRelation()->first();
 
         if (!$latest) {
-            return [];
+            return null;
         }
         if (!$latest->relationLoaded('answers')) {
             $latest->load('answers.question');
