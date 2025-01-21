@@ -4,7 +4,15 @@
         <div class="card"
              id="{{ is_null($category['category']['id']) ? 'custom' : 'category_'.$category['category']['id'] }}">
             <div class="shopping-list-title-wrapper">
-                <h4 class="shopping-list_ingredients_title"><b>{{ ucfirst($category['category']['name']) }}</b></h4>
+                <h4 class="shopping-list_ingredients_title">
+                    <b>
+                        @if(is_null($category['category']['id']))
+                            {{ __('shopping-list::common.labels.custom') }}
+                        @else
+                            {{ ucfirst($category['category']['name']) }}
+                        @endif
+                    </b>
+                </h4>
                 @if($loop->first && !$isPrintPage)
                     <x-ingredient-piece-switch></x-ingredient-piece-switch>
                 @endif
