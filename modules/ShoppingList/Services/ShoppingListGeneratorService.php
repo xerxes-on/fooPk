@@ -205,31 +205,31 @@ final class ShoppingListGeneratorService
          * To avoid querying inside the loop we need to collect ingredients data,
          * category in particular, used inside provided collection.
          */
-        $ingredientsWithCategory = Ingredient::ofIds($this->ingredients->pluck('id')->toArray())
+        $ingredientsWithCategory = Ingredient::ofIds($this->ingredients->pluck('id')->unique()->toArray())
             ->withOnly([
                 'category' => fn(HasOne $query) => $query
                     ->withOnly([])
                     ->select('id', 'tree_information')
             ])
-            ->get(['id', 'category_id']);
+            ->get(['id', 'category_id'])
+            ->keyBy('id');
         $this->ingredients = $this->ingredients
             ->map(
                 function (\stdClass $ingredient) use ($ingredientsWithCategory, $listId) {
                     // We must check if ingredient in Collection really exist in DB and not removed.
-                    if (!$ingredientsWithCategory->where('id', $ingredient->id)->first()) {
+                    $ingredientModel = $ingredientsWithCategory->get($ingredient->id);
+                    if (!$ingredientModel) {
                         return [];
                     }
-                    /**
-                     * get ingredient category prepared collection.
-                     * Later, we must check mid_category, if exist -> category = mid-category
-                     */
-                    $category = $ingredientsWithCategory->where('id', $ingredient->id)->first()?->category;
-                    $category = $category?->tree_information['mid_category'] ?? $category?->id;
+
+                    // Access category relationship
+                    $categoryModel = $ingredientModel->category;
+                    $categoryId = $categoryModel?->tree_information['mid_category'] ?? $categoryModel?->id;
 
                     return [
                         'list_id'       => $listId,
                         'ingredient_id' => $ingredient->id,
-                        'category_id'   => $category ?? IngredientCategoryEnum::SPICES->value,
+                        'category_id' => $categoryId ?? IngredientCategoryEnum::SPICES->value,
                         'amount'        => $ingredient->amount,
                     ];
                 }
