@@ -209,7 +209,7 @@ final class ShoppingListRetrieverService
         return collect(
             [
                 $list->recipes()->with('ingestions')->get(),
-                $list->customRecipes()->with(['ingestion', 'originalRecipe.image', 'pivot'])->get(),
+                $list->customRecipes()->with(['ingestion', 'originalRecipe'])->get(),
                 $list->flexmeals($userId)->with(['ingestion', 'image', 'pivot'])->get()
             ]
         )
@@ -226,7 +226,10 @@ final class ShoppingListRetrieverService
     {
         $map = config('shopping-list.category_sorting_order_map');
         uksort($ingredientCategories, function (string $firstKey, string $secondKey) use ($map) {
-            if (in_array($this->baseSlug, [$firstKey, $secondKey], true)) {
+            if ($firstKey === 'custom') {
+                return 1;
+            }
+            if ($secondKey === 'custom') {
                 return -1;
             }
 
@@ -236,7 +239,14 @@ final class ShoppingListRetrieverService
             if ($index1 === $index2) {
                 return 0;
             }
-            return ($index1 < $index2) ? -1 : 1;
+            if ($index1 === false) {
+                return 1;
+            }
+            if ($index2 === false) {
+                return -1;
+            }
+
+            return $index1 <=> $index2; // Sort by the indices in the map
         });
     }
 }
