@@ -10,7 +10,6 @@ use Modules\ShoppingList\Http\Requests\ChangeIngredientStatusRequest;
 use Modules\ShoppingList\Http\Requests\CustomIngredientRequest;
 use Modules\ShoppingList\Http\Requests\DeleteIngredientRequest;
 use Modules\ShoppingList\Models\ShoppingListIngredient;
-use Modules\ShoppingList\Models\ShoppingListRecipe;
 use Modules\ShoppingList\Services\ShoppingListIngredientsService;
 
 /**
@@ -42,49 +41,13 @@ final class ShoppingListIngredientController extends Controller
      *
      * @route POST /user/purchases/ingredient/delete
      */
-    public function destroy(DeleteIngredientRequest $request): JsonResponse
+    public function destroy(DeleteIngredientRequest $request, ShoppingListIngredientsService $service): JsonResponse
     {
-        $response = [
-            'success' => false,
-            'message' => trans('shopping-list::messages.error.item_removal')
-        ];
-
-        $shoppingListIngredient = ShoppingListIngredient::whereId($request->ingredient_id);
-
-        if (empty($shoppingListIngredient)) {
-            return response()->json($response, 404);
-        }
-
-        $shoppingList = auth()->user()->shoppinglist;
-        $deletedRecipes = [];
-
-        if ($shoppingListIngredient->delete()) {
-            foreach ($shoppingList->recipes as $recipe) {
-                $remainingIngredients = $shoppingList->ingredients()
-                    ->whereIn('shopping_lists_ingredients.id', function ($query) use ($recipe) {
-                        $query->select('id')
-                            ->from('shopping_lists_ingredients')
-                            ->whereIn('ingredient_id', $recipe->ingredients->pluck('id'));
-                    })
-                    ->count();
-
-                if ($remainingIngredients === 0) {
-                    $pivotId = $recipe->pivot->id;
-                    ShoppingListRecipe::where('recipe_id', $recipe->id)
-                        ->where('list_id', $shoppingList->id)
-                        ->delete();
-
-                    $deletedRecipes[] = $pivotId;
-                }
-            }
-            $response = [
-                'success' => true,
-                'message' => trans('shopping-list::messages.success.item_removed'),
-                'deletedRecipes' => $deletedRecipes
-            ];
-        }
-
-        return response()->json($response);
+        $data = $service->removeIngredient(intval($request->input('ingredient_id')));
+        return response()->json(
+            is_array($data) ? ['success' => true, 'deletedRecipes' => $data, 'message' => trans('common.success')] :
+                ['success' => false, 'message' => trans('common.error')]
+        );
     }
 
     /**
