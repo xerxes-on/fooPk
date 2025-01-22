@@ -157,6 +157,12 @@ export default {
 
       this.ingredientsUsed.splice(key, 1);
 
+      this.ingredientsUsed = this.ingredientsUsed.map((ingredient, index) => {
+        return {
+          ...ingredient,
+          id: index  // Update the keyId to match new index
+        };
+      });
       // Timing is broken without it
       this.$nextTick(() => {
         this.handleCalculations();
