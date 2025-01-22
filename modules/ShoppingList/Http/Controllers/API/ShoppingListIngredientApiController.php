@@ -40,7 +40,7 @@ class ShoppingListIngredientApiController extends APIBase
      */
     public function destroy(DeleteIngredientRequest $request, ShoppingListIngredientsService $service): JsonResponse
     {
-        return $service->removeIngredient($request->input('ingredient_id')) ?
+        return $service->removeIngredient($request->user(), $request->ingredient_id) ?
             $this->sendResponse(true, trans('common.success')) :
             $this->sendError(message: trans('common.error'));
     }

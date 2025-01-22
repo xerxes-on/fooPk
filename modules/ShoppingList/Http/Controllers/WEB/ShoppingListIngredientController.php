@@ -43,7 +43,7 @@ final class ShoppingListIngredientController extends Controller
      */
     public function destroy(DeleteIngredientRequest $request, ShoppingListIngredientsService $service): JsonResponse
     {
-        $data = $service->removeIngredient(intval($request->input('ingredient_id')));
+        $data = $service->removeIngredient($request->user(), $request->ingredient_id);
         return response()->json(
             is_array($data) ? ['success' => true, 'deletedRecipes' => $data, 'message' => trans('common.success')] :
                 ['success' => false, 'message' => trans('common.error')]

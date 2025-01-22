@@ -6,7 +6,6 @@ namespace Modules\ShoppingList\Services;
 
 use App\Models\{User};
 use Modules\ShoppingList\Events\ShoppingListProcessed;
-use Modules\ShoppingList\Models\ShoppingList;
 use Modules\ShoppingList\Models\ShoppingListIngredient;
 use Modules\ShoppingList\Models\ShoppingListRecipe;
 
@@ -32,14 +31,14 @@ final class ShoppingListIngredientsService
         ]);
     }
 
-    public function removeIngredient(int $ingredientId): ?array
+    public function removeIngredient($user, int|string $ingredientId): ?array
     {
         $shoppingListIngredient = ShoppingListIngredient::find($ingredientId);
 
         if (empty($shoppingListIngredient)) {
             return null;
         }
-        $shoppingList = ShoppingList::find($shoppingListIngredient->list_id);
+        $shoppingList = $user->shoppingList;
         $deletedRecipes = [];
         //TODO: edited recipe's ingredients are not matching to displayed ones
         if ($shoppingListIngredient->delete()) {
@@ -47,7 +46,7 @@ final class ShoppingListIngredientsService
                 ->merge($shoppingList->customRecipes ?? [])
                 ->merge($shoppingList->flexmeals ?? []);
 
-            foreach ($recipes as $recipe) {
+            $recipes->each(function ($recipe) use ($shoppingList) {
                 $remainingIngredients = $shoppingList->ingredients()
                     ->whereIn('ingredient_id', $recipe->ingredients->pluck('id'))
                     ->count();
@@ -58,7 +57,7 @@ final class ShoppingListIngredientsService
 
                     $deletedRecipes[] = $recipe->pivot->id;
                 }
-            }
+            });
         }
         return $deletedRecipes;
     }
