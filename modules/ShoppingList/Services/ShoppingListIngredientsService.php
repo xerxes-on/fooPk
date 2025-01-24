@@ -53,28 +53,28 @@ final class ShoppingListIngredientsService
         $deletedRecipes = [];
 
         foreach ($shoppingList->recipes as $recipe) {
-            $mealTime = $user->recipes()
+            $meal = $user->recipes()
                 ->where('recipes.id', $recipe->id)
+                ->without('translations')
                 ->firstOrFail()
-                ->pivot->meal_time;
+                ->pivot;
 
-            $mealDate = $user->recipes()
-                ->where('recipes.id', $recipe->id)
-                ->firstOrFail()
-                ->pivot->meal_date;
+            $mealTime = $meal->meal_time;
+            $mealDate = $meal->meal_date;
 
-            $ingestion = Ingestion::ofKey($mealTime)->firstOrFail();
+            $ingestion = Ingestion::ofKey($mealTime)
+                ->without('translations')
+                ->select('id')
+                ->firstOrFail();
 
             $remainingIngredients = $shoppingList->ingredients()
                 ->whereIn('ingredient_id', $this->getIngredientIds($user, $recipe, $mealDate, $ingestion->id))
                 ->count();
 
             if ($remainingIngredients === 0) {
-                ShoppingListRecipe::where('recipe_id', $recipe->id)
-                    ->where('list_id', $shoppingList->id)
-                    ->delete();
-                $deletedRecipes[] = $recipe->pivot->id;
+                $deletedRecipes[] = $this->deleteRecipe($recipe, $shoppingList->id);
             }
+
         }
 
         return $deletedRecipes;
@@ -85,7 +85,9 @@ final class ShoppingListIngredientsService
         $deletedRecipes = [];
 
         foreach ($shoppingList->customRecipes as $recipe) {
-            $customPlannedRecipe = $user->customPlannedRecipe($recipe->id)->firstOrFail();
+            $customPlannedRecipe = $user->customPlannedRecipe($recipe->id)
+                ->without('translations')
+                ->firstOrFail();
 
             $mealTime = $customPlannedRecipe->meal_time ?? null;
             $mealDate = $customPlannedRecipe->meal_date ?? null;
@@ -94,17 +96,17 @@ final class ShoppingListIngredientsService
                 continue;
             }
 
-            $ingestion = Ingestion::ofKey($mealTime)->firstOrFail();
+            $ingestion = Ingestion::ofKey($mealTime)
+                ->select('id')
+                ->without('translations')
+                ->firstOrFail();
 
             $remainingIngredients = $shoppingList->ingredients()
                 ->whereIn('ingredient_id', $this->getCustomIngredientIds($user, $recipe, $mealDate, $ingestion->id))
                 ->count();
 
             if ($remainingIngredients === 0) {
-                ShoppingListRecipe::where('recipe_id', $recipe->id)
-                    ->where('list_id', $shoppingList->id)
-                    ->delete();
-                $deletedRecipes[] = $recipe->pivot->id;
+                $deletedRecipes[] = $this->deleteRecipe($recipe, $shoppingList->id);
             }
         }
 
@@ -127,17 +129,17 @@ final class ShoppingListIngredientsService
                 continue;
             }
 
-            $ingestion = Ingestion::ofKey($mealTime)->firstOrFail();
+            $ingestion = Ingestion::ofKey($mealTime)
+                ->select('id')
+                ->without('translations')
+                ->firstOrFail();
 
             $remainingIngredients = $shoppingList->ingredients()
                 ->whereIn('ingredient_id', $this->getFlexIngredientIds($user, $recipe, $mealDate, $ingestion->id))
                 ->count();
 
             if ($remainingIngredients === 0) {
-                ShoppingListRecipe::where('recipe_id', $recipe->id)
-                    ->where('list_id', $shoppingList->id)
-                    ->delete();
-                $deletedRecipes[] = $recipe->pivot->id;
+                $deletedRecipes[] = $this->deleteRecipe($recipe, $shoppingList->id);
             }
         }
 
@@ -147,7 +149,8 @@ final class ShoppingListIngredientsService
     private function getIngredientIds(User $user, Recipe $recipe, string $mealDate, int $ingestionId): array
     {
         try {
-            $plannedRecipe = $user->plannedRecipes($recipe->id, $mealDate, $ingestionId)->firstOrFail();
+            $plannedRecipe = $user->plannedRecipesForGettingIngredients($recipe->id, $mealDate, $ingestionId)
+                ->firstOrFail();
 
             $recipeData = json_decode($plannedRecipe->calc_recipe_data, true);
 
@@ -164,8 +167,8 @@ final class ShoppingListIngredientsService
     private function getCustomIngredientIds(User $user, CustomRecipe $recipe, string $mealDate, int $ingestionId): array
     {
         try {
-            $plannedRecipe = $user->customPlannedRecipe($recipe->id)->firstOrFail();
-
+            $plannedRecipe = $user->customplannedRecipeForGettingIngredient($recipe->id)
+                ->firstOrFail();
             $recipeData = json_decode($plannedRecipe->calc_recipe_data, true);
 
             if (!empty($recipeData['ingredients'])) {
@@ -197,4 +200,11 @@ final class ShoppingListIngredientsService
         }
     }
 
+    private function deleteRecipe($recipe, $shoppingListId)
+    {
+        ShoppingListRecipe::where('recipe_id', $recipe->id)
+            ->where('list_id', $shoppingListId)
+            ->delete();
+        return $recipe->pivot->id;
+    }
 }
