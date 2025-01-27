@@ -315,8 +315,8 @@ window.foodPunk.deleteIngredient = function (e) {
 
                 $(`#ingredient_${id}`).remove();
 
-                if (resp.deletedRecipes && resp.deletedRecipes.length > 0) {
-                    resp.deletedRecipes.forEach(pivotId => {
+                if (resp.data && resp.data.length > 0) {
+                    resp.data.forEach(pivotId => {
                         const recipeElement = $(`#recipe_${pivotId}`);
                         const recipeGroup = recipeElement.closest('.shopping-list_recipes-group');
 
@@ -328,11 +328,6 @@ window.foodPunk.deleteIngredient = function (e) {
                         }
                     });
                 }
-
-                if (resp.data) {
-                    $('#ingredients_wrapper').empty().append(resp.data);
-                }
-
                 let item = $(`#${category_id}`);
                 if (!item.find('li').length) {
                     item.remove();

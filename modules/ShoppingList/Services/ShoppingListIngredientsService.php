@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Modules\ShoppingList\Services;
 
 use App\Models\{CustomRecipe, Ingestion, Recipe, User};
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Cache;
 use Modules\FlexMeal\Models\Flexmeal;
 use Modules\ShoppingList\Events\ShoppingListProcessed;
+use Modules\ShoppingList\Models\ShoppingList;
 use Modules\ShoppingList\Models\ShoppingListIngredient;
 use Modules\ShoppingList\Models\ShoppingListRecipe;
 
@@ -32,7 +35,6 @@ final class ShoppingListIngredientsService
             'custom_title'  => $title,
         ]);
     }
-
     public function removeIngredient(User $user, int|string $ingredientId): ?array
     {
         if (!ShoppingListIngredient::whereId($ingredientId)->delete()) {
@@ -40,15 +42,17 @@ final class ShoppingListIngredientsService
         }
 
         $shoppingList = $user->shoppingList;
-
+        $ingestions = Cache::remember('ingestions_by_key', now()->addHour(), function () {
+            return Ingestion::without('translations')->get()->keyBy('key');
+        });
         return array_merge(
-            $this->handleStandardRecipes($user, $shoppingList),
-            $this->handleCustomRecipes($user, $shoppingList),
-            $this->handleFlexMeals($user, $shoppingList)
+            $this->handleStandardRecipes($user, $shoppingList, $ingestions),
+            $this->handleCustomRecipes($user, $shoppingList, $ingestions),
+            $this->handleFlexMeals($user, $shoppingList, $ingestions)
         );
     }
 
-    private function handleStandardRecipes(User $user, $shoppingList): array
+    private function handleStandardRecipes(User $user, ShoppingList $shoppingList, Collection $ingestions): array
     {
         $deletedRecipes = [];
 
@@ -57,10 +61,7 @@ final class ShoppingListIngredientsService
             ->without('translations')
             ->get()
             ->keyBy('id');
-        $ingestions = Ingestion::whereIn('key', $userRecipes->pluck('pivot.meal_time'))
-            ->without('translations')
-            ->get()
-            ->keyBy('key');
+
         foreach ($shoppingList->recipes as $recipe) {
 
             $meal = $userRecipes[$recipe->id]->pivot ?? null;
@@ -90,7 +91,7 @@ final class ShoppingListIngredientsService
         return $deletedRecipes;
     }
 
-    private function handleCustomRecipes(User $user, $shoppingList): array
+    private function handleCustomRecipes(User $user, ShoppingList $shoppingList, Collection $ingestions): array
     {
         $deletedRecipes = [];
 
@@ -99,27 +100,24 @@ final class ShoppingListIngredientsService
             ->without('translations')
             ->get()
             ->keyBy('id');
-
-        $ingestions = Ingestion::whereIn('key', $customPlannedRecipes->pluck('pivot.meal_time'))
-            ->without('translations')
-            ->get()
-            ->keyBy('key');
         foreach ($shoppingList->customRecipes as $recipe) {
             $customPlannedRecipe = $customPlannedRecipes[$recipe->id]->pivot ?? null;
-            //            dd($customPlannedRecipe->pivot);
+
             if (!$customPlannedRecipe) {
                 continue;
             }
             $mealTime = $customPlannedRecipe->meal_time ?? null;
-            $mealDate = $customPlannedRecipe->meal_date ?? null;
+            //            $mealDate = $customPlannedRecipe->meal_date ?? null;
 
             $ingestion = $ingestions[$mealTime] ?? null;
             if (!$ingestion) {
                 continue;
             }
             $remainingIngredients = $shoppingList->ingredients()
-                ->whereIn('ingredient_id',
-                    $this->getCustomIngredientIds($user, $recipe, (string) $mealDate, $ingestion->id))
+                ->whereIn(
+                    'ingredient_id',
+                    $this->getCustomIngredientIds($user, $recipe)
+                )
                 ->count();
 
             if ($remainingIngredients === 0) {
@@ -130,7 +128,7 @@ final class ShoppingListIngredientsService
         return $deletedRecipes;
     }
 
-    private function handleFlexMeals(User $user, $shoppingList): array
+    private function handleFlexMeals(User $user, ShoppingList $shoppingList, Collection $ingestions): array
     {
         $deletedRecipes = [];
 
@@ -139,30 +137,21 @@ final class ShoppingListIngredientsService
             ->without('translations')
             ->get()
             ->keyBy('id');
-
-        $ingestions = Ingestion::whereIn('key', $flexMeals->pluck('pivot.meal_time'))
-            ->without('translations')
-            ->get()
-            ->keyBy('key');
         foreach ($shoppingList->flexmeals as $recipe) {
             $flexMeal = $flexMeals[$recipe->id] ?? null;
-
             if (!$flexMeal || !$flexMeal->pivot->meal_time || !$flexMeal->pivot->meal_date) {
                 continue;
             }
 
             $mealTime = $flexMeal->pivot->meal_time;
-            $mealDate = $flexMeal->pivot->meal_date;
-
+            //            $mealDate = $flexMeal->pivot->meal_date;
             $ingestion = $ingestions[$mealTime] ?? null;
             if (!$ingestion) {
                 continue;
             }
 
-
-
             $remainingIngredients = $shoppingList->ingredients()
-                ->whereIn('ingredient_id', $this->getFlexIngredientIds($user, $recipe, $mealDate, $ingestion->id))
+                ->whereIn('ingredient_id', $this->getFlexIngredientIds($user, $recipe))
                 ->count();
             if ($remainingIngredients === 0) {
                 $deletedRecipes[] = $this->deleteRecipe($recipe, $shoppingList->id);
@@ -190,7 +179,7 @@ final class ShoppingListIngredientsService
         }
     }
 
-    private function getCustomIngredientIds(User $user, CustomRecipe $recipe, string $mealDate, int $ingestionId): array
+    private function getCustomIngredientIds(User $user, CustomRecipe $recipe): array
     {
         try {
             $plannedRecipe = $user->customplannedRecipeForGettingIngredient($recipe->id)
@@ -207,7 +196,7 @@ final class ShoppingListIngredientsService
         }
     }
 
-    private function getFlexIngredientIds(User $user, Flexmeal $recipe, string $mealDate, int $ingestionId): array
+    private function getFlexIngredientIds(User $user, Flexmeal $recipe): array
     {
         try {
             $plannedRecipe = $user->plannedFlexmeals()
@@ -226,7 +215,7 @@ final class ShoppingListIngredientsService
         }
     }
 
-    private function deleteRecipe($recipe, $shoppingListId)
+    private function deleteRecipe(Recipe|Flexmeal|CustomRecipe $recipe, int $shoppingListId): int
     {
         ShoppingListRecipe::where('recipe_id', $recipe->id)
             ->where('list_id', $shoppingListId)
