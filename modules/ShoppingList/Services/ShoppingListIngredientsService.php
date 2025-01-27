@@ -52,20 +52,30 @@ final class ShoppingListIngredientsService
     {
         $deletedRecipes = [];
 
+        $userRecipes = $user->recipes()
+            ->whereIn('recipes.id', $shoppingList->recipes->pluck('id'))
+            ->without('translations')
+            ->get()
+            ->keyBy('id');
+        $ingestions = Ingestion::whereIn('key', $userRecipes->pluck('pivot.meal_time'))
+            ->without('translations')
+            ->get()
+            ->keyBy('key');
         foreach ($shoppingList->recipes as $recipe) {
-            $meal = $user->recipes()
-                ->where('recipes.id', $recipe->id)
-                ->without('translations')
-                ->firstOrFail()
-                ->pivot;
+
+            $meal = $userRecipes[$recipe->id]->pivot ?? null;
+
+            if (!$meal) {
+                continue;
+            }
 
             $mealTime = $meal->meal_time;
             $mealDate = $meal->meal_date;
 
-            $ingestion = Ingestion::ofKey($mealTime)
-                ->without('translations')
-                ->select('id')
-                ->firstOrFail();
+            $ingestion = $ingestions[$mealTime] ?? null;
+            if (!$ingestion) {
+                continue;
+            }
 
             $remainingIngredients = $shoppingList->ingredients()
                 ->whereIn('ingredient_id', $this->getIngredientIds($user, $recipe, $mealDate, $ingestion->id))
@@ -84,25 +94,32 @@ final class ShoppingListIngredientsService
     {
         $deletedRecipes = [];
 
-        foreach ($shoppingList->customRecipes as $recipe) {
-            $customPlannedRecipe = $user->customPlannedRecipe($recipe->id)
-                ->without('translations')
-                ->firstOrFail();
+        $customPlannedRecipes = $user->datedCustomRecipes()
+            ->whereIn('custom_recipes.id', $shoppingList->customRecipes->pluck('id'))
+            ->without('translations')
+            ->get()
+            ->keyBy('id');
 
+        $ingestions = Ingestion::whereIn('key', $customPlannedRecipes->pluck('pivot.meal_time'))
+            ->without('translations')
+            ->get()
+            ->keyBy('key');
+        foreach ($shoppingList->customRecipes as $recipe) {
+            $customPlannedRecipe = $customPlannedRecipes[$recipe->id]->pivot ?? null;
+            //            dd($customPlannedRecipe->pivot);
+            if (!$customPlannedRecipe) {
+                continue;
+            }
             $mealTime = $customPlannedRecipe->meal_time ?? null;
             $mealDate = $customPlannedRecipe->meal_date ?? null;
 
-            if (!$mealTime || !$mealDate) {
+            $ingestion = $ingestions[$mealTime] ?? null;
+            if (!$ingestion) {
                 continue;
             }
-
-            $ingestion = Ingestion::ofKey($mealTime)
-                ->select('id')
-                ->without('translations')
-                ->firstOrFail();
-
             $remainingIngredients = $shoppingList->ingredients()
-                ->whereIn('ingredient_id', $this->getCustomIngredientIds($user, $recipe, $mealDate, $ingestion->id))
+                ->whereIn('ingredient_id',
+                    $this->getCustomIngredientIds($user, $recipe, (string) $mealDate, $ingestion->id))
                 ->count();
 
             if ($remainingIngredients === 0) {
@@ -117,27 +134,36 @@ final class ShoppingListIngredientsService
     {
         $deletedRecipes = [];
 
+        $flexMeals = $user->plannedFlexmeals()
+            ->whereIn('flexmeal_lists.id', $shoppingList->flexmeals->pluck('id'))
+            ->without('translations')
+            ->get()
+            ->keyBy('id');
+
+        $ingestions = Ingestion::whereIn('key', $flexMeals->pluck('pivot.meal_time'))
+            ->without('translations')
+            ->get()
+            ->keyBy('key');
         foreach ($shoppingList->flexmeals as $recipe) {
-            $flexMeal = $user->plannedFlexmeals()
-                ->where('flexmeal_lists.id', $recipe->id)
-                ->firstOrFail();
+            $flexMeal = $flexMeals[$recipe->id] ?? null;
 
-            $mealTime = $flexMeal->pivot->meal_time ?? null;
-            $mealDate = $flexMeal->pivot->meal_date ?? null;
-
-            if (!$mealTime || !$mealDate) {
+            if (!$flexMeal || !$flexMeal->pivot->meal_time || !$flexMeal->pivot->meal_date) {
                 continue;
             }
 
-            $ingestion = Ingestion::ofKey($mealTime)
-                ->select('id')
-                ->without('translations')
-                ->firstOrFail();
+            $mealTime = $flexMeal->pivot->meal_time;
+            $mealDate = $flexMeal->pivot->meal_date;
+
+            $ingestion = $ingestions[$mealTime] ?? null;
+            if (!$ingestion) {
+                continue;
+            }
+
+
 
             $remainingIngredients = $shoppingList->ingredients()
                 ->whereIn('ingredient_id', $this->getFlexIngredientIds($user, $recipe, $mealDate, $ingestion->id))
                 ->count();
-
             if ($remainingIngredients === 0) {
                 $deletedRecipes[] = $this->deleteRecipe($recipe, $shoppingList->id);
             }
