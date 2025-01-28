@@ -7,7 +7,6 @@ namespace App\Http\Traits\Scope;
 use App\Enums\Admin\Client\Filters\ClientConsultantFilterEnum;
 use App\Enums\Admin\Client\Filters\ClientFormularFilterEnum;
 use App\Enums\Admin\Client\Filters\ClientSubscriptionFilterEnum;
-use App\Enums\DatabaseTableEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Query\JoinClause;
@@ -33,10 +32,10 @@ trait UserModelScope
             $whereValue = $conditions['v_search'];
             $query->where(
                 function (Builder $subQuery) use ($whereValue) {
-                    $subQuery->where(DatabaseTableEnum::USERS . '.id', 'LIKE', "%{$whereValue}%")
-                        ->orWhere(DatabaseTableEnum::USERS . '.first_name', 'LIKE', "%{$whereValue}%")
-                        ->orWhere(DatabaseTableEnum::USERS . '.last_name', 'LIKE', "%{$whereValue}%")
-                        ->orWhere(DatabaseTableEnum::USERS . '.email', 'LIKE', "%{$whereValue}%");
+                    $subQuery->where('users.id', 'LIKE', "%{$whereValue}%")
+                        ->orWhere('users.first_name', 'LIKE', "%{$whereValue}%")
+                        ->orWhere('users.last_name', 'LIKE', "%{$whereValue}%")
+                        ->orWhere('users.email', 'LIKE', "%{$whereValue}%");
                 }
             );
         }
@@ -48,24 +47,24 @@ trait UserModelScope
                 ClientFormularFilterEnum::NOT_APPROVED->value => $query
                     ->select(
                         [
-                            DatabaseTableEnum::USERS . '.*',
-                            DatabaseTableEnum::QUESTIONNAIRE . '.id as formular_id',
-                            DatabaseTableEnum::QUESTIONNAIRE . '.user_id',
-                            DatabaseTableEnum::QUESTIONNAIRE . '.is_approved'
+                            'users.*',
+                            'questionnaires.id as formular_id',
+                            'questionnaires.user_id',
+                            'questionnaires.is_approved'
                         ]
                     )
-                    ->join(DatabaseTableEnum::QUESTIONNAIRE, function (JoinClause $join) {
+                    ->join('questionnaires', function (JoinClause $join) {
                         $join
-                            ->on('users.id', '=', DatabaseTableEnum::QUESTIONNAIRE . '.user_id')
+                            ->on('users.id', '=', 'questionnaires.user_id')
                             ->whereRaw(
                                 sprintf(
                                     '%1$s.id = (select MAX(%1$s.id) from %1$s where %1$s.user_id = %2$s.id)',
-                                    DatabaseTableEnum::QUESTIONNAIRE,
-                                    DatabaseTableEnum::USERS,
+                                    'questionnaires',
+                                    'users',
                                 )
                             )
                             ->where(
-                                DatabaseTableEnum::QUESTIONNAIRE . '.is_approved',
+                                'questionnaires.is_approved',
                                 '=',
                                 0,
                             );
@@ -73,24 +72,24 @@ trait UserModelScope
                 ClientFormularFilterEnum::APPROVED->value => $query
                     ->select(
                         [
-                            DatabaseTableEnum::USERS . '.*',
-                            DatabaseTableEnum::QUESTIONNAIRE . '.id as formular_id',
-                            DatabaseTableEnum::QUESTIONNAIRE . '.user_id',
-                            DatabaseTableEnum::QUESTIONNAIRE . '.is_approved'
+                            'users.*',
+                            'questionnaires.id as formular_id',
+                            'questionnaires.user_id',
+                            'questionnaires.is_approved'
                         ]
                     )
-                    ->join(DatabaseTableEnum::QUESTIONNAIRE, function (JoinClause $join) {
+                    ->join('questionnaires', function (JoinClause $join) {
                         $join
                             ->on('users.id', '=', 'questionnaires.user_id')
                             ->whereRaw(
                                 sprintf(
                                     '%1$s.id = (select MAX(%1$s.id) from %1$s where %1$s.user_id = %2$s.id)',
-                                    DatabaseTableEnum::QUESTIONNAIRE,
-                                    DatabaseTableEnum::USERS,
+                                    'questionnaires',
+                                    'users',
                                 )
                             )
                             ->where(
-                                DatabaseTableEnum::QUESTIONNAIRE . '.is_approved',
+                                'questionnaires.is_approved',
                                 '=',
                                 1,
                             );
@@ -124,8 +123,8 @@ trait UserModelScope
                             ->whereRaw(
                                 sprintf(
                                     '%1$s.id = (select MAX(%1$s.id) from %1$s where %1$s.assigned_user_id = %2$s.id)',
-                                    DatabaseTableEnum::CHARGEBEE_SUBSCRIPTIONS,
-                                    DatabaseTableEnum::USERS
+                                    'chargebee_subscriptions',
+                                    'users'
                                 )
                             )
                             ->whereJsonContains('data->status', 'active');
@@ -136,8 +135,8 @@ trait UserModelScope
                             ->selectSub(
                                 sprintf(
                                     'select count(%1$s.id) from %1$s where %2$s.id = %1$s.assigned_user_id and JSON_VALUE(%1$s.data, \'$.status\') = \'active\'',
-                                    DatabaseTableEnum::CHARGEBEE_SUBSCRIPTIONS,
-                                    DatabaseTableEnum::USERS
+                                    'chargebee_subscriptions',
+                                    'users'
                                 ),
                                 'assigned_chargebee_subscriptions_count'
                             )
@@ -231,27 +230,27 @@ trait UserModelScope
         return $this
             ->allRecipes()
             ->leftJoin(
-                DatabaseTableEnum::USER_RECIPE_CALCULATED,
-                DatabaseTableEnum::RECIPES . '.id',
+                'user_recipe_calculated',
+                'recipes.id',
                 '=',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.recipe_id'
+                'user_recipe_calculated.recipe_id'
             )
             ->leftJoin(
-                DatabaseTableEnum::INGESTIONS,
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.ingestion_id',
+                'ingestions',
+                'user_recipe_calculated.ingestion_id',
                 '=',
-                DatabaseTableEnum::INGESTIONS . '.id'
+                'ingestions.id'
             )
             ->select([
-                DatabaseTableEnum::RECIPES . '.*',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.ingestion_id AS calc_ingestion_id',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.recipe_data AS calc_recipe_data',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.invalid AS calc_invalid',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.updated_at AS calc_updated_at',
+                'recipes.*',
+                'user_recipe_calculated.ingestion_id AS calc_ingestion_id',
+                'user_recipe_calculated.recipe_data AS calc_recipe_data',
+                'user_recipe_calculated.invalid AS calc_invalid',
+                'user_recipe_calculated.updated_at AS calc_updated_at',
             ])
-            ->where(DatabaseTableEnum::USER_RECIPE_CALCULATED . '.user_id', $this->id)
-            ->where(DatabaseTableEnum::USER_RECIPE_CALCULATED . '.invalid', 0)
-            ->where(DatabaseTableEnum::RECIPES . '.id', $recipeId);
+            ->where('user_recipe_calculated.user_id', $this->id)
+            ->where('user_recipe_calculated.invalid', 0)
+            ->where('recipes.id', $recipeId);
     }
 
     /**
@@ -263,34 +262,34 @@ trait UserModelScope
             ->recipes()
             ->withPivot('meal_date', 'meal_time', 'cooked')
             ->leftJoin(
-                DatabaseTableEnum::USER_RECIPE_CALCULATED,
-                DatabaseTableEnum::RECIPES . '.id',
+                'user_recipe_calculated',
+                'recipes.id',
                 '=',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.recipe_id'
+                'user_recipe_calculated.recipe_id'
             )
             ->leftJoin(
-                DatabaseTableEnum::INGESTIONS,
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.ingestion_id',
+                'ingestions',
+                'user_recipe_calculated.ingestion_id',
                 '=',
-                DatabaseTableEnum::INGESTIONS . '.id'
+                'ingestions.id'
             )
             ->select(
-                DatabaseTableEnum::RECIPES . '.*',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.recipe_data AS calc_recipe_data',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.invalid AS calc_invalid',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.updated_at AS calc_updated_at',
-                DatabaseTableEnum::RECIPES_TO_USERS . '.meal_date AS meal_date',
-                DatabaseTableEnum::INGESTIONS . '.key AS meal_time'
+                'recipes.*',
+                'user_recipe_calculated.recipe_data AS calc_recipe_data',
+                'user_recipe_calculated.invalid AS calc_invalid',
+                'user_recipe_calculated.updated_at AS calc_updated_at',
+                'recipes_to_users.meal_date AS meal_date',
+                'ingestions.key AS meal_time'
             )
             ->whereColumn(
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.ingestion_id',
-                DatabaseTableEnum::RECIPES_TO_USERS . '.ingestion_id'
+                'user_recipe_calculated.ingestion_id',
+                'recipes_to_users.ingestion_id'
             )
-            ->where(DatabaseTableEnum::USER_RECIPE_CALCULATED . '.user_id', $this->id)
-            ->where(DatabaseTableEnum::USER_RECIPE_CALCULATED . '.invalid', 0)
-            ->where(DatabaseTableEnum::RECIPES_TO_USERS . '.eat_out', '!=', 1)
-            ->whereDate(DatabaseTableEnum::RECIPES_TO_USERS . '.meal_date', '>=', $dateStart)
-            ->whereDate(DatabaseTableEnum::RECIPES_TO_USERS . '.meal_date', '<=', $dateEnd);
+            ->where('user_recipe_calculated.user_id', $this->id)
+            ->where('user_recipe_calculated.invalid', 0)
+            ->where('recipes_to_users.eat_out', '!=', 1)
+            ->whereDate('recipes_to_users.meal_date', '>=', $dateStart)
+            ->whereDate('recipes_to_users.meal_date', '<=', $dateEnd);
     }
 
     /**
@@ -302,31 +301,31 @@ trait UserModelScope
             ->recipes()
             ->withPivot('meal_date', 'meal_time', 'cooked')
             ->leftJoin(
-                DatabaseTableEnum::USER_RECIPE_CALCULATED,
-                DatabaseTableEnum::RECIPES . '.id',
+                'user_recipe_calculated',
+                'recipes.id',
                 '=',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.recipe_id'
+                'user_recipe_calculated.recipe_id'
             )
             ->leftJoin(
-                DatabaseTableEnum::INGESTIONS,
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.ingestion_id',
+                'ingestions',
+                'user_recipe_calculated.ingestion_id',
                 '=',
-                DatabaseTableEnum::INGESTIONS . '.id'
+                'ingestions.id'
             )
             ->select([
-                DatabaseTableEnum::RECIPES . '.*',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.recipe_data AS calc_recipe_data',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.invalid AS calc_invalid',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.updated_at AS calc_updated_at',
-                DatabaseTableEnum::RECIPES_TO_USERS . '.meal_date AS meal_date',
+                'recipes.*',
+                'user_recipe_calculated.recipe_data AS calc_recipe_data',
+                'user_recipe_calculated.invalid AS calc_invalid',
+                'user_recipe_calculated.updated_at AS calc_updated_at',
+                'recipes_to_users.meal_date AS meal_date',
             ])
             ->whereColumn(
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.ingestion_id',
-                DatabaseTableEnum::RECIPES_TO_USERS . '.ingestion_id'
+                'user_recipe_calculated.ingestion_id',
+                'recipes_to_users.ingestion_id'
             )
-            ->where(DatabaseTableEnum::USER_RECIPE_CALCULATED . '.user_id', $this->id)
-            ->where(DatabaseTableEnum::USER_RECIPE_CALCULATED . '.invalid', 0)
-            ->where(DatabaseTableEnum::RECIPES . '.id', $recipeID);
+            ->where('user_recipe_calculated.user_id', $this->id)
+            ->where('user_recipe_calculated.invalid', 0)
+            ->where('recipes.id', $recipeID);
     }
 
     /**
@@ -338,31 +337,31 @@ trait UserModelScope
             ->datedCustomRecipes()
             ->withPivot('meal_date', 'meal_time', 'cooked')
             ->leftJoin(
-                DatabaseTableEnum::USER_RECIPE_CALCULATED,
-                DatabaseTableEnum::CUSTOM_RECIPES . '.id',
+                'user_recipe_calculated',
+                'custom_recipes.id',
                 '=',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.custom_recipe_id'
+                'user_recipe_calculated.custom_recipe_id'
             )
             ->leftJoin(
-                DatabaseTableEnum::INGESTIONS,
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.ingestion_id',
+                'ingestions',
+                'user_recipe_calculated.ingestion_id',
                 '=',
-                DatabaseTableEnum::INGESTIONS . '.id'
+                'ingestions.id'
             )
             ->select([
-                DatabaseTableEnum::RECIPES_TO_USERS . '.custom_recipe_id AS custom_recipe_id',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.recipe_data AS calc_recipe_data',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.invalid AS calc_invalid',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.updated_at AS calc_updated_at',
-                DatabaseTableEnum::RECIPES_TO_USERS . '.meal_date AS meal_date',
+                'recipes_to_users.custom_recipe_id AS custom_recipe_id',
+                'user_recipe_calculated.recipe_data AS calc_recipe_data',
+                'user_recipe_calculated.invalid AS calc_invalid',
+                'user_recipe_calculated.updated_at AS calc_updated_at',
+                'recipes_to_users.meal_date AS meal_date',
             ])
             ->whereColumn(
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.ingestion_id',
-                DatabaseTableEnum::RECIPES_TO_USERS . '.ingestion_id'
+                'user_recipe_calculated.ingestion_id',
+                'recipes_to_users.ingestion_id'
             )
-            ->where(DatabaseTableEnum::USER_RECIPE_CALCULATED . '.user_id', $this->id)
-            ->where(DatabaseTableEnum::USER_RECIPE_CALCULATED . '.invalid', 0)
-            ->where(DatabaseTableEnum::CUSTOM_RECIPES . '.id', $recipeId);
+            ->where('user_recipe_calculated.user_id', $this->id)
+            ->where('user_recipe_calculated.invalid', 0)
+            ->where('custom_recipes.id', $recipeId);
     }
 
     /**
@@ -374,33 +373,33 @@ trait UserModelScope
             ->datedCustomRecipes()
             ->withPivot('meal_date', 'meal_time', 'cooked')
             ->leftJoin(
-                DatabaseTableEnum::USER_RECIPE_CALCULATED,
-                DatabaseTableEnum::CUSTOM_RECIPES . '.id',
+                'user_recipe_calculated',
+                'custom_recipes.id',
                 '=',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.custom_recipe_id'
+                'user_recipe_calculated.custom_recipe_id'
             )
             ->leftJoin(
-                DatabaseTableEnum::INGESTIONS,
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.ingestion_id',
+                'ingestions',
+                'user_recipe_calculated.ingestion_id',
                 '=',
-                DatabaseTableEnum::INGESTIONS . '.id'
+                'ingestions.id'
             )
             ->select(
-                DatabaseTableEnum::RECIPES_TO_USERS . '.custom_recipe_id AS custom_recipe_id',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.recipe_data AS calc_recipe_data',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.invalid AS calc_invalid',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.updated_at AS calc_updated_at',
-                DatabaseTableEnum::RECIPES_TO_USERS . '.meal_date AS meal_date',
+                'recipes_to_users.custom_recipe_id AS custom_recipe_id',
+                'user_recipe_calculated.recipe_data AS calc_recipe_data',
+                'user_recipe_calculated.invalid AS calc_invalid',
+                'user_recipe_calculated.updated_at AS calc_updated_at',
+                'recipes_to_users.meal_date AS meal_date',
             )
             ->whereColumn(
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.ingestion_id',
-                DatabaseTableEnum::RECIPES_TO_USERS . '.ingestion_id'
+                'user_recipe_calculated.ingestion_id',
+                'recipes_to_users.ingestion_id'
             )
-            ->where(DatabaseTableEnum::USER_RECIPE_CALCULATED . '.user_id', $this->id)
-            ->where(DatabaseTableEnum::USER_RECIPE_CALCULATED . '.invalid', 0)
-            ->where(DatabaseTableEnum::RECIPES_TO_USERS . '.eat_out', '!=', 1)
-            ->whereDate(DatabaseTableEnum::RECIPES_TO_USERS . '.meal_date', '>=', $dateStart)
-            ->whereDate(DatabaseTableEnum::RECIPES_TO_USERS . '.meal_date', '<=', $dateEnd);
+            ->where('user_recipe_calculated.user_id', $this->id)
+            ->where('user_recipe_calculated.invalid', 0)
+            ->where('recipes_to_users.eat_out', '!=', 1)
+            ->whereDate('recipes_to_users.meal_date', '>=', $dateStart)
+            ->whereDate('recipes_to_users.meal_date', '<=', $dateEnd);
     }
 
     /**
@@ -412,31 +411,31 @@ trait UserModelScope
             ->datedCustomRecipes()
             ->withPivot('meal_date', 'meal_time', 'cooked')
             ->leftJoin(
-                DatabaseTableEnum::USER_RECIPE_CALCULATED,
-                DatabaseTableEnum::CUSTOM_RECIPES . '.id',
+                'user_recipe_calculated',
+                'custom_recipes.id',
                 '=',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.custom_recipe_id'
+                'user_recipe_calculated.custom_recipe_id'
             )
             ->leftJoin(
-                DatabaseTableEnum::INGESTIONS,
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.ingestion_id',
+                'ingestions',
+                'user_recipe_calculated.ingestion_id',
                 '=',
-                DatabaseTableEnum::INGESTIONS . '.id'
+                'ingestions.id'
             )
             ->select(
-                DatabaseTableEnum::RECIPES_TO_USERS . '.custom_recipe_id AS custom_recipe_id',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.recipe_data AS calc_recipe_data',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.invalid AS calc_invalid',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.updated_at AS calc_updated_at',
-                DatabaseTableEnum::RECIPES_TO_USERS . '.meal_date AS meal_date'
+                'recipes_to_users.custom_recipe_id AS custom_recipe_id',
+                'user_recipe_calculated.recipe_data AS calc_recipe_data',
+                'user_recipe_calculated.invalid AS calc_invalid',
+                'user_recipe_calculated.updated_at AS calc_updated_at',
+                'recipes_to_users.meal_date AS meal_date'
             )
             ->whereColumn(
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.ingestion_id',
-                DatabaseTableEnum::RECIPES_TO_USERS . '.ingestion_id'
+                'user_recipe_calculated.ingestion_id',
+                'recipes_to_users.ingestion_id'
             )
-            ->where(DatabaseTableEnum::USER_RECIPE_CALCULATED . '.invalid', 0)
-            ->where(DatabaseTableEnum::USER_RECIPE_CALCULATED . '.user_id', $this->id)
-            ->where(DatabaseTableEnum::CUSTOM_RECIPES . '.id', $recipeID);
+            ->where('user_recipe_calculated.invalid', 0)
+            ->where('user_recipe_calculated.user_id', $this->id)
+            ->where('custom_recipes.id', $recipeID);
     }
 
     /**
@@ -461,34 +460,34 @@ trait UserModelScope
         return $this
             ->recipes()
             ->withPivot('meal_date', 'meal_time', 'cooked')
-            ->leftJoin(DatabaseTableEnum::USER_RECIPE_CALCULATED, function ($join) use ($ingestionId) {
+            ->leftJoin('user_recipe_calculated', function ($join) use ($ingestionId) {
                 $join
-                    ->where(DatabaseTableEnum::USER_RECIPE_CALCULATED . '.user_id', '=', $this->id)
-                    ->on(DatabaseTableEnum::USER_RECIPE_CALCULATED . '.recipe_id', '=', DatabaseTableEnum::RECIPES . '.id')
-                    ->where(DatabaseTableEnum::USER_RECIPE_CALCULATED . '.ingestion_id', '=', $ingestionId);
+                    ->where('user_recipe_calculated.user_id', '=', $this->id)
+                    ->on('user_recipe_calculated.recipe_id', '=', 'recipes.id')
+                    ->where('user_recipe_calculated.ingestion_id', '=', $ingestionId);
             })
             ->leftJoin(
-                DatabaseTableEnum::INGESTIONS,
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.ingestion_id',
+                'ingestions',
+                'user_recipe_calculated.ingestion_id',
                 '=',
-                DatabaseTableEnum::INGESTIONS . '.id'
+                'ingestions.id'
             )
             ->select([
-                DatabaseTableEnum::RECIPES . '.*',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.recipe_data AS calc_recipe_data',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.invalid AS calc_invalid',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.updated_at AS calc_updated_at',
-                DatabaseTableEnum::RECIPES_TO_USERS . '.meal_date AS meal_date'
+                'recipes.*',
+                'user_recipe_calculated.recipe_data AS calc_recipe_data',
+                'user_recipe_calculated.invalid AS calc_invalid',
+                'user_recipe_calculated.updated_at AS calc_updated_at',
+                'recipes_to_users.meal_date AS meal_date'
            ])
             ->whereColumn(
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.ingestion_id',
-                DatabaseTableEnum::RECIPES_TO_USERS . '.ingestion_id'
+                'user_recipe_calculated.ingestion_id',
+                'recipes_to_users.ingestion_id'
             )
-            ->where(DatabaseTableEnum::RECIPES . '.id', $recipe_id)
-            ->where(DatabaseTableEnum::RECIPES_TO_USERS . '.ingestion_id', $ingestionId)
+            ->where('recipes.id', $recipe_id)
+            ->where('recipes_to_users.ingestion_id', $ingestionId)
             //TODO:: @NickMost refactor, trick to show only allowed for user ingestions
-            ->whereIn(DatabaseTableEnum::INGESTIONS.'.id', $this->allowed_ingestion_ids)
-            ->whereDate(DatabaseTableEnum::RECIPES_TO_USERS . '.meal_date', $date);
+            ->whereIn('ingestions'.'.id', $this->allowed_ingestion_ids)
+            ->whereDate('recipes_to_users.meal_date', $date);
     }
 
     public function scopePlannedRecipesForGettingIngredients(
@@ -535,35 +534,35 @@ trait UserModelScope
             ->datedCustomRecipes()
             ->withPivot('meal_date', 'meal_time', 'cooked')
             ->leftJoin(
-                DatabaseTableEnum::USER_RECIPE_CALCULATED,
-                DatabaseTableEnum::CUSTOM_RECIPES . '.id',
+                'user_recipe_calculated',
+                'custom_recipes.id',
                 '=',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.custom_recipe_id'
+                'user_recipe_calculated.custom_recipe_id'
             )
             ->leftJoin(
-                DatabaseTableEnum::INGESTIONS,
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.ingestion_id',
+                'ingestions',
+                'user_recipe_calculated.ingestion_id',
                 '=',
-                DatabaseTableEnum::INGESTIONS . '.id'
+                'ingestions.id'
             )
             ->select(
-                DatabaseTableEnum::CUSTOM_RECIPES . '.*',
-                DatabaseTableEnum::CUSTOM_RECIPES . '.recipe_id AS original_recipe_id',
-                DatabaseTableEnum::RECIPES_TO_USERS . '.custom_recipe_id AS custom_recipe_id',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.recipe_data AS calc_recipe_data',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.invalid AS calc_invalid',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.updated_at AS calc_updated_at',
-                DatabaseTableEnum::RECIPES_TO_USERS . '.meal_date AS meal_date',
-                DatabaseTableEnum::INGESTIONS . '.key AS meal_time'
+                'custom_recipes.*',
+                'custom_recipes.recipe_id AS original_recipe_id',
+                'recipes_to_users.custom_recipe_id AS custom_recipe_id',
+                'user_recipe_calculated.recipe_data AS calc_recipe_data',
+                'user_recipe_calculated.invalid AS calc_invalid',
+                'user_recipe_calculated.updated_at AS calc_updated_at',
+                'recipes_to_users.meal_date AS meal_date',
+                'ingestions.key AS meal_time'
             )
             ->whereColumn(
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.ingestion_id',
-                DatabaseTableEnum::RECIPES_TO_USERS . '.ingestion_id'
+                'user_recipe_calculated.ingestion_id',
+                'recipes_to_users.ingestion_id'
             )
             //TODO:: @NickMost refactor, trick to show only allowed for user ingestions
-//            ->whereIn(DatabaseTableEnum::INGESTIONS.'.id',$this->allowedIngestionsId())
-            ->where(DatabaseTableEnum::USER_RECIPE_CALCULATED . '.user_id', $this->id)
-            ->where(DatabaseTableEnum::CUSTOM_RECIPES . '.id', $id);
+//            ->whereIn('ingestions'.'.id',$this->allowedIngestionsId())
+            ->where('user_recipe_calculated.user_id', $this->id)
+            ->where('custom_recipes.id', $id);
     }
 
     public function scopeCustomPlannedRecipeForGettingIngredient(Builder $query, int $id): BelongsToMany
@@ -609,39 +608,39 @@ trait UserModelScope
         return $this
             ->allRecipes()
             ->leftJoin(
-                DatabaseTableEnum::USER_RECIPE_CALCULATED,
-                DatabaseTableEnum::RECIPES . '.id',
+                'user_recipe_calculated',
+                'recipes.id',
                 '=',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.recipe_id'
+                'user_recipe_calculated.recipe_id'
             )
             ->leftJoin(
-                DatabaseTableEnum::INGESTIONS,
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.ingestion_id',
+                'ingestions',
+                'user_recipe_calculated.ingestion_id',
                 '=',
-                DatabaseTableEnum::INGESTIONS . '.id'
+                'ingestions.id'
             )
             ->leftJoin(
                 'user_excluded_recipes',
                 function ($join) {
-                    $join->on(DatabaseTableEnum::RECIPES . '.id', '=', 'user_excluded_recipes.recipe_id')
-                        ->on(DatabaseTableEnum::USER_RECIPE_CALCULATED . '.user_id', '=', 'user_excluded_recipes.user_id');
+                    $join->on('recipes.id', '=', 'user_excluded_recipes.recipe_id')
+                        ->on('user_recipe_calculated.user_id', '=', 'user_excluded_recipes.user_id');
                 }
             )
             ->select(
-                DatabaseTableEnum::RECIPES . '.*',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.ingestion_id AS calc_ingestion_id',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.recipe_data AS calc_recipe_data',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.invalid AS calc_invalid',
+                'recipes.*',
+                'user_recipe_calculated.ingestion_id AS calc_ingestion_id',
+                'user_recipe_calculated.recipe_data AS calc_recipe_data',
+                'user_recipe_calculated.invalid AS calc_invalid',
                 'user_excluded_recipes.recipe_id AS excluded',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED . '.updated_at AS calc_updated_at',
-                DatabaseTableEnum::INGESTIONS . '.key AS meal_time'
+                'user_recipe_calculated.updated_at AS calc_updated_at',
+                'ingestions.key AS meal_time'
             )
-            ->where(DatabaseTableEnum::USER_RECIPE_CALCULATED . '.user_id', $this->id)
-            ->where(DatabaseTableEnum::RECIPES . '.id', $recipeId)
-            ->where(DatabaseTableEnum::USER_RECIPE_CALCULATED . '.recipe_data', '!=', '')
-            ->where(DatabaseTableEnum::USER_RECIPE_CALCULATED . '.recipe_data', '!=', '[]')
+            ->where('user_recipe_calculated.user_id', $this->id)
+            ->where('recipes.id', $recipeId)
+            ->where('user_recipe_calculated.recipe_data', '!=', '')
+            ->where('user_recipe_calculated.recipe_data', '!=', '[]')
             //TODO:: @NickMost refactor, trick to show only allowed for user ingestions
-//            ->whereIn(DatabaseTableEnum::INGESTIONS.'.id',$this->allowedIngestionsId())
-            ->whereIn(DatabaseTableEnum::USER_RECIPE_CALCULATED . '.id', $preferedUserRecipeCalculatedIds);
+//            ->whereIn('ingestions'.'.id',$this->allowedIngestionsId())
+            ->whereIn('user_recipe_calculated.id', $preferedUserRecipeCalculatedIds);
     }
 }
