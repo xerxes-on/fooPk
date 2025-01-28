@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Modules\ShoppingList\Services;
 
+use App\Exceptions\PublicException;
 use App\Models\{CustomRecipe, Ingestion, Recipe, User};
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Cache;
 use Modules\FlexMeal\Models\Flexmeal;
 use Modules\ShoppingList\Events\ShoppingListProcessed;
@@ -35,10 +35,14 @@ final class ShoppingListIngredientsService
             'custom_title'  => $title,
         ]);
     }
-    public function removeIngredient(User $user, int|string $ingredientId): ?array
+
+    /**
+     * @throws PublicException
+     */
+    public function removeIngredient(User $user, int|string $ingredientId): array
     {
         if (!ShoppingListIngredient::whereId($ingredientId)->delete()) {
-            return null;
+            throw new PublicException('Ingredient not found thus could not be deleted');
         }
 
         $shoppingList = $user->shoppingList;
@@ -107,7 +111,6 @@ final class ShoppingListIngredientsService
                 continue;
             }
             $mealTime = $customPlannedRecipe->meal_time ?? null;
-            //            $mealDate = $customPlannedRecipe->meal_date ?? null;
 
             $ingestion = $ingestions[$mealTime] ?? null;
             if (!$ingestion) {
@@ -144,7 +147,7 @@ final class ShoppingListIngredientsService
             }
 
             $mealTime = $flexMeal->pivot->meal_time;
-            //            $mealDate = $flexMeal->pivot->meal_date;
+
             $ingestion = $ingestions[$mealTime] ?? null;
             if (!$ingestion) {
                 continue;
@@ -163,56 +166,48 @@ final class ShoppingListIngredientsService
 
     private function getIngredientIds(User $user, Recipe $recipe, string $mealDate, int $ingestionId): array
     {
-        try {
-            $plannedRecipe = $user->plannedRecipesForGettingIngredients($recipe->id, $mealDate, $ingestionId)
-                ->firstOrFail();
 
-            $recipeData = json_decode($plannedRecipe->calc_recipe_data, true);
+        $plannedRecipe = $user->plannedRecipesForGettingIngredients($recipe->id, $mealDate, $ingestionId)
+            ->firstOrFail();
 
-            if (!empty($recipeData['ingredients'])) {
-                return array_column($recipeData['ingredients'], 'id');
-            }
+        $recipeData = json_decode($plannedRecipe->calc_recipe_data, true);
 
-            return [];
-        } catch (ModelNotFoundException) {
-            return [];
+        if (!empty($recipeData['ingredients'])) {
+            return array_column($recipeData['ingredients'], 'id');
         }
+
+        return [];
+
     }
 
     private function getCustomIngredientIds(User $user, CustomRecipe $recipe): array
     {
-        try {
-            $plannedRecipe = $user->customplannedRecipeForGettingIngredient($recipe->id)
-                ->firstOrFail();
-            $recipeData = json_decode($plannedRecipe->calc_recipe_data, true);
+        $plannedRecipe = $user->customplannedRecipeForGettingIngredient($recipe->id)
+            ->firstOrFail();
+        $recipeData = json_decode($plannedRecipe->calc_recipe_data, true);
 
-            if (!empty($recipeData['ingredients'])) {
-                return array_column($recipeData['ingredients'], 'id');
-            }
-
-            return [];
-        } catch (ModelNotFoundException) {
-            return [];
+        if (!empty($recipeData['ingredients'])) {
+            return array_column($recipeData['ingredients'], 'id');
         }
+
+        return [];
+
     }
 
     private function getFlexIngredientIds(User $user, Flexmeal $recipe): array
     {
-        try {
-            $plannedRecipe = $user->plannedFlexmeals()
-                ->where('flexmeal_lists.id', $recipe->id)
-                ->firstOrFail();
+        $plannedRecipe = $user->plannedFlexmeals()
+            ->where('flexmeal_lists.id', $recipe->id)
+            ->firstOrFail();
 
-            $recipeData = json_decode($plannedRecipe->calc_recipe_data, true);
+        $recipeData = json_decode($plannedRecipe->calc_recipe_data, true);
 
-            if (!empty($recipeData['ingredients'])) {
-                return array_column($recipeData['ingredients'], 'id');
-            }
-
-            return [];
-        } catch (ModelNotFoundException) {
-            return [];
+        if (!empty($recipeData['ingredients'])) {
+            return array_column($recipeData['ingredients'], 'id');
         }
+
+        return [];
+
     }
 
     private function deleteRecipe(Recipe|Flexmeal|CustomRecipe $recipe, int $shoppingListId): int

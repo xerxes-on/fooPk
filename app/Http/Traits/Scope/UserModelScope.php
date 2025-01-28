@@ -499,30 +499,28 @@ trait UserModelScope
     ): BelongsToMany {
         return $this
             ->recipes()
-            ->leftJoin(DatabaseTableEnum::USER_RECIPE_CALCULATED, function ($join) use ($ingestionId) {
+            ->leftJoin('user_recipe_calculated', function ($join) use ($ingestionId) {
                 $join
-                    ->where(DatabaseTableEnum::USER_RECIPE_CALCULATED.'.user_id', '=', $this->id)
-                    ->on(DatabaseTableEnum::USER_RECIPE_CALCULATED.'.recipe_id', '=', DatabaseTableEnum::RECIPES.'.id')
-                    ->where(DatabaseTableEnum::USER_RECIPE_CALCULATED.'.ingestion_id', '=', $ingestionId);
+                    ->where('user_recipe_calculated.user_id', '=', $this->id)
+                    ->on('user_recipe_calculated.recipe_id', '=', 'recipes.id')
+                    ->where('user_recipe_calculated.ingestion_id', '=', $ingestionId);
             })
             ->leftJoin(
-                DatabaseTableEnum::INGESTIONS,
-                DatabaseTableEnum::USER_RECIPE_CALCULATED.'.ingestion_id',
+                'ingestions',
+                'user_recipe_calculated.ingestion_id',
                 '=',
-                DatabaseTableEnum::INGESTIONS.'.id'
+                'ingestions.id'
             )
-            ->select([
-                DatabaseTableEnum::USER_RECIPE_CALCULATED.'.recipe_data AS calc_recipe_data',
-            ])
+            ->select('user_recipe_calculated.recipe_data AS calc_recipe_data',)
             ->whereColumn(
-                DatabaseTableEnum::USER_RECIPE_CALCULATED.'.ingestion_id',
-                DatabaseTableEnum::RECIPES_TO_USERS.'.ingestion_id'
+                'user_recipe_calculated.ingestion_id',
+                'recipes_to_users.ingestion_id'
             )
-            ->where(DatabaseTableEnum::RECIPES.'.id', $recipe_id)
-            ->where(DatabaseTableEnum::RECIPES_TO_USERS.'.ingestion_id', $ingestionId)
+            ->where('recipes.id', $recipe_id)
+            ->where('recipes_to_users.ingestion_id', $ingestionId)
             //TODO:: @NickMost refactor, trick to show only allowed for user ingestions
-            ->whereIn(DatabaseTableEnum::INGESTIONS.'.id', $this->allowed_ingestion_ids)
-            ->whereDate(DatabaseTableEnum::RECIPES_TO_USERS.'.meal_date', $date);
+            ->whereIn('ingestions.id', $this->allowed_ingestion_ids)
+            ->whereDate('recipes_to_users.meal_date', $date);
     }
 
 
@@ -573,28 +571,24 @@ trait UserModelScope
         return $this
             ->datedCustomRecipes()
             ->leftJoin(
-                DatabaseTableEnum::USER_RECIPE_CALCULATED,
-                DatabaseTableEnum::CUSTOM_RECIPES.'.id',
+                'user_recipe_calculated',
+                'custom_recipes.id',
                 '=',
-                DatabaseTableEnum::USER_RECIPE_CALCULATED.'.custom_recipe_id'
+                'user_recipe_calculated.custom_recipe_id'
             )
             ->leftJoin(
-                DatabaseTableEnum::INGESTIONS,
-                DatabaseTableEnum::USER_RECIPE_CALCULATED.'.ingestion_id',
+                'ingestions',
+                'user_recipe_calculated.ingestion_id',
                 '=',
-                DatabaseTableEnum::INGESTIONS.'.id'
+                'ingestions.id'
             )
-            ->select(
-                DatabaseTableEnum::USER_RECIPE_CALCULATED.'.recipe_data AS calc_recipe_data',
-            )
+            ->select('user_recipe_calculated.recipe_data AS calc_recipe_data',)
             ->whereColumn(
-                DatabaseTableEnum::USER_RECIPE_CALCULATED.'.ingestion_id',
-                DatabaseTableEnum::RECIPES_TO_USERS.'.ingestion_id'
+                'user_recipe_calculated.ingestion_id',
+                'recipes_to_users.ingestion_id'
             )
-            //TODO:: @NickMost refactor, trick to show only allowed for user ingestions
-//            ->whereIn(DatabaseTableEnum::INGESTIONS.'.id',$this->allowedIngestionsId())
-            ->where(DatabaseTableEnum::USER_RECIPE_CALCULATED.'.user_id', $this->id)
-            ->where(DatabaseTableEnum::CUSTOM_RECIPES.'.id', $id);
+            ->where('user_recipe_calculated.user_id', $this->id)
+            ->where('custom_recipes.id', $id);
     }
 
     /**

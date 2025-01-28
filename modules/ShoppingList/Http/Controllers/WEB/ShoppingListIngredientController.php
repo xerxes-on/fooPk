@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\ShoppingList\Http\Controllers\WEB;
 
+use App\Exceptions\PublicException;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Modules\ShoppingList\Http\Requests\ChangeIngredientStatusRequest;
@@ -43,10 +44,12 @@ final class ShoppingListIngredientController extends Controller
      */
     public function destroy(DeleteIngredientRequest $request, ShoppingListIngredientsService $service): JsonResponse
     {
-        $data = $service->removeIngredient($request->user(), $request->ingredient_id);
-        return is_array($data) ?
-            $this->sendResponse($data, trans('common.success')) :
-            $this->sendError(message: trans('common.error'));
+        try {
+            $data = $service->removeIngredient($request->user(), $request->ingredient_id);
+        } catch (PublicException $e) {
+            return $this->sendError(message: trans('common.error'));
+        }
+        return $this->sendResponse($data, trans('common.success'));
     }
 
     /**
