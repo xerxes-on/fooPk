@@ -29,7 +29,7 @@ final class UserSettingsFormRequest extends FormRequest
     {
         return [
             'first_name'    => ['required', 'string'],
-            'last_name'     => ['required', 'string'],
+            'last_name' => ['string', 'nullable'],
             'lang'          => ['required', 'string'],
             'old_password'  => ['string', 'nullable'],
             'new_password'  => ['string', 'nullable'],

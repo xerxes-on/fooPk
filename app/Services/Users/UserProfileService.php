@@ -18,9 +18,10 @@ final class UserProfileService
         // TODO: modify validate and process date inside form request handler
         $user             = $request->user();
         $user->first_name = $request->first_name;
-        $user->last_name  = $request->last_name;
         $user->lang       = $request->lang;
-
+        if ($request->last_name) {
+            $user->last_name = $request->last_name;
+        }
         if (!empty($request->old_password) && !empty($request->new_password)) {
             if (!\Hash::check($request->old_password, $user->password)) {
                 throw new PublicException(trans('common.current_password_is_incorrect'));
