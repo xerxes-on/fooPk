@@ -187,6 +187,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static Builder|User plannedFlexmealsForDatePeriod(string $dateStart, string $dateEnd)
  * @method static Builder|User plannedRecipes(int $recipe_id, string $date, int $ingestionId)
  * @method static Builder|User plannedRecipesForGettingIngredients(int $recipe_id, string $date, int $ingestionId)
+ * @method static Builder|User plannedFlexmealForGettingIngredients(int $recipe_id, string $date, int $ingestionId)
  * @method static Builder|User query()
  * @method static Builder|User recipeWithCalculations(int $recipeId)
  * @method static Builder|User role($roles, $guard = null)

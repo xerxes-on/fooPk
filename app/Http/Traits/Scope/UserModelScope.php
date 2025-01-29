@@ -590,6 +590,28 @@ trait UserModelScope
             ->where('custom_recipes.id', $id);
     }
 
+    public function scopePlannedFlexmealForGettingIngredients(
+        Builder $query,
+        int $id,
+        string $date,
+        int $ingestionId
+    ): BelongsToMany {
+        return $this
+            ->plannedFlexmeals()
+            ->join(
+                'user_recipe_calculated',
+                'flexmeal_lists.id',
+                '=',
+                'recipes_to_users.flexmeal_id'
+            )
+            ->with('ingredients')
+            ->select(
+                'flexmeal_lists.id'
+            )
+            ->where('flexmeal_lists.id', $id)
+            ->whereDate('recipes_to_users.meal_date', $date)
+            ->where('recipes_to_users.ingestion_id', $ingestionId);
+    }
     /**
      * Scope a query for common recipe with calculations.
      */

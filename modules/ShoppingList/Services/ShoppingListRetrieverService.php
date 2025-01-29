@@ -210,7 +210,7 @@ final class ShoppingListRetrieverService
             [
                 $list->recipes()->with('ingestions')->get(),
                 $list->customRecipes()->with(['ingestion', 'originalRecipe'])->get(),
-                $list->flexmeals($userId)->with(['ingestion', 'image', 'pivot'])->get()
+                $list->flexmeals($userId)->with('ingestion')->get()
             ]
         )
             ->flatten()

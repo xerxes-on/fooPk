@@ -7,8 +7,7 @@ namespace Modules\ShoppingList\Services;
 use App\Exceptions\PublicException;
 use App\Models\{CustomRecipe, Ingestion, Recipe, User};
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Cache;
-use Modules\FlexMeal\Models\Flexmeal;
+use Modules\FlexMeal\Models\FlexmealLists;
 use Modules\ShoppingList\Events\ShoppingListProcessed;
 use Modules\ShoppingList\Models\ShoppingList;
 use Modules\ShoppingList\Models\ShoppingListIngredient;
@@ -42,13 +41,11 @@ final class ShoppingListIngredientsService
     public function removeIngredient(User $user, int|string $ingredientId): array
     {
         if (!ShoppingListIngredient::whereId($ingredientId)->delete()) {
-            throw new PublicException('Ingredient not found thus could not be deleted');
+            throw new PublicException(__('shopping-list::messages.error.item_removal'));
         }
 
         $shoppingList = $user->shoppingList;
-        $ingestions = Cache::remember('ingestions_by_key', now()->addHour(), function () {
-            return Ingestion::without('translations')->get()->keyBy('key');
-        });
+        $ingestions = Ingestion::getAll()->keyBy('key');
         return array_merge(
             $this->handleStandardRecipes($user, $shoppingList, $ingestions),
             $this->handleCustomRecipes($user, $shoppingList, $ingestions),
@@ -81,13 +78,17 @@ final class ShoppingListIngredientsService
             if (!$ingestion) {
                 continue;
             }
-
-            $remainingIngredients = $shoppingList->ingredients()
-                ->whereIn('ingredient_id', $this->getIngredientIds($user, $recipe, $mealDate, $ingestion->id))
-                ->count();
-
-            if ($remainingIngredients === 0) {
-                $deletedRecipes[] = $this->deleteRecipe($recipe, $shoppingList->id);
+            if (!$shoppingList->ingredients()
+                ->whereIn(
+                    'ingredient_id',
+                    $this->getIngredientIds($user, $recipe, $mealDate, $ingestion->id)
+                )
+                ->exists()) {
+                $id = $this->deleteRecipe($recipe, $shoppingList->id);
+                if ($id === 0) {
+                    continue;
+                }
+                $deletedRecipes[] = $id;
             }
 
         }
@@ -116,15 +117,17 @@ final class ShoppingListIngredientsService
             if (!$ingestion) {
                 continue;
             }
-            $remainingIngredients = $shoppingList->ingredients()
-                ->whereIn(
-                    'ingredient_id',
-                    $this->getCustomIngredientIds($user, $recipe)
-                )
-                ->count();
 
-            if ($remainingIngredients === 0) {
-                $deletedRecipes[] = $this->deleteRecipe($recipe, $shoppingList->id);
+            if (!$shoppingList->ingredients()->whereIn(
+                'ingredient_id',
+                $this->getIngredientIds($user, $recipe)
+            )
+                ->exists()) {
+                $id = $this->deleteRecipe($recipe, $shoppingList->id);
+                if ($id === 0) {
+                    continue;
+                }
+                $deletedRecipes[] = $id;
             }
         }
 
@@ -147,74 +150,60 @@ final class ShoppingListIngredientsService
             }
 
             $mealTime = $flexMeal->pivot->meal_time;
-
+            $mealDate = $flexMeal->pivot->meal_date;
             $ingestion = $ingestions[$mealTime] ?? null;
             if (!$ingestion) {
                 continue;
             }
-
-            $remainingIngredients = $shoppingList->ingredients()
-                ->whereIn('ingredient_id', $this->getFlexIngredientIds($user, $recipe))
-                ->count();
-            if ($remainingIngredients === 0) {
-                $deletedRecipes[] = $this->deleteRecipe($recipe, $shoppingList->id);
+            if ($shoppingList->ingredients()
+                    ->whereIn('ingredient_id', $this->getIngredientIds($user, $recipe, $mealDate, $ingestion->id))
+                    ->count() === 0) {
+                $id = $this->deleteRecipe($recipe, $shoppingList->id);
+                if ($id === 0) {
+                    continue;
+                }
+                $deletedRecipes[] = $id;
             }
         }
-
         return $deletedRecipes;
     }
 
-    private function getIngredientIds(User $user, Recipe $recipe, string $mealDate, int $ingestionId): array
+    private function getIngredientIds(User $user, $recipe, string $mealDate = null, int $ingestionId = null): array
     {
-
-        $plannedRecipe = $user->plannedRecipesForGettingIngredients($recipe->id, $mealDate, $ingestionId)
-            ->firstOrFail();
-
-        $recipeData = json_decode($plannedRecipe->calc_recipe_data, true);
-
-        if (!empty($recipeData['ingredients'])) {
-            return array_column($recipeData['ingredients'], 'id');
+        switch (true) {
+            case $recipe instanceof Recipe:
+                $plannedRecipe = $user->plannedRecipesForGettingIngredients(
+                    $recipe->id,
+                    $mealDate,
+                    $ingestionId
+                )->first();
+                break;
+            case $recipe instanceof CustomRecipe:
+                $plannedRecipe = $user->customplannedRecipeForGettingIngredient($recipe->id)->first();
+                break;
+            case $recipe instanceof FlexmealLists:
+                $plannedRecipe = $user->plannedFlexmealForGettingIngredients($recipe->id, $mealDate,
+                    $ingestionId)->first();
+                return $plannedRecipe->ingredients?->pluck('ingredient_id')->toArray();
+            default:
+                return [];
         }
-
-        return [];
-
+        if (empty($plannedRecipe) || empty($plannedRecipe->calc_recipe_data)) {
+            return [];
+        }
+        $recipeData = json_decode($plannedRecipe->calc_recipe_data, true);
+        if (empty($recipeData['ingredients'])) {
+            return [];
+        }
+        return array_column($recipeData['ingredients'], 'id');
     }
 
-    private function getCustomIngredientIds(User $user, CustomRecipe $recipe): array
+    private function deleteRecipe(Recipe|FlexmealLists|CustomRecipe $recipe, int $shoppingListId): int
     {
-        $plannedRecipe = $user->customplannedRecipeForGettingIngredient($recipe->id)
-            ->firstOrFail();
-        $recipeData = json_decode($plannedRecipe->calc_recipe_data, true);
-
-        if (!empty($recipeData['ingredients'])) {
-            return array_column($recipeData['ingredients'], 'id');
+        if (!ShoppingListRecipe::where('recipe_id', $recipe->id)->where('list_id', $shoppingListId)->delete()) {
+            return 0;
         }
-
-        return [];
-
-    }
-
-    private function getFlexIngredientIds(User $user, Flexmeal $recipe): array
-    {
-        $plannedRecipe = $user->plannedFlexmeals()
-            ->where('flexmeal_lists.id', $recipe->id)
-            ->firstOrFail();
-
-        $recipeData = json_decode($plannedRecipe->calc_recipe_data, true);
-
-        if (!empty($recipeData['ingredients'])) {
-            return array_column($recipeData['ingredients'], 'id');
-        }
-
-        return [];
-
-    }
-
-    private function deleteRecipe(Recipe|Flexmeal|CustomRecipe $recipe, int $shoppingListId): int
-    {
-        ShoppingListRecipe::where('recipe_id', $recipe->id)
-            ->where('list_id', $shoppingListId)
-            ->delete();
         return $recipe->pivot->id;
     }
+
 }

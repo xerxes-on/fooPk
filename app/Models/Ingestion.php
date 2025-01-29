@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Services\IngestionService;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
@@ -120,5 +121,10 @@ final class Ingestion extends TranslatableStaplerModel
     public static function getAllActive(): \Illuminate\Database\Eloquent\Collection
     {
         return app(IngestionService::class)->getAllActive();
+    }
+
+    public static function getSpecific(int|string|array $ids): Collection|null|Ingestion
+    {
+        return app(IngestionService::class)->getSpecific($ids);
     }
 }

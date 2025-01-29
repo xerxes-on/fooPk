@@ -62,4 +62,19 @@ final class IngestionService
     {
         return $this->getAll()->filter(static fn(Ingestion $ingestion) => in_array($ingestion->key, $filterData, true));
     }
+
+    /** * Get specific ingestion(s) * *
+     * @param  int|string|array  $ids  * @return null|Ingestion|Collection<array-key,Ingestion>
+     * @return Ingestion|Collection|null
+     */
+    public function getSpecific(int|string|array $ids): null|Ingestion|Collection
+    {
+        if (is_array($ids)) {
+            return $this->getAll()->whereIn('id', $ids);
+        }
+        if (is_string($ids)) {
+            return $this->getAll()->firstWhere('key', $ids);
+        }
+        return $this->getAll()->firstWhere('id', $ids);
+    }
 }
