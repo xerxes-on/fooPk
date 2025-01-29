@@ -493,7 +493,7 @@ return [
     'empty_user_diet_data'          => 'Du hast keine Infos zu Ernährungsweisen.',
     'empty_nutrients'               => 'Deine Nährwerte werden derzeit von unseren Experten berechnet',
     'insufficient_funds_for_recipe' => 'Lade dein Foodpunkte-Konto auf, um das Rezept freizuschalten',
-    'check_errors'                  => 'Bitte überprüfe deine Angaben.',
+    'check_errors' => 'Bitte fülle alle Angaben aus.',
 
     // Success messages
     'record_created_successfully'      => 'Eintrag erfolgreich erstellt',

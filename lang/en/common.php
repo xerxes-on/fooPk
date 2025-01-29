@@ -491,7 +491,7 @@ return [
     'empty_user_diet_data'          => 'You do not have information about the diet.',
     'empty_nutrients'               => "Your nutrients didn\'t calculated. We are working on it.",
     'insufficient_funds_for_recipe' => 'Top up your Foodpoints balance to unlock the recipe.',
-    'check_errors'                  => 'Please check the form below.',
+    'check_errors' => 'Please fill mandatory fields.',
 
     // Success messages
     'record_created_successfully'      => 'Record created successfully',
