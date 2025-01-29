@@ -7,13 +7,14 @@ namespace App\Services\Users;
 use App\Events\UserProfileChanged;
 use App\Exceptions\PublicException;
 use App\Http\Requests\Profile\UserSettingsFormRequest;
+use Hash;
 
 final class UserProfileService
 {
     /**
      * Process user sittings update.
      *
-     * @throws \App\Exceptions\PublicException
+     * @throws PublicException
      */
     public function processStore(UserSettingsFormRequest $request): void
     {
@@ -23,12 +24,14 @@ final class UserProfileService
         $user->lang       = $request->lang;
         if ($request->last_name) {
             $user->last_name = $request->last_name;
+        } elseif ($user->last_name) {
+            $user->last_name = null;
         }
         if (!empty($request->old_password) && !empty($request->new_password)) {
-            if (!\Hash::check($request->old_password, $user->password)) {
+            if (!Hash::check($request->old_password, $user->password)) {
                 throw new PublicException(trans('common.current_password_is_incorrect'));
             }
-            $user->password = \Hash::make($request->new_password);
+            $user->password = Hash::make($request->new_password);
         }
 
         if (is_string($request->notifications)) {
