@@ -3,6 +3,7 @@
 use App\Http\Controllers;
 use App\Http\Controllers\API as APIControllers;
 use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
