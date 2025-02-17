@@ -21,7 +21,10 @@ use App\Services\Users\UserService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\{DB};
+use Modules\FlexMeal\Models\FlexmealLists;
 use Modules\Ingredient\Enums\IngredientCategoryEnum;
+use Modules\Ingredient\Enums\IngredientTypeEnum;
+use Modules\Ingredient\Http\Resources\IngredientHintResource;
 use Modules\Ingredient\Jobs\SyncUserExcludedIngredientsJob;
 use Modules\Ingredient\Models\Ingredient;
 use Modules\Ingredient\Models\IngredientCategory;
@@ -3971,5 +3974,100 @@ class Calculation
         }
 
         return $relatedRecipeGroups;
+    }
+
+    public static function parseRecipeDataForServings(Recipe $recipe, int $servings, string $userLocale = ''): array
+    {
+        $_parseData = [];
+
+        if (isset($recipe->calc_recipe_data) && ($_recipeData = json_decode($recipe->calc_recipe_data)) &&
+            (!empty($_recipeData) && property_exists($_recipeData, 'ingredients'))) {
+
+            $ingredientsIds = array_map(static fn($ingredient) => $ingredient->id, $_recipeData->ingredients);
+            $usedIngredients = Ingredient::ofIds($ingredientsIds)
+                ->with(['category', 'hint', 'alternativeUnit'])
+                ->get();
+
+            foreach ($_recipeData->ingredients as $item) {
+                $ingredient = $usedIngredients->find($item->id);
+                if ($ingredient === null) {
+                    continue;
+                }
+
+                $calculatedAmount = (int) round($item->amount * $servings);
+
+                $hint = $ingredient->hint?->translations->where('locale', $userLocale)->first();
+
+                $hintContent = $hint !== null ? [
+                    'title' => $ingredient->name,
+                    'content' => $hint->content,
+                    'link_url' => $hint->link_url,
+                    'link_text' => $hint->link_text,
+                ] : [];
+
+                $prepareData = [
+                    'ingredient_id' => $ingredient->id,
+                    'ingredient_type' => $item->type,
+                    'main_category' => $ingredient->category->tree_information['main_category'],
+                    'ingredient_amount' => $calculatedAmount,
+                    'ingredient_text' => $ingredient->unit->visibility
+                        ? "{$ingredient->unit->short_name} {$ingredient->name}"
+                        : $ingredient->name,
+                    'ingredient_name' => $ingredient->name,
+                    'ingredient_unit' => $ingredient->unit->visibility
+                        ? $ingredient->unit->short_name
+                        : '',
+                    'hint' => $hintContent,
+                    IngredientConversionService::KEY => app(IngredientConversionService::class)
+                        ->generateData($ingredient, $calculatedAmount)
+                ];
+
+                if ($prepareData['main_category'] == IngredientCategoryEnum::SEASON->value) {
+                    $prepareData['ingredient_text'] = $ingredient->name;
+                }
+
+                $prepareData['allow_replacement'] = !empty($prepareData['main_category']) &&
+                    isset(IngredientCategory::MAIN_CATEGORIES[$prepareData['main_category']]);
+
+                $_parseData[] = $prepareData;
+            }
+        }
+
+        return $_parseData;
+    }
+
+    public static function parseFlexMealIngredientsForServings(
+        FlexmealLists $flexmeal,
+        int $servings,
+    ): array {
+        $_parseData = [];
+        foreach ($flexmeal->ingredients as $flexMealIngredient) {
+            $baseAmount = $flexMealIngredient->getOriginal('amount');
+            $calculatedAmount = (int) round($baseAmount * $servings);
+
+            $ingredient = $flexMealIngredient->ingredient;
+            if (!$ingredient) {
+                continue;
+            }
+            $prepareData = [
+                'ingredient_id' => $ingredient->id,
+                'ingredient_type' => IngredientTypeEnum::FIXED->value,
+                'main_category' => $ingredient->category->tree_information['main_category'],
+                'ingredient_amount' => $calculatedAmount,
+                'ingredient_text' => $ingredient->unit->visibility
+                    ? "{$ingredient->unit->short_name} {$ingredient->name}"
+                    : $ingredient->name,
+                'ingredient_name' => $ingredient->name,
+                'ingredient_unit' => $ingredient->unit->visibility ? $ingredient->unit->short_name : '',
+                'allow_replacement' => false,
+                'hint' => new IngredientHintResource($ingredient),
+                IngredientConversionService::KEY => app(IngredientConversionService::class)
+                    ->generateData($ingredient, $calculatedAmount)
+            ];
+
+            $_parseData[] = $prepareData;
+        }
+
+        return $_parseData;
     }
 }

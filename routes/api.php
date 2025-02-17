@@ -3,6 +3,7 @@
 use App\Http\Controllers;
 use App\Http\Controllers\API as APIControllers;
 use Illuminate\Support\Facades\Route;
+use Modules\PushNotification\Http\Controllers\API\UserDeviceApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -86,6 +87,7 @@ Route::prefix('v1')->group(
                                 Route::get('plan', 'getPlan');
                                 Route::post('replace-recipe', 'replace');
                                 Route::post('eat-out', 'eatOutRecipe');
+                                Route::get('planned-meal-ingredients', 'getPlannedMealIngredients');
                             }
                         );
 
@@ -147,7 +149,7 @@ Route::prefix('v1')->group(
                         );
 
                     // User devices
-                    Route::controller(\Modules\PushNotification\Http\Controllers\API\UserDeviceApiController::class)
+                    Route::controller(UserDeviceApiController::class)
                         ->prefix('user-device')
                         ->group(
                             function () {
