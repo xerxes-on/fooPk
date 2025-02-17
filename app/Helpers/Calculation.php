@@ -3976,7 +3976,7 @@ class Calculation
         return $relatedRecipeGroups;
     }
 
-    public static function parseRecipeDataForServings(Recipe $recipe, int $servings, string $userLocale = ''): array
+    public static function parseRecipeDataForServings(Recipe|CustomRecipe $recipe, int $servings, string $userLocale = ''): array
     {
         $_parseData = [];
 
