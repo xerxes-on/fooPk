@@ -1584,7 +1584,7 @@ class Calculation
      * @param $_recipe
      * @return array|null
      */
-    public static function parseRecipeData($_recipe, string $userLocale = '')
+    public static function parseRecipeData($_recipe, string $userLocale = '', int $servings = 0): ?array
     {
         # get recipe data
         $_parseData = [];
@@ -1611,12 +1611,12 @@ class Calculation
                     'ingredient_id' => $ingredient->id,
                     'ingredient_type' => $item->type,
                     'main_category' => $ingredient->category->tree_information['main_category'],
-                    'ingredient_amount' => (int)$item->amount,
+                    'ingredient_amount' => $servings ?:(int)$item->amount,
                     'ingredient_text' => $ingredient->unit->visibility ? "{$ingredient->unit->short_name} $ingredient->name" : $ingredient->name,
                     'ingredient_name' => $ingredient->name,
                     'ingredient_unit' => $ingredient->unit->visibility ? $ingredient->unit->short_name : '',
                     'hint' => $hintContent,
-                    IngredientConversionService::KEY => app(IngredientConversionService::class)->generateData($ingredient, (int)$item->amount)
+                    IngredientConversionService::KEY => app(IngredientConversionService::class)->generateData($ingredient, $servings?:(int)$item->amount)
                 ];
 
                 if ($prepareData['main_category'] == IngredientCategoryEnum::SEASON->value) {
@@ -3975,67 +3975,6 @@ class Calculation
 
         return $relatedRecipeGroups;
     }
-
-    public static function parseRecipeDataForServings(Recipe|CustomRecipe $recipe, int $servings, string $userLocale = ''): array
-    {
-        $_parseData = [];
-
-        if (isset($recipe->calc_recipe_data) && ($_recipeData = json_decode($recipe->calc_recipe_data)) &&
-            (!empty($_recipeData) && property_exists($_recipeData, 'ingredients'))) {
-
-            $ingredientsIds = array_map(static fn($ingredient) => $ingredient->id, $_recipeData->ingredients);
-            $usedIngredients = Ingredient::ofIds($ingredientsIds)
-                ->with(['category', 'hint', 'alternativeUnit'])
-                ->get();
-
-            foreach ($_recipeData->ingredients as $item) {
-                $ingredient = $usedIngredients->find($item->id);
-                if ($ingredient === null) {
-                    continue;
-                }
-
-                $calculatedAmount = (int) round($item->amount * $servings);
-
-                $hint = $ingredient->hint?->translations->where('locale', $userLocale)->first();
-
-                $hintContent = $hint !== null ? [
-                    'title' => $ingredient->name,
-                    'content' => $hint->content,
-                    'link_url' => $hint->link_url,
-                    'link_text' => $hint->link_text,
-                ] : [];
-
-                $prepareData = [
-                    'ingredient_id' => $ingredient->id,
-                    'ingredient_type' => $item->type,
-                    'main_category' => $ingredient->category->tree_information['main_category'],
-                    'ingredient_amount' => $calculatedAmount,
-                    'ingredient_text' => $ingredient->unit->visibility
-                        ? "{$ingredient->unit->short_name} {$ingredient->name}"
-                        : $ingredient->name,
-                    'ingredient_name' => $ingredient->name,
-                    'ingredient_unit' => $ingredient->unit->visibility
-                        ? $ingredient->unit->short_name
-                        : '',
-                    'hint' => $hintContent,
-                    IngredientConversionService::KEY => app(IngredientConversionService::class)
-                        ->generateData($ingredient, $calculatedAmount)
-                ];
-
-                if ($prepareData['main_category'] == IngredientCategoryEnum::SEASON->value) {
-                    $prepareData['ingredient_text'] = $ingredient->name;
-                }
-
-                $prepareData['allow_replacement'] = !empty($prepareData['main_category']) &&
-                    isset(IngredientCategory::MAIN_CATEGORIES[$prepareData['main_category']]);
-
-                $_parseData[] = $prepareData;
-            }
-        }
-
-        return $_parseData;
-    }
-
     public static function parseFlexMealIngredientsForServings(
         FlexmealLists $flexmeal,
         int $servings,

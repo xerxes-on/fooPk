@@ -7,10 +7,13 @@ namespace App\Http\Controllers\API;
 use App\Enums\Recipe\RecipeTypeEnum;
 use App\Exceptions\PublicException;
 use App\Helpers\Calculation;
+use App\Models\CustomRecipe;
+use App\Models\Recipe;
+use App\Models\User;
 use App\Http\Requests\API\Meal\{MealWeekFilterRequest,
     PlannedMealFilterRequest,
-    PlannedMealIngredientsRequest,
-    SkipMealRequest};
+    SkipMealRequest
+};
 use App\Http\Requests\API\Recipe\Replacement\RecipeReplacementRequest;
 use App\Http\Resources\{Meal\PlannedMealResource, UsersNutritionData};
 use App\Repositories\Recipes;
@@ -19,6 +22,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\JsonResponse;
 use Modules\FlexMeal\Http\Resources\FlexMealIngredientResource;
+use Modules\FlexMeal\Models\FlexmealLists;
 use Modules\ShoppingList\Services\{ShoppingListAssistanceService};
 use Modules\ShoppingList\Services\ShoppingListRecipesService;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
@@ -48,7 +52,7 @@ final class MealsApiController extends APIBase
         /**@var \App\Models\User $user */
         $user          = $request->user();
         $formattedDate = $request->date->format('Y-m-d');
-
+        $servings      = intval($request->input('servings'));
         try {
             $meal = $user
                 ->meals()
@@ -102,7 +106,11 @@ final class MealsApiController extends APIBase
         if ($recipe instanceof \App\Models\Recipe) {
             $recipe->loadMissing('publicTags.translations');
         }
-
+        if ($servings && $servings > 1) {
+            return $this->sendResponse(
+                ['ingredients' => $this->getIngredients($recipe, $servings, $user)],
+                __('common.success'));
+        }
         if (is_null($meal->flexmeal_id)) {
             $result['users-nutrition-data'] = new UsersNutritionData($user);
             $result['ingredients']          = Calculation::parseRecipeData($recipe, $user->lang);
@@ -250,68 +258,14 @@ final class MealsApiController extends APIBase
         return $this->sendResponse(trans('api.meal_skipped'), trans('common.success'));
     }
 
-    public function getPlannedMealIngredients(PlannedMealIngredientsRequest $request): JsonResponse
+    public function getIngredients(Recipe|FlexmealLists|CustomRecipe $recipe, int $servings, User $user): array
     {
-        /**@var \App\Models\User $user */
-        $user          = $request->user();
-        $formattedDate = $request->date->format('Y-m-d');
-        $servings      = (int) $request->input('servings');
-        try {
-            $meal = $user
-                ->meals()
-                ->whereDate('meal_date', $request->date)
-                ->where('ingestion_id', $request->ingestion->id)
-                ->firstOrFail();
-        } catch (ModelNotFoundException) {
-            return $this->sendError(message: "There's no {$request->ingestion->key} on $formattedDate.");
-        }
-        // Detect recipe type. Will always be one instanceof UserRecipe
-        if ($meal->recipe_id) {
-            try {
-                $recipe = $user
-                    ->plannedRecipes(
-                        $meal->recipe_id,
-                        $formattedDate,
-                        $request->ingestion->id
-                    )
-                    ->firstOrFail();
-                $recipe->custom_categories = $this->recipesRepo->getRecipeCustomCategories($recipe, $user);
-            } catch (ModelNotFoundException) {
-                return $this->sendError(message: 'The recipe can\'t be found.');
-            }
-        } elseif ($meal->custom_recipe_id) {
-            $recipe = $user->customPlannedRecipe($meal->custom_recipe_id)->first();
-        } elseif ($meal->flexmeal_id) {
-            $recipe = $user
-                ->plannedFlexmeals()
-                ->with([
-                    'ingredients.ingredient' => static fn(Relation $query) => $query->with([
-                        'hint', 'alternativeUnit'
-                    ])
-                ])
-                ->where([
-                    ['flexmeal_id', $meal->flexmeal_id],
-                    ['meal_date', $meal->meal_date],
-                ])
-                ->first();
+        if ($recipe instanceof FlexmealLists) {
+            $ingredients = Calculation::parseFlexMealIngredientsForServings($recipe, $servings);
         } else {
-            return $this->sendError(message: 'The meal doesn\'t have a recipe.');
+            $ingredients = Calculation::parseRecipeData($recipe, $user->lang, $servings);
         }
 
-        if (!$recipe) {
-            return $this->sendError(message: 'The recipe can\'t be found.');
-        }
-
-        if (is_null($recipe->pivot->ingestion)) {
-            $recipe->pivot->ingestion = $request->ingestion;
-        }
-
-        if (is_null($meal->flexmeal_id)) {
-            $ingredients['ingredients'] = Calculation::parseRecipeDataForServings($recipe, $servings, $user->lang);
-        } else {
-            $ingredients['ingredients'] = Calculation::parseFlexMealIngredientsForServings($recipe, $servings);
-        }
-
-        return $this->sendResponse($ingredients, __('common.success'));
+        return $ingredients;
     }
 }

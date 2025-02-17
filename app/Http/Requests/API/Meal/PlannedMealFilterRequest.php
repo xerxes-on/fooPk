@@ -11,6 +11,7 @@ use App\Models\Ingestion;
  *
  * @property-read \Carbon\Carbon $date
  * @property-read Ingestion $ingestion
+ * @property-read int $servings
  * @property-read int $ingestionIntValue Value of ingestion obtained from enum
  *
  * @package App\Http\Requests\API
@@ -27,6 +28,7 @@ final class PlannedMealFilterRequest extends BaseRequest
         return [
             'date'      => ['required', 'date'],
             'ingestion' => ['required', 'string'],
+            'servings'  => ['nullable', 'numeric']
         ];
     }
 }
