@@ -86,7 +86,7 @@ Route::prefix('v1')->group(
                                 Route::get('plan', 'getPlan');
                                 Route::post('replace-recipe', 'replace');
                                 Route::post('eat-out', 'eatOutRecipe');
-                                Route::get('increase-portions', 'getIngredients');
+                                Route::get('increase-portions', 'getRecalculatedIngredients');
                             }
                         );
 

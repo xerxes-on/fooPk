@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\JsonResponse;
 use Modules\FlexMeal\Http\Resources\FlexMealIngredientResource;
 use Modules\FlexMeal\Models\FlexmealLists;
+use Modules\FlexMeal\Services\Calculations\FlexMealCalculator;
 use Modules\ShoppingList\Services\{ShoppingListAssistanceService};
 use Modules\ShoppingList\Services\ShoppingListRecipesService;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
@@ -251,37 +252,31 @@ final class MealsApiController extends APIBase
         return $this->sendResponse(trans('api.meal_skipped'), trans('common.success'));
     }
 
-    public function getIngredients(CalculateIngredientsRequest $request): JsonResponse
+    public function getRecalculatedIngredients(CalculateIngredientsRequest $request): JsonResponse
     {
         $user        = $request->user();
-        $recipe_type = $request->input('recipe_type');
-        $recipe_id   = $request->input('recipe_id');
-        $servings    = intval($request->input('servings'));
+        $recipe_id   = $request->recipe_id;
+        $recipe_type = (int)$request->recipe_type;
+
         try {
-            if ($recipe_type === "custom") {
-                $recipe = $user
-                    ->customPlannedRecipe($recipe_id)
-                    ->firstOrFail();
-            } elseif ($recipe_type === 'flexmeal') {
-                $recipe = $user
-                    ->plannedFlexmeals()
-                    ->where('flexmeal_id', $recipe_id)
-                    ->firstOrFail();
-            } elseif ($recipe_type === 'common') {
-                $recipe = $user
-                    ->calculatedRecipeByID($recipe_id)
-                    ->firstOrFail();
-            } else {
-                throw new ModelNotFoundException();
-            }
+            $recipe = match ($recipe_type) {
+                RecipeTypeEnum::ORIGINAL->value => $user->calculatedRecipeByID($recipe_id)
+                                                        ->firstOrFail(),
+                RecipeTypeEnum::CUSTOM->value => $user->customPlannedRecipe($recipe_id)
+                                                        ->firstOrFail(),
+                RecipeTypeEnum::FLEXMEAL->value => $user->plannedFlexmeals()
+                                                        ->where('flexmeal_id', $recipe_id)
+                                                        ->firstOrFail(),
+                default => throw new ModelNotFoundException()
+            };
         } catch (ModelNotFoundException) {
             return $this->sendError(message: __('common.no_such_recipe'));
         }
 
         if ($recipe instanceof FlexmealLists) {
-            $result['ingredients'] = Calculation::parseFlexMealIngredientsForServings($recipe, $servings);
+            $result['ingredients'] = FlexMealCalculator::parseIngredients($recipe, (int) $request->servings);
         } else {
-            $result['ingredients'] = Calculation::parseRecipeData($recipe, $user->lang, $servings);
+            $result['ingredients'] = Calculation::parseRecipeData($recipe, $user->lang, (int) $request->servings);
         }
         return $this->sendResponse($result, __('common.success'));
     }

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\API\Meal;
 
+use App\Enums\Recipe\RecipeTypeEnum;
 use App\Http\Requests\BaseRequest;
+use Illuminate\Validation\Rule;
 
 final class CalculateIngredientsRequest extends BaseRequest
 {
@@ -15,7 +17,7 @@ final class CalculateIngredientsRequest extends BaseRequest
     {
         return [
             'recipe_id'   => ['required', 'numeric'],
-            'recipe_type' => ['required', 'string'],
+            'recipe_type' => ['required', Rule::in(RecipeTypeEnum::values())],
             'servings'    => ['required', 'numeric'],
         ];
     }
