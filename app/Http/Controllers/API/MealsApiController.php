@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\JsonResponse;
 use Modules\FlexMeal\Http\Resources\FlexMealIngredientResource;
 use Modules\FlexMeal\Models\FlexmealLists;
+use Modules\FlexMeal\Services\Calculations\CalculateFlexmealIngredientsByServings;
 use Modules\FlexMeal\Services\Calculations\FlexMealCalculator;
 use Modules\ShoppingList\Services\{ShoppingListAssistanceService};
 use Modules\ShoppingList\Services\ShoppingListRecipesService;
@@ -274,7 +275,8 @@ final class MealsApiController extends APIBase
         }
 
         if ($recipe instanceof FlexmealLists) {
-            $result['ingredients'] = FlexMealCalculator::parseIngredients($recipe, (int) $request->servings);
+            $calculator            = new CalculateFlexmealIngredientsByServings();
+            $result['ingredients'] = $calculator($recipe, (int) $request->servings);
         } else {
             $result['ingredients'] = Calculation::parseRecipeData($recipe, $user->lang, (int) $request->servings);
         }

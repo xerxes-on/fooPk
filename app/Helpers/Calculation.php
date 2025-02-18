@@ -1604,16 +1604,17 @@ class Calculation
                         'link_text' => $hint->link_text,
                     ];
                 }
+                $amount = $servings * (int)$item->amount;
                 $prepareData = [
                     'ingredient_id' => $ingredient->id,
                     'ingredient_type' => $item->type,
                     'main_category' => $ingredient->category->tree_information['main_category'],
-                    'ingredient_amount' => $servings * (int)$item->amount,
+                    'ingredient_amount' => $amount,
                     'ingredient_text' => $ingredient->unit->visibility ? "{$ingredient->unit->short_name} $ingredient->name" : $ingredient->name,
                     'ingredient_name' => $ingredient->name,
                     'ingredient_unit' => $ingredient->unit->visibility ? $ingredient->unit->short_name : '',
                     'hint' => $hintContent,
-                    IngredientConversionService::KEY => app(IngredientConversionService::class)->generateData($ingredient, $servings*(int)$item->amount)
+                    IngredientConversionService::KEY => app(IngredientConversionService::class)->generateData($ingredient, $amount)
                 ];
 
                 if ($prepareData['main_category'] == IngredientCategoryEnum::SEASON->value) {
