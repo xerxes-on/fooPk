@@ -49,6 +49,7 @@ final class MealsApiController extends APIBase
         /**@var \App\Models\User $user */
         $user          = $request->user();
         $formattedDate = $request->date->format('Y-m-d');
+
         try {
             $meal = $user
                 ->meals()
@@ -102,6 +103,7 @@ final class MealsApiController extends APIBase
         if ($recipe instanceof \App\Models\Recipe) {
             $recipe->loadMissing('publicTags.translations');
         }
+
         if (is_null($meal->flexmeal_id)) {
             $result['users-nutrition-data'] = new UsersNutritionData($user);
             $result['ingredients']          = Calculation::parseRecipeData($recipe, $user->lang);
