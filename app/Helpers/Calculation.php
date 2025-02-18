@@ -1584,7 +1584,7 @@ class Calculation
      * @param $_recipe
      * @return array|null
      */
-    public static function parseRecipeData($_recipe, string $userLocale = '', int $servings = 0): ?array
+    public static function parseRecipeData($_recipe, string $userLocale = '', $servings = 1): array
     {
         # get recipe data
         $_parseData = [];
@@ -1611,12 +1611,12 @@ class Calculation
                     'ingredient_id' => $ingredient->id,
                     'ingredient_type' => $item->type,
                     'main_category' => $ingredient->category->tree_information['main_category'],
-                    'ingredient_amount' => $servings ?:(int)$item->amount,
+                    'ingredient_amount' => $servings * (int)$item->amount,
                     'ingredient_text' => $ingredient->unit->visibility ? "{$ingredient->unit->short_name} $ingredient->name" : $ingredient->name,
                     'ingredient_name' => $ingredient->name,
                     'ingredient_unit' => $ingredient->unit->visibility ? $ingredient->unit->short_name : '',
                     'hint' => $hintContent,
-                    IngredientConversionService::KEY => app(IngredientConversionService::class)->generateData($ingredient, $servings?:(int)$item->amount)
+                    IngredientConversionService::KEY => app(IngredientConversionService::class)->generateData($ingredient, $servings*(int)$item->amount)
                 ];
 
                 if ($prepareData['main_category'] == IngredientCategoryEnum::SEASON->value) {
