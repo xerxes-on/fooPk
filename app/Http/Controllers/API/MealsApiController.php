@@ -7,6 +7,7 @@ namespace App\Http\Controllers\API;
 use App\Enums\Recipe\RecipeTypeEnum;
 use App\Exceptions\PublicException;
 use App\Helpers\Calculation;
+use App\Models\User;
 use App\Http\Requests\API\Meal\{CalculateIngredientsRequest, MealWeekFilterRequest,
     PlannedMealFilterRequest,
     SkipMealRequest
@@ -259,19 +260,9 @@ final class MealsApiController extends APIBase
         $recipe_id   = $request->recipe_id;
         $recipe_type = (int)$request->recipe_type;
 
-        try {
-            $recipe = match ($recipe_type) {
-                RecipeTypeEnum::ORIGINAL->value => $user->calculatedRecipeByID($recipe_id)
-                                                        ->firstOrFail(),
-                RecipeTypeEnum::CUSTOM->value => $user->customPlannedRecipe($recipe_id)
-                                                        ->firstOrFail(),
-                RecipeTypeEnum::FLEXMEAL->value => $user->plannedFlexmeals()
-                                                        ->where('flexmeal_id', $recipe_id)
-                                                        ->firstOrFail(),
-                default => throw new ModelNotFoundException()
-            };
-        } catch (ModelNotFoundException) {
-            return $this->sendError(message: __('common.no_such_recipe'));
+        $recipe = $this->resolveRecipe($user, $recipe_id, $recipe_type);
+        if (!$recipe) {
+            return $this->sendError(__('common.no_such_recipe'));
         }
 
         if ($recipe instanceof FlexmealLists) {
@@ -281,5 +272,16 @@ final class MealsApiController extends APIBase
             $result['ingredients'] = Calculation::parseRecipeData($recipe, $user->lang, (int) $request->servings);
         }
         return $this->sendResponse($result, __('common.success'));
+    }
+    private function resolveRecipe(User $user, int $recipeId, int $recipe_type)
+    {
+        return match ($recipe_type) {
+            RecipeTypeEnum::ORIGINAL->value => $user->calculatedRecipeByID($recipeId)->first(),
+            RecipeTypeEnum::CUSTOM->value   => $user->customPlannedRecipe($recipeId)->first(),
+            RecipeTypeEnum::FLEXMEAL->value => $user->plannedFlexmeals()
+                ->where('flexmeal_id', $recipeId)
+                ->first(),
+            default => null,
+        };
     }
 }
