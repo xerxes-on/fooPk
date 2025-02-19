@@ -22,7 +22,6 @@ use Illuminate\Http\JsonResponse;
 use Modules\FlexMeal\Http\Resources\FlexMealIngredientResource;
 use Modules\FlexMeal\Models\FlexmealLists;
 use Modules\FlexMeal\Services\Calculations\CalculateFlexmealIngredientsByServings;
-use Modules\FlexMeal\Services\Calculations\FlexMealCalculator;
 use Modules\ShoppingList\Services\{ShoppingListAssistanceService};
 use Modules\ShoppingList\Services\ShoppingListRecipesService;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
@@ -273,7 +272,7 @@ final class MealsApiController extends APIBase
         }
         return $this->sendResponse($result, __('common.success'));
     }
-    private function resolveRecipe(User $user, int $recipeId, int $recipe_type)
+    private function resolveRecipe(User $user, string $recipeId, int $recipe_type)
     {
         return match ($recipe_type) {
             RecipeTypeEnum::ORIGINAL->value => $user->calculatedRecipeByID($recipeId)->first(),
